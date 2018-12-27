@@ -16,10 +16,6 @@ sudo spctl --master-disable
 # Disable guest user
 sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
 
-# Set a blazingly fast keyboard repeat rate
-defaults write NSGlobalDomain KeyRepeat -int 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 10
-
 # Fix fonts on Mojave
 defaults write -g CGFontRenderingFontSmoothingDisabled -bool FALSE
 
@@ -45,6 +41,8 @@ brew install watchman
 brew install docker-compose
 brew install cask
 brew install go
+brew install coreutils
+brew install findutils
 brew cleanup
 
 # Cask
@@ -70,6 +68,7 @@ brew cask install androidtool
 brew cask install caskroom/fonts/font-open-sans
 brew cask install caskroom/fonts/font-roboto
 brew cask install caskroom/fonts/font-source-code-pro
+brew cask install font-roboto-mono-for-powerline
 brew cleanup
 
 # Node packages
