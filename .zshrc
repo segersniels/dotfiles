@@ -7,19 +7,23 @@ export ZSH=/Users/niels/.oh-my-zsh
 # Remove the username infront of execution
 export DEFAULT_USER="$(whoami)"
 
-# Theming
-ZSH_THEME="custom-agnoster"
-COMPLETION_WAITING_DOTS="true"
+# Theming (disabled for pure prompt)
+ZSH_THEME=""
 
 # Plugins
 plugins=(git docker dotenv osx screen)
 
 source $ZSH/oh-my-zsh.sh
 
+# Pure theme
+autoload -U promptinit
+promptinit
+prompt pure
+
 # ZSH styling
 zstyle ':completion:*:make:*:targets' call-command true # outputs all possible results for make targets
 zstyle ':completion:*:make:*' tag-order targets
-zstyle ':completion:*:make:*' group-name '' 
+zstyle ':completion:*:make:*' group-name ''
 zstyle ':completion:*:descriptions' format '%B%d%b'
 
 # ZSH sources
@@ -29,7 +33,7 @@ source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Binaries and other exports
 export NVM_DIR="$HOME/.nvm"
-  . "/usr/local/opt/nvm/nvm.sh"
+. "/usr/local/opt/nvm/nvm.sh"
 export PATH="$HOME/.fastlane/bin:$PATH"
 export PATH=$PATH:$HOME/go/bin
 
@@ -51,21 +55,21 @@ alias playground="cd $HOME/playground"
 alias dcomp="docker-compose"
 
 # Functions
-function get_public_ip () {
-  curl ipinfo.io/ip --silent
+function get_public_ip() {
+	curl ipinfo.io/ip --silent
 }
 
-function beautify_json_file () {
-  cat $1 |jq '.' > .TEMP
-  if [ -s ".TEMP" ]; then
-    mv .TEMP $1
-  else
-    echo "ERR: File $1 contains invalid JSON"
-    rm .TEMP
-  fi
+function beautify_json_file() {
+	cat $1 | jq '.' >.TEMP
+	if [ -s ".TEMP" ]; then
+		mv .TEMP $1
+	else
+		echo "ERR: File $1 contains invalid JSON"
+		rm .TEMP
+	fi
 }
 
-function reconfigure_git () {
-  git config --global user.name "Niels Segers"
-  git config --global user.email segers.n@hotmail.com
+function reconfigure_git() {
+	git config --global user.name "Niels Segers"
+	git config --global user.email segers.n@hotmail.com
 }

@@ -80,6 +80,7 @@ npm install -g wml
 npm install -g webpack
 npm install -g ts-node
 npm install -g typescript
+npm install -g pure-prompt
 
 # Gems
 gem install bundler
@@ -108,7 +109,7 @@ code --install-extension christian-kohler.path-intellisense
 code --install-extension vsmobile.vscode-react-native
 code --install-extension eg2.tslint
 
-# Oh-my-zsh
+# ZSH
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
