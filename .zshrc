@@ -13,6 +13,7 @@ ZSH_THEME=""
 # Plugins
 plugins=(git docker dotenv osx screen)
 
+export ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
 # Pure theme
@@ -32,8 +33,6 @@ source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Binaries and other exports
-export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
 export PATH="$HOME/.fastlane/bin:$PATH"
 export PATH=$PATH:$HOME/go/bin
 
