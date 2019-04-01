@@ -39,7 +39,8 @@ export PATH=$PATH:$HOME/go/bin
 # Aliases
 ## General usage
 alias reconfigure-git=reconfigure_git
-alias gcam="git pull ; git add . ; git commit -m"
+alias gcam="git add . ; gitmoji -c"
+alias gcamp="git add -p ; gitmoji -c"
 alias gp="git push"
 alias gpo="git push origin"
 alias gpof="git push --force origin"
