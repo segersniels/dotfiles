@@ -72,6 +72,6 @@ function beautify_json_file() {
 }
 
 function reconfigure_git() {
-	git config --global user.name "Niels Segers"
+	git config --global user.name "segersniels"
 	git config --global user.email segers.n@hotmail.com
 }
