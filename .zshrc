@@ -37,8 +37,7 @@ export PATH="$HOME/.fastlane/bin:$PATH"
 export PATH=$PATH:$HOME/go/bin
 
 # Aliases
-## General usage
-alias reconfigure-git=reconfigure_git
+## Git
 alias gcam="git add . ; gitmoji -c"
 alias gcamp="git add -p ; gitmoji -c"
 alias gp="git push"
@@ -46,6 +45,9 @@ alias gpo="git push origin"
 alias gpof="git push --force origin"
 alias gcp="git checkout --patch"
 alias gc="git checkout"
+
+## General usage
+alias reconfigure-git=reconfigure_git
 alias jsonify=beautify_json_file
 alias docker="supdock"
 alias myip=get_public_ip
