@@ -31,5 +31,8 @@
     },
     "prettier.singleQuote": true,
     "prettier.tabWidth": 4,
-    "prettier.trailingComma": "es5"
+    "prettier.trailingComma": "es5",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.tslint": true
+    }
 }
