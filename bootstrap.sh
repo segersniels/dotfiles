@@ -46,6 +46,8 @@ brew install coreutils
 brew install findutils
 brew install autosuggestions
 brew install zsh-syntax-highlighting
+brew install thefuck
+brew install ncdu
 brew cleanup
 
 # Cask
@@ -84,6 +86,8 @@ npm install -g ts-node
 npm install -g typescript
 npm install -g pure-prompt
 npm install -g git+https://git@github.com/segersniels/gitmoji-cli.git
+npm install -g pnpm
+npm install -g supdock
 
 # Gems
 gem install bundler

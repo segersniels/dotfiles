@@ -11,6 +11,3 @@ rsync \
   -avh --no-perms . ~
 
 cp .vscode-settings.json ${HOME}/Library/Application\ Support/Code/User/settings.json
-
-# Golang packages
-go get -u github.com/segersniels/supdock
