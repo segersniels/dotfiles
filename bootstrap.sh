@@ -30,6 +30,7 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 brew update
 brew upgrade
 brew install git
+brew install tig
 brew install zsh
 brew install zsh-completions
 brew install grep
@@ -51,7 +52,6 @@ brew cleanup
 brew tap caskroom/versions
 brew cask install 1password
 brew cask install spectacle
-brew cask install rightzoom
 brew cask install visual-studio-code
 brew cask install sequel-pro
 brew cask install iterm2
@@ -97,20 +97,15 @@ code --install-extension flowtype.flow-for-vscode
 code --install-extension naumovs.color-highlight
 code --install-extension peterjausovec.vscode-docker
 code --install-extension esbenp.prettier-vscode
-code --install-extension eg2.vscode-npm-script
 code --install-extension zignd.html-css-class-completion
-code --install-extension ms-python.python
 code --install-extension mikestead.dotenv
 code --install-extension whatwedo.twig
 code --install-extension ricard.postcss
 code --install-extension equinusocio.vsc-material-theme
 code --install-extension mechatroner.rainbow-csv
-code --install-extension christian-kohler.npm-intellisense
 code --install-extension mikestead.dotenv
-code --install-extension christian-kohler.path-intellisense
 code --install-extension vsmobile.vscode-react-native
-code --install-extension eg2.tslint
-
+code --install-extension ms-vscode.vscode-typescript-tslint-plugin
 # ZSH
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
