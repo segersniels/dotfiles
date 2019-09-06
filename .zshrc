@@ -7,19 +7,14 @@ export ZSH=/Users/nielssegers/.oh-my-zsh
 # Remove the username infront of execution
 export DEFAULT_USER="$(whoami)"
 
-# Theming (disabled for pure prompt)
-ZSH_THEME=""
+# Theming
+ZSH_THEME="agnoster"
 
 # Plugins
 plugins=(git docker dotenv osx screen zsh-autosuggestions)
 
 export ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
-
-# Pure theme
-autoload -U promptinit
-promptinit
-prompt pure
 
 # Fuck
 eval $(thefuck --alias)
@@ -61,7 +56,6 @@ alias dcomp="docker-compose"
 alias awsenv="$(aws-env)"
 alias zshrc="code $HOME/.zshrc"
 alias search="history |grep"
-alias npm="pnpm"
 
 ## nielssegers.com
 export AUTH_KEY=

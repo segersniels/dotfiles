@@ -84,7 +84,6 @@ npm install -g wml
 npm install -g webpack
 npm install -g ts-node
 npm install -g typescript
-npm install -g pure-prompt
 npm install -g git+https://git@github.com/segersniels/gitmoji-cli.git
 npm install -g pnpm
 npm install -g supdock
