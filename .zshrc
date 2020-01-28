@@ -53,7 +53,6 @@ alias lego="go run *.go"
 alias playground="cd $HOME/playground"
 alias personal="cd $HOME/personal"
 alias dcomp="docker-compose"
-alias awsenv="$(aws-env)"
 alias zshrc="code $HOME/.zshrc"
 alias search="history |grep"
 alias gifify=convert_to_gif
