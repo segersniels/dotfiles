@@ -29,8 +29,9 @@ zstyle ':completion:*:descriptions' format '%B%d%b'
 fpath=(/usr/local/share/zsh-completions $fpath)
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# Binaries and other exports
-export PATH=$PATH:$HOME/go/bin
+# Title
+DISABLE_AUTO_TITLE="true"
+precmd() { echo -n -e "\033]0;$(basename "$PWD")\007" }
 
 # Aliases
 ## Git
@@ -48,14 +49,14 @@ alias jsonify=beautify_json_file
 alias docker="supdock"
 alias myip=get_public_ip
 alias reload="source ~/.zshrc"
+alias lego="go run *.go"
 alias playground="cd $HOME/playground"
 alias personal="cd $HOME/personal"
 alias dcomp="docker-compose"
+alias awsenv="$(aws-env)"
 alias zshrc="code $HOME/.zshrc"
 alias search="history |grep"
-
-## NPM
-export NPM_TOKEN=
+alias gifify=convert_to_gif
 
 # Functions
 function get_public_ip() {
@@ -72,7 +73,20 @@ function beautify_json_file() {
 	fi
 }
 
-# NVM
+function reconfigure_git() {
+	git config --global user.name "segersniels"
+	git config --global user.email segers.n@hotmail.com
+}
+
+function convert_to_gif() {
+	filename=$(basename -- "$1")
+	output="${filename%.*}.gif"
+	ffmpeg -i $1 -pix_fmt rgb8 -r 10 $output # convert to gif
+	gifsicle -O3 $output -o $output # optimize
+}
+
+# Exports
+## NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

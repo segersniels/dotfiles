@@ -73,6 +73,7 @@ brew cask install caskroom/fonts/font-open-sans
 brew cask install caskroom/fonts/font-roboto
 brew cask install caskroom/fonts/font-source-code-pro
 brew cask install font-roboto-mono-for-powerline
+brew cask install hyper
 brew cleanup
 
 # Node packages
