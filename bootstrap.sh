@@ -48,6 +48,8 @@ brew install autosuggestions
 brew install zsh-syntax-highlighting
 brew install thefuck # CLI failed command correction
 brew install ncdu # Interactive diskspace overview
+brew install ffmpeg
+brew install gifsicle
 brew cleanup
 
 # Cask
