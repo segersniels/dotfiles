@@ -89,3 +89,17 @@ function convert_to_gif() {
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+## Android
+export ANDROID_HOME=/usr/local/share/android-sdk
+export PATH=$ANDROID_HOME/tools:$PATH
+export PATH=$ANDROID_HOME/platform-tools:$PATH
+export PATH=$ANDROID_HOME/build-tools/19.1.0:$PATH
+
+## NPM
+export NPM_TOKEN=
+
+## Binaries and other exports
+export PATH="$HOME/.fastlane/bin:$PATH"
+export PATH=$PATH:$HOME/go/bin
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
