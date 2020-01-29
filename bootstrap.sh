@@ -46,8 +46,8 @@ brew install coreutils
 brew install findutils
 brew install autosuggestions
 brew install zsh-syntax-highlighting
-brew install thefuck
-brew install ncdu
+brew install thefuck # CLI failed command correction
+brew install ncdu # Interactive diskspace overview
 brew cleanup
 
 # Cask
@@ -56,7 +56,6 @@ brew cask install 1password
 brew cask install spectacle
 brew cask install visual-studio-code
 brew cask install sequel-pro
-brew cask install iterm2
 brew cask install docker
 brew cask install google-chrome
 brew cask install spotify
@@ -94,7 +93,6 @@ gem install bundler
 
 # Code packages
 code --install-extension dbaeumer.vscode-eslint
-code --install-extension dracula-theme.theme-dracula
 code --install-extension eamodio.gitlens
 code --install-extension editorconfig.editorconfig
 code --install-extension flowtype.flow-for-vscode
@@ -105,11 +103,12 @@ code --install-extension zignd.html-css-class-completion
 code --install-extension mikestead.dotenv
 code --install-extension whatwedo.twig
 code --install-extension ricard.postcss
-code --install-extension equinusocio.vsc-material-theme
 code --install-extension mechatroner.rainbow-csv
 code --install-extension mikestead.dotenv
 code --install-extension vsmobile.vscode-react-native
 code --install-extension ms-vscode.vscode-typescript-tslint-plugin
+code --install-extension daylerees.rainglow
+
 # ZSH
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
