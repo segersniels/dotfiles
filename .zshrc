@@ -96,9 +96,6 @@ export PATH=$ANDROID_HOME/tools:$PATH
 export PATH=$ANDROID_HOME/platform-tools:$PATH
 export PATH=$ANDROID_HOME/build-tools/19.1.0:$PATH
 
-## NPM
-export NPM_TOKEN=
-
 ## Binaries and other exports
 export PATH="$HOME/.fastlane/bin:$PATH"
 export PATH=$PATH:$HOME/go/bin
