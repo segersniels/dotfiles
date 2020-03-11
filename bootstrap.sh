@@ -31,12 +31,14 @@ brew update
 brew upgrade
 brew install git
 brew install tig
+brew install gh
 brew install zsh
 brew install zsh-completions
 brew install grep
 brew install jq
 brew install curl
 brew install wget
+brew install yarn
 brew install node
 brew install watchman
 brew install docker-compose
@@ -78,17 +80,17 @@ brew cask install hyper
 brew cleanup
 
 # Node packages
-npm install -g yarn
-npm install -g react-devtools
-npm install -g react-native-cli
-npm install -g flow-bin
-npm install -g wml
-npm install -g webpack
-npm install -g ts-node
-npm install -g typescript
-npm install -g git+https://git@github.com/segersniels/gitmoji-cli.git
-npm install -g pnpm
-npm install -g supdock
+yarn global add yarn
+yarn global add react-devtools
+yarn global add react-native-cli
+yarn global add flow-bin
+yarn global add wml
+yarn global add webpack
+yarn global add ts-node
+yarn global add typescript
+yarn global add git+https://git@github.com/segersniels/gitmoji-cli.git
+yarn global add supdock
+yarn global add now
 
 # Gems
 gem install bundler
@@ -114,3 +116,12 @@ code --install-extension daylerees.rainglow
 # ZSH
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+# Git
+git config --global pull.rebase true
+
+# Finalize
+cp .vscode-settings.json ${HOME}/Library/Application\ Support/Code/User/settings.json
+cp .zshrc ${HOME}/.zshrc
+cp .vimrc ${HOME}/.vimrc
+mkdir -p ${HOME}/.hyper_plugins && cp .hyper-sync-settings.json ${HOME}/.hyper_plugins/.hyper-sync-settings.json
