@@ -78,6 +78,7 @@ brew cask install caskroom/fonts/font-source-code-pro
 brew cask install font-roboto-mono-for-powerline
 brew cask install hyper
 brew cask install viscosity
+brew cask install brooklyn
 brew cleanup
 
 # Node packages
