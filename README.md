@@ -7,3 +7,6 @@ Plugins > Sync Settings > Restore Settings
 ```
 
 After this just restart your Hyper terminal and everything should be ready to go.
+
+## Visual Studio Code
+Select `Frontier Rainglow` as theme.
