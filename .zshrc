@@ -56,6 +56,7 @@ alias dcomp="docker-compose"
 alias zshrc="code $HOME/.zshrc"
 alias search="history |grep"
 alias gifify=convert_to_gif
+alias hyperconfig="code $HOME/.hyper.js"
 
 # Functions
 function get_public_ip() {
