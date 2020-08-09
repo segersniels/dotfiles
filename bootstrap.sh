@@ -110,7 +110,6 @@ code --install-extension mikestead.dotenv
 code --install-extension whatwedo.twig
 code --install-extension ricard.postcss
 code --install-extension mechatroner.rainbow-csv
-code --install-extension mikestead.dotenv
 code --install-extension vsmobile.vscode-react-native
 code --install-extension ms-vscode.vscode-typescript-tslint-plugin
 code --install-extension daylerees.rainglow
