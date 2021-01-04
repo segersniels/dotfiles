@@ -56,30 +56,32 @@ brew install tldr
 brew cleanup
 
 # Cask
-brew tap caskroom/versions
-brew cask install 1password
-brew cask install spectacle
-brew cask install visual-studio-code
-brew cask install sequel-pro
-brew cask install docker
-brew cask install google-chrome
-brew cask install spotify
-brew cask install dropbox
-brew cask install vlc
-brew cask install slack
-brew cask install discord
-brew cask install java8
-brew cask install android-sdk
-brew cask install android-platform-tools
-brew cask install android-studio
-brew cask install androidtool
-brew cask install caskroom/fonts/font-open-sans
-brew cask install caskroom/fonts/font-roboto
-brew cask install caskroom/fonts/font-source-code-pro
-brew cask install font-roboto-mono-for-powerline
-brew cask install hyper
-brew cask install viscosity
-brew cask install brooklyn
+brew tap homebrew/cask-versions
+brew tap homebrew/cask-fonts
+brew install --cask 1password
+brew install --cask spectacle
+brew install --cask visual-studio-code
+brew install --cask sequel-pro
+brew install --cask docker
+brew install --cask google-chrome
+brew install --cask spotify
+brew install --cask dropbox
+brew install --cask vlc
+brew install --cask slack
+brew install --cask discord
+brew install --cask java8
+brew install --cask android-sdk
+brew install --cask android-platform-tools
+brew install --cask android-studio
+brew install --cask androidtool
+brew install --cask font-open-sans
+brew install --cask font-roboto
+brew install --cask font-source-code-pro
+brew install --cask font-roboto-mono-for-powerline
+brew install --cask font-hack
+brew install --cask hyper
+brew install --cask viscosity
+brew install --cask brooklyn
 brew cleanup
 
 # Node packages
