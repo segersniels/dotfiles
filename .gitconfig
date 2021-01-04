@@ -1,0 +1,7 @@
+[pull]
+	rebase = true
+[user]
+	name = segersniels
+	email = segers.n@hotmail.com
+[core]
+	excludesfile = ~/.gitignore
