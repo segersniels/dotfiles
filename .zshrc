@@ -82,3 +82,4 @@ export PATH=$ANDROID_HOME/build-tools/19.1.0:$PATH
 export PATH="$HOME/.fastlane/bin:$PATH"
 export PATH=$PATH:$HOME/go/bin
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export PATH=/opt/homebrew/bin:$PATH
