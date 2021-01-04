@@ -2,7 +2,7 @@
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/nielssegers/.oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
 
 # Remove the username infront of execution
 export DEFAULT_USER="$(whoami)"
@@ -44,10 +44,7 @@ alias gcp="git checkout --patch"
 alias gc="git checkout"
 
 ## General usage
-alias reconfigure-git=reconfigure_git
-alias jsonify=beautify_json_file
 alias docker="supdock"
-alias myip=get_public_ip
 alias reload="source ~/.zshrc"
 alias lego="go run *.go"
 alias playground="cd $HOME/playground"
@@ -57,27 +54,11 @@ alias zshrc="code $HOME/.zshrc"
 alias search="history |grep"
 alias gifify=convert_to_gif
 alias hyperconfig="code $HOME/.hyper.js"
+alias code="code-exploration"
+alias clean-ds-store="find . -name ".DS_Store" -delete"
+alias fix-docker="echo \"find /var/lib/docker/containers -name config.v2.json -exec sed -i'' -E 's/\"Running\":true(,.*\"Restarting\":true)/\"Running\":false\1/' {} \; ; exit\" | nc -U ~/Library/Containers/com.docker.docker/Data/debug-shell.sock"
 
 # Functions
-function get_public_ip() {
-	curl ipinfo.io/ip --silent
-}
-
-function beautify_json_file() {
-	cat $1 | jq '.' >.TEMP
-	if [ -s ".TEMP" ]; then
-		mv .TEMP $1
-	else
-		echo "ERR: File $1 contains invalid JSON"
-		rm .TEMP
-	fi
-}
-
-function reconfigure_git() {
-	git config --global user.name "segersniels"
-	git config --global user.email segers.n@hotmail.com
-}
-
 function convert_to_gif() {
 	filename=$(basename -- "$1")
 	output="${filename%.*}.gif"

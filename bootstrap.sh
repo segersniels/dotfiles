@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Ask for the administrator password upfront.
 sudo -v
@@ -91,9 +91,9 @@ yarn global add wml
 yarn global add webpack
 yarn global add ts-node
 yarn global add typescript
-yarn global add git+https://git@github.com/segersniels/gitmoji-cli.git
+yarn global add @segersniels/gitmoji
 yarn global add supdock
-yarn global add now
+yarn global add vercel
 
 # Gems
 gem install bundler
@@ -115,5 +115,14 @@ code --install-extension vsmobile.vscode-react-native
 code --install-extension ms-vscode.vscode-typescript-tslint-plugin
 code --install-extension daylerees.rainglow
 
+# ZSH
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
 # Finalize
-./finalize.sh
+mkdir -p ${HOME}/.hyper_plugins && cp .hyper-sync-settings.json ${HOME}/.hyper_plugins/.hyper-sync-settings.json
+rsync .vscode-settings.json ${HOME}/Library/Application\ Support/Code/User/settings.json
+rsync .zshrc ${HOME}/.zshrc
+rsync .vimrc ${HOME}/.vimrc
+rsync .gitignore ${HOME}/.gitignore
+rsync .gitconfig ${HOME}/.gitconfig

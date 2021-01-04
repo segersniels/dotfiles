@@ -2,7 +2,7 @@
     "window.zoomLevel": 1,
     "explorer.openEditors.visible": 0,
     "explorer.confirmDragAndDrop": false,
-    "workbench.colorTheme": "One Dark Pro",
+    "workbench.colorTheme": "Frontier (rainglow)",
     "workbench.iconTheme": "eq-material-theme-icons",
     "workbench.colorCustomizations": {
         "activityBarBadge.background": "#FF4081",
@@ -34,5 +34,16 @@
     "prettier.trailingComma": "es5",
     "editor.codeActionsOnSave": {
         "source.fixAll.tslint": true
+    },
+    "editor.fontFamily": "Hack, Menlo, Monaco, 'Courier New', monospace",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "workbench.startupEditor": "newUntitledFile",
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }
