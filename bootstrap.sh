@@ -43,9 +43,9 @@ mkdir -p ${HOME}/.nvm
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-nvm install 14
-nvm alias default 14
-nvm use 14
+nvm install 15
+nvm alias default 15
+npm install -g npm@6.14.10
 
 # Yarn
 curl -o- -L https://yarnpkg.com/install.sh | bash
