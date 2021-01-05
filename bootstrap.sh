@@ -32,6 +32,24 @@ brew upgrade
 brew bundle
 brew cleanup
 
+# Zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+rsync .zshrc ${HOME}/.zshrc
+chsh -s /usr/local/bin/zsh
+
+# Node
+mkdir -p ${HOME}/.nvm
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+nvm install 14
+nvm alias default 14
+nvm use 14
+
+# Yarn
+curl -o- -L https://yarnpkg.com/install.sh | bash
+
 # Node packages
 yarn global add yarn
 yarn global add react-devtools
@@ -65,14 +83,9 @@ code --install-extension vsmobile.vscode-react-native
 code --install-extension ms-vscode.vscode-typescript-tslint-plugin
 code --install-extension daylerees.rainglow
 
-# ZSH
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-
 # Finalize
 mkdir -p ${HOME}/.hyper_plugins && cp .hyper-sync-settings.json ${HOME}/.hyper_plugins/.hyper-sync-settings.json
 rsync .vscode-settings.json ${HOME}/Library/Application\ Support/Code/User/settings.json
-rsync .zshrc ${HOME}/.zshrc
 rsync .vimrc ${HOME}/.vimrc
 rsync .gitignore ${HOME}/.gitignore
 rsync .gitconfig ${HOME}/.gitconfig

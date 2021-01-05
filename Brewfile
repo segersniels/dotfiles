@@ -8,8 +8,7 @@ brew install grep
 brew install jq
 brew install curl
 brew install wget
-brew install yarn
-brew install node
+brew install nvm
 brew install watchman
 brew install docker-compose
 brew install cask
