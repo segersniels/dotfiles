@@ -22,6 +22,7 @@ brew install ncdu # Interactive diskspace overview
 brew install ffmpeg
 brew install gifsicle
 brew install tldr
+brew install svn
 
 # Cask
 brew tap homebrew/cask-versions
