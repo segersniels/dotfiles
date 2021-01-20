@@ -1,9 +1,7 @@
 {
-    "window.zoomLevel": 1,
     "explorer.openEditors.visible": 0,
     "explorer.confirmDragAndDrop": false,
     "workbench.colorTheme": "Frontier (rainglow)",
-    "workbench.iconTheme": "eq-material-theme-icons",
     "workbench.colorCustomizations": {
         "activityBarBadge.background": "#FF4081",
         "list.activeSelectionForeground": "#FF4081",
@@ -25,25 +23,39 @@
         "menu.selectionForeground": "#FF4081",
         "menubar.selectionForeground": "#FF4081"
     },
-    "materialTheme.accent": "Pink",
     "files.associations": {
         "*.json": "jsonc"
     },
     "prettier.singleQuote": true,
     "prettier.tabWidth": 4,
     "prettier.trailingComma": "es5",
-    "editor.codeActionsOnSave": {
-        "source.fixAll.tslint": true
-    },
-    "editor.fontFamily": "Hack, Menlo, Monaco, 'Courier New', monospace",
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "workbench.startupEditor": "newUntitledFile",
+    "flow.useNPMPackagedFlow": true,
+    "javascript.validate.enable": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.fontFamily": "Hack, Menlo, Monaco, 'Courier New', monospace",
     "[jsonc]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "workbench.startupEditor": "newUntitledFile",
     "[typescriptreact]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
-    }
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "window.zoomLevel": 1
 }

@@ -54,7 +54,7 @@ alias zshrc="code $HOME/.zshrc"
 alias search="history |grep"
 alias gifify=convert_to_gif
 alias hyperconfig="code $HOME/.hyper.js"
-alias code="code-exploration"
+alias code="code-insiders"
 alias clean-ds-store="find . -name ".DS_Store" -delete"
 alias fix-docker="echo \"find /var/lib/docker/containers -name config.v2.json -exec sed -i'' -E 's/\"Running\":true(,.*\"Restarting\":true)/\"Running\":false\1/' {} \; ; exit\" | nc -U ~/Library/Containers/com.docker.docker/Data/debug-shell.sock"
 
