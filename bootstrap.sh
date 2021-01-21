@@ -62,6 +62,7 @@ yarn global add typescript
 yarn global add @segersniels/gitmoji
 yarn global add supdock
 yarn global add vercel
+yarn global add ngrok
 
 # Gems
 gem install bundler
