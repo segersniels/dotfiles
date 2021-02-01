@@ -1,7 +1,6 @@
 # Core
 brew install git
 brew install tig
-brew install gh
 brew install zsh
 brew install zsh-completions
 brew install zsh-syntax-highlighting
