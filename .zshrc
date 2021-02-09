@@ -16,7 +16,7 @@ plugins=(git docker osx screen zsh-autosuggestions)
 export ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
-# Fuck
+# Evals
 eval $(thefuck --alias)
 
 # ZSH styling
@@ -57,6 +57,7 @@ alias hyperconfig="code $HOME/.hyper.js"
 alias code="code-insiders"
 alias clean-ds-store="find . -name ".DS_Store" -delete"
 alias fix-docker="echo \"find /var/lib/docker/containers -name config.v2.json -exec sed -i'' -E 's/\"Running\":true(,.*\"Restarting\":true)/\"Running\":false\1/' {} \; ; exit\" | nc -U ~/Library/Containers/com.docker.docker/Data/debug-shell.sock"
+alias rosetta="arch -x86_64"
 
 # Functions
 function convert_to_gif() {
