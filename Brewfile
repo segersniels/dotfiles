@@ -29,7 +29,7 @@ brew tap homebrew/cask-fonts
 brew install --cask 1password
 brew install --cask spectacle
 brew install --cask visual-studio-code-insiders
-brew install --cask sequel-ace
+brew install --cask tableplus
 brew install --cask docker
 brew install --cask google-chrome
 brew install --cask spotify
