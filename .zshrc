@@ -30,8 +30,7 @@ fpath=(/usr/local/share/zsh-completions $fpath)
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Title
-DISABLE_AUTO_TITLE="true"
-precmd() { echo -n -e "\033]0;$(basename "$PWD")\007" }
+ZSH_THEME_TERM_TITLE_IDLE="%~"
 
 # Aliases
 ## Git
@@ -42,21 +41,19 @@ alias gpo="git push origin"
 alias gpof="git push --force origin"
 alias gcp="git checkout --patch"
 alias gc="git checkout"
+alias gbd="git branch --merged origin/master | grep -v master | xargs git branch -d"
 
 ## General usage
 alias docker="supdock"
 alias reload="source ~/.zshrc"
-alias lego="go run *.go"
 alias playground="cd $HOME/playground"
 alias personal="cd $HOME/personal"
-alias dcomp="docker-compose"
+alias dcomp="docker compose"
 alias zshrc="code $HOME/.zshrc"
 alias search="history |grep"
 alias gifify=convert_to_gif
 alias hyperconfig="code $HOME/.hyper.js"
-alias code="code-insiders"
 alias clean-ds-store="find . -name ".DS_Store" -delete"
-alias fix-docker="echo \"find /var/lib/docker/containers -name config.v2.json -exec sed -i'' -E 's/\"Running\":true(,.*\"Restarting\":true)/\"Running\":false\1/' {} \; ; exit\" | nc -U ~/Library/Containers/com.docker.docker/Data/debug-shell.sock"
 alias rosetta="arch -x86_64"
 
 # Functions
@@ -64,7 +61,7 @@ function convert_to_gif() {
 	filename=$(basename -- "$1")
 	output="${filename%.*}.gif"
 	ffmpeg -i $1 -pix_fmt rgb8 -r 10 $output # convert to gif
-	gifsicle -O3 $output -o $output # optimize
+	gifsicle -i $output -O3 --colors 256 -o $output # optimize
 }
 
 # Exports

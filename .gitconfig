@@ -4,4 +4,4 @@
 	name = segersniels
 	email = segers.n@hotmail.com
 [core]
-	excludesfile = ~/.gitignore
+	excludesfile = /Users/niels/.gitignore
