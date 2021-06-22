@@ -2,21 +2,14 @@
 // which will not automatically be merged into this file.
 // See https://hyper.is#cfg for all currently supported options.
 
-const fontSize = 16;
-const fontFamily = 'Hack, Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace';
-const fontWeight = "normal";
-const fontWeightBold = "bold";
-const lineHeight = 1;
-const letterSpacing = 0;
-
 module.exports = {
   config: {
-    fontSize,
-    fontFamily,
-    fontWeight,
-    fontWeightBold,
-    lineHeight,
-    letterSpacing,
+    fontSize: 16,
+    fontFamily: 'Hack, Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
+    fontWeight: "normal",
+    fontWeightBold: "bold",
+    lineHeight: 1,
+    letterSpacing: 0,
     updateChannel: "canary",
     cursorAccentColor: "#000",
     cursorShape: "BLOCK",
@@ -32,9 +25,9 @@ module.exports = {
     defaultSSHApp: true,
     quickEdit: false,
     macOptionSelectionMode: "vertical",
-    theme: {
-      // base, moon or dawn
-      variant: 'base',
+    smooth: {
+      variant: 'dark',
+      disableAutomaticTheming: false,
     },
     hyperTabs: {
       trafficButtons: true,
@@ -46,7 +39,7 @@ module.exports = {
     "hypercwd",
     "hyper-search",
     "hyperterm-paste",
-    "hyper-rose-pine",
+    "hyper-smooth",
     "hyper-highlight-active-pane",
     "hyper-dark-scrollbar",
     "hyper-tabs-enhanced"
