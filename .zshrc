@@ -55,20 +55,25 @@ alias gifify=convert_to_gif
 alias hyperconfig="code $HOME/.hyper.js"
 alias clean-ds-store="find . -name ".DS_Store" -delete"
 alias rosetta="arch -x86_64"
+alias lipsum=lipsum
 
 # Functions
 function convert_to_gif() {
-	filename=$(basename -- "$1")
-	output="${filename%.*}.gif"
-	ffmpeg -i $1 -pix_fmt rgb8 -r 10 $output # convert to gif
-	gifsicle -i $output -O3 --colors 256 -o $output # optimize
+  filename=$(basename -- "$1")
+  output="${filename%.*}.gif"
+  ffmpeg -i $1 -pix_fmt rgb8 -r 10 $output        # convert to gif
+  gifsicle -i $output -O3 --colors 256 -o $output # optimize
+}
+
+function lipsum() {
+  echo $(curl -s 'https://www.lipsum.com/feed/json?what=paras&amount=1' | jq -r .feed.lipsum) | pbcopy
 }
 
 # Exports
 ## NVM
 export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
 
 ## Android
 export ANDROID_HOME=/usr/local/share/android-sdk
