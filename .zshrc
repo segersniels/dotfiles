@@ -11,7 +11,7 @@ export DEFAULT_USER="$(whoami)"
 ZSH_THEME="avit"
 
 # Plugins
-plugins=(git docker osx screen zsh-autosuggestions)
+plugins=(git docker macos screen zsh-autosuggestions)
 
 export ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
@@ -24,10 +24,6 @@ zstyle ':completion:*:make:*:targets' call-command true # outputs all possible r
 zstyle ':completion:*:make:*' tag-order targets
 zstyle ':completion:*:make:*' group-name ''
 zstyle ':completion:*:descriptions' format '%B%d%b'
-
-# ZSH sources
-fpath=(/usr/local/share/zsh-completions $fpath)
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Title
 ZSH_THEME_TERM_TITLE_IDLE="%~"
@@ -74,12 +70,6 @@ function lipsum() {
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-
-## Android
-export ANDROID_HOME=/usr/local/share/android-sdk
-export PATH=$ANDROID_HOME/tools:$PATH
-export PATH=$ANDROID_HOME/platform-tools:$PATH
-export PATH=$ANDROID_HOME/build-tools/19.1.0:$PATH
 
 ## Binaries and other exports
 export PATH="$HOME/.fastlane/bin:$PATH"

@@ -26,7 +26,9 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # Homebrew
-cd /opt && mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ${HOME}/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
 brew update
 brew upgrade
 brew bundle
@@ -34,7 +36,6 @@ brew cleanup
 
 # Zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 rsync .zshrc ${HOME}/.zshrc
 chsh -s /usr/local/bin/zsh
 
@@ -43,19 +44,15 @@ mkdir -p ${HOME}/.nvm
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-nvm install 15
-nvm alias default 15
-npm install -g npm@6.14.10
+nvm install 16
+nvm alias default 16
 
 # Yarn
-curl -o- -L https://yarnpkg.com/install.sh | bash
+npm install --global yarn
 
 # Node packages
-yarn global add yarn
 yarn global add react-devtools
 yarn global add react-native-cli
-yarn global add flow-bin
-yarn global add wml
 yarn global add webpack
 yarn global add ts-node
 yarn global add typescript
@@ -65,28 +62,10 @@ yarn global add vercel
 yarn global add ngrok
 
 # Gems
-gem install bundler
-
-# Code packages
-code --install-extension dbaeumer.vscode-eslint
-code --install-extension eamodio.gitlens
-code --install-extension editorconfig.editorconfig
-code --install-extension flowtype.flow-for-vscode
-code --install-extension naumovs.color-highlight
-code --install-extension peterjausovec.vscode-docker
-code --install-extension esbenp.prettier-vscode
-code --install-extension zignd.html-css-class-completion
-code --install-extension mikestead.dotenv
-code --install-extension whatwedo.twig
-code --install-extension ricard.postcss
-code --install-extension mechatroner.rainbow-csv
-code --install-extension vsmobile.vscode-react-native
-code --install-extension ms-vscode.vscode-typescript-tslint-plugin
-code --install-extension daylerees.rainglow
+sudo gem install bundler
 
 # Finalize
-mkdir -p ${HOME}/.hyper_plugins && cp .hyper-sync-settings.json ${HOME}/.hyper_plugins/.hyper-sync-settings.json
-rsync .vscode-settings.json ${HOME}/Library/Application\ Support/Code/User/settings.json
 rsync .vimrc ${HOME}/.vimrc
 rsync .gitignore ${HOME}/.gitignore
 rsync .gitconfig ${HOME}/.gitconfig
+rsync .hyper.js ${HOME}/.hyper.js
