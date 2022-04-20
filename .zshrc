@@ -11,8 +11,9 @@ export DEFAULT_USER="$(whoami)"
 ZSH_THEME="avit"
 
 # Plugins
-plugins=(git docker macos screen zsh-autosuggestions)
+plugins=(git docker macos screen)
 
+# Oh My Zsh
 export ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
