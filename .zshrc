@@ -16,6 +16,7 @@ plugins=(git docker macos screen)
 # Oh My Zsh
 export ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Evals
 eval $(thefuck --alias)
