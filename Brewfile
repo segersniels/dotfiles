@@ -24,6 +24,7 @@ brew "ffmpeg"
 brew "gifsicle"
 brew "tldr"
 brew "svn" # Needed for fonts
+brew "cmake"
 
 # Cask
 cask "1password"
