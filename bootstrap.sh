@@ -50,6 +50,7 @@ chsh -s /usr/local/bin/zsh
 
 # Setup base environment using Fig
 fig login
+fig install --dotfiles
 fig source
 
 # Node
