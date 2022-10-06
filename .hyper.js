@@ -25,6 +25,7 @@ module.exports = {
     defaultSSHApp: true,
     quickEdit: false,
     macOptionSelectionMode: "vertical",
+    scrollback: 5000,
     smooth: {
       variant: 'dark',
       disableAutomaticTheming: false,
@@ -44,7 +45,9 @@ module.exports = {
     "hyper-dark-scrollbar",
     "hyper-tabs-enhanced"
   ],
-  localPlugins: [],
+  localPlugins: [
+  "fig-hyper-integration"
+  ],
   keymaps: {
     "tab:next": ["command+right", "command+shift+right"],
     "tab:prev": ["command+left", "command+shift+left"],
