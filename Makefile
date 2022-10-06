@@ -1,4 +1,4 @@
-FILES?=zshrc vimrc gitconfig hyper.js
+FILES?=vimrc gitconfig hyper.js
 
 update-all: $(patsubst %, update-%, $(FILES))
 update-%:

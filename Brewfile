@@ -3,12 +3,10 @@ tap "homebrew/cask-versions"
 tap "homebrew/cask-fonts"
 
 # Core
-brew "git"
+brew "fig" # Part of the dotfiles setup
+brew "git" # Should be installed by now
 brew "tig"
 brew "zsh"
-brew "zsh-autosuggestions"
-brew "zsh-completions"
-brew "zsh-syntax-highlighting"
 brew "grep"
 brew "jq"
 brew "curl"

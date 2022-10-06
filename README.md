@@ -2,4 +2,6 @@
 
 ## Installing
 
-Simply run `./bootstrap.sh` and you should be good to go.
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/segersniels/dotfiles/master/bootstrap.sh)"
+```
