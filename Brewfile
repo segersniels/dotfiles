@@ -3,7 +3,6 @@ tap "homebrew/cask-versions"
 tap "homebrew/cask-fonts"
 
 # Core
-brew "fig" # Part of the dotfiles setup
 brew "git" # Should be installed by now
 brew "tig"
 brew "zsh"
@@ -25,6 +24,7 @@ brew "svn" # Needed for fonts
 brew "cmake"
 
 # Cask
+cask "fig" # Part of the dotfiles setup
 cask "1password"
 cask "spectacle"
 cask "visual-studio-code"
