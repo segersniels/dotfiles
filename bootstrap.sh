@@ -79,5 +79,11 @@ rsync .hyper.js ${HOME}/.hyper.js
 # Move back to original directory
 popd
 
-# Clean up
+# Clean up temporary files
 rm -rf ./dotfiles
+
+# Hacky way of disabling the <user>@<ip> prefix in the tab title as Fig doesn't allow us to set the variable after sourcing oh-my-zsh (yet)
+echo "\nexport ZSH_THEME_TERM_TITLE_IDLE=%~" >> .zshrc
+
+# Source the .zshrc file
+source $HOME/.zshrc
