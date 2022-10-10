@@ -2,6 +2,11 @@
 
 NODE_VERSION=16
 DOTFILES_REPO=https://github.com/segersniels/dotfiles
+ZSHRC_FILE=$HOME/.zshrc
+
+function log {
+    echo "[INFO] $1"
+}
 
 # Ask for the administrator password upfront.
 sudo -v
@@ -27,63 +32,64 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # Install git if not available
 if git ! --version &>/dev/null; then
-    echo "Git not found. Installing..."
+    log "Git not found. Installing..."
     brew install git
 fi
 
 # Clone the repository
-echo "Preparing local environment..."
+log "Preparing local environment..."
 git clone $DOTFILES_REPO &>/dev/null
 pushd ./dotfiles
 
 # Homebrew
+log "Installing Homebrew..."
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >>${HOME}/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
 brew update
 brew upgrade
 brew bundle
 brew cleanup
 
-# Change default shell to zsh
-chsh -s /usr/local/bin/zsh
+# ZSH
+log "Installing ZSH..."
+brew install zsh
+chsh -s $(which zsh)
 
-# Setup base environment using Fig
+# Fig
+log "Installing Fig..."
 fig login
-fig install --dotfiles
-fig source
+touch $ZSHRC_FILE # Create the .zshrc file so NVM can install with it being present
 
-# Node
+# NVM
+log "Preparing node v${NODE_VERSION}..."
 mkdir -p ${HOME}/.nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 
-# Yarn
+# Node
+log "Installing node packages..."
 npm install --global yarn
-
-# Node packages
-yarn global add ts-node
-yarn global add typescript
-yarn global add @segersniels/gitmoji
-yarn global add supdock
+yarn global add -s ts-node
+yarn global add -s typescript
+yarn global add -s @segersniels/gitmoji
+yarn global add -s supdock
 
 # Finalize
+log "Syncing config files..."
 rsync .vimrc ${HOME}/.vimrc
 rsync .gitignore ${HOME}/.gitignore
 rsync .gitconfig ${HOME}/.gitconfig
 rsync .hyper.js ${HOME}/.hyper.js
 
 # Move back to original directory
+log "Moving back to original directory and cleaning up..."
 popd
-
-# Clean up temporary files
 rm -rf ./dotfiles
 
-# Hacky way of disabling the <user>@<ip> prefix in the tab title as Fig doesn't allow us to set the variable after sourcing oh-my-zsh (yet)
-echo "\nexport ZSH_THEME_TERM_TITLE_IDLE=%~" >> .zshrc
-
-# Source the .zshrc file
-source $HOME/.zshrc
+# Finishing up
+fig install --dotfiles
+fig source
+log "To finish the setup please run 'source $ZSHRC_FILE'! If something went wrong check if Fig sourced the dotfiles correctly or run 'fig source' and debug."
