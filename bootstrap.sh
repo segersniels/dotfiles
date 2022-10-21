@@ -49,6 +49,10 @@ brew upgrade
 brew bundle
 brew cleanup
 
+# ZSH
+log "Updating default shell to ZSH..."
+chsh -s $(which zsh)
+
 # Fig
 log "Installing Fig..."
 fig login
