@@ -49,11 +49,6 @@ brew upgrade
 brew bundle
 brew cleanup
 
-# ZSH
-log "Installing ZSH..."
-brew install zsh
-chsh -s $(which zsh)
-
 # Fig
 log "Installing Fig..."
 fig login
