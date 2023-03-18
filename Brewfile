@@ -21,6 +21,7 @@ brew "gifsicle"
 brew "tldr"
 brew "svn" # Needed for fonts
 brew "cmake"
+brew "awscli"
 
 # Cask
 cask "fig" # Part of the dotfiles setup
