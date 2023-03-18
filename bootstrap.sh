@@ -4,10 +4,6 @@ NODE_VERSION=16
 DOTFILES_REPO=https://github.com/segersniels/dotfiles
 ZSHRC_FILE=$HOME/.zshrc
 
-function log {
-    echo "[INFO] $1"
-}
-
 # Ask for the administrator password upfront.
 sudo -v
 
@@ -32,17 +28,14 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # Install git if not available
 if git ! --version &>/dev/null; then
-    log "Git not found. Installing..."
     brew install git
 fi
 
 # Clone the repository
-log "Preparing local environment..."
 git clone $DOTFILES_REPO &>/dev/null
 pushd ./dotfiles
 
 # Homebrew
-log "Installing Homebrew..."
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew update
 brew upgrade
@@ -50,16 +43,13 @@ brew bundle
 brew cleanup
 
 # ZSH
-log "Updating default shell to ZSH..."
 chsh -s $(which zsh)
 
 # Fig
-log "Installing Fig..."
 fig login
 touch $ZSHRC_FILE # Create the .zshrc file so NVM can install with it being present
 
 # NVM
-log "Preparing node v${NODE_VERSION}..."
 mkdir -p ${HOME}/.nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
@@ -69,7 +59,6 @@ nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 
 # Node
-log "Installing node packages..."
 npm install --global yarn
 yarn global add -s ts-node
 yarn global add -s typescript
@@ -77,15 +66,13 @@ yarn global add -s @segersniels/gitmoji
 yarn global add -s supdock
 
 # Finalize
-log "Syncing config files..."
 make restore
 
 # Move back to original directory
-log "Moving back to original directory and cleaning up..."
 popd
 rm -rf ./dotfiles
 
 # Finishing up
 fig install --dotfiles
 fig source
-log "To finish the setup please run 'source $ZSHRC_FILE'! If something went wrong check if Fig sourced the dotfiles correctly or run 'fig source' and debug."
+echo "To finish the setup please run 'source $ZSHRC_FILE'! If something went wrong check if Fig sourced the dotfiles correctly or run 'fig source' and debug."
