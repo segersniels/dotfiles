@@ -45,9 +45,7 @@ module.exports = {
     "hyper-dark-scrollbar",
     "hyper-tabs-enhanced"
   ],
-  localPlugins: [
-  "fig-hyper-integration"
-  ],
+  localPlugins: [],
   keymaps: {
     "tab:next": ["command+right", "command+shift+right"],
     "tab:prev": ["command+left", "command+shift+left"],
