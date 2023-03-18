@@ -78,10 +78,7 @@ yarn global add -s supdock
 
 # Finalize
 log "Syncing config files..."
-rsync .vimrc ${HOME}/.vimrc
-rsync .gitignore ${HOME}/.gitignore
-rsync .gitconfig ${HOME}/.gitconfig
-rsync .hyper.js ${HOME}/.hyper.js
+make restore
 
 # Move back to original directory
 log "Moving back to original directory and cleaning up..."
