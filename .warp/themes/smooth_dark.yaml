@@ -1,14 +1,14 @@
 terminal_colors:
-  bright:
-    yellow: "#fefdd5"
-    magenta: "#ffb1fe"
-    red: "#ffc4bd"
-    black: "#8e8e8e"
-    white: "#feffff"
-    blue: "#c1e3fe"
-    green: "#d6fcb9"
-    cyan: "#e5e6fe"
   normal:
+    green: "#00D894"
+    blue: "#69bee9"
+    white: "#f1f1f1"
+    black: "#616161"
+    red: "#eb6f92"
+    yellow: "#f6c177"
+    magenta: "#AAA2FF"
+    cyan: "#ebbcba"
+  bright:
     green: "#00D894"
     blue: "#69bee9"
     white: "#f1f1f1"
@@ -21,4 +21,3 @@ accent: "#f6c177"
 background: "#383838"
 details: "darker"
 foreground: "#e0def4"
-
