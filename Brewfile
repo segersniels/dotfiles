@@ -22,6 +22,7 @@ brew "tldr"
 brew "svn" # Needed for fonts
 brew "cmake"
 brew "awscli"
+brew "rust"
 
 # Cask
 cask "fig" # Part of the dotfiles setup
