@@ -59,11 +59,8 @@ nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 
 # Node
-npm install --global yarn
-yarn global add -s ts-node
-yarn global add -s typescript
-yarn global add -s @segersniels/gitmoji
-yarn global add -s supdock
+npm install --global --silent @segersniels/gitmoji
+npm install --global --silent supdock
 
 # Finalize
 make restore
