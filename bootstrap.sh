@@ -59,7 +59,7 @@ nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 
 # Node
-npm install --global --silent @segersniels/gitmoji
+npm install --global --silent gitmoji-cli
 npm install --global --silent supdock
 npm install --global --silent ts-node
 npm install --global --silent typescript
