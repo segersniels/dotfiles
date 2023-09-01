@@ -58,18 +58,19 @@ export NVM_DIR="$HOME/.nvm"
 nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 
-# Node
-npm install --global --silent gitmoji-cli
-npm install --global --silent supdock
-npm install --global --silent ts-node
-npm install --global --silent typescript
-
 # Finalize
 make restore
 
 # Move back to original directory
 popd
 rm -rf ./dotfiles
+
+# Node
+npm install --global --silent gitmoji-cli
+npm install --global --silent supdock
+npm install --global --silent ts-node
+npm install --global --silent typescript
+npm install --global --silent turbo
 
 # Finishing up
 fig install --dotfiles

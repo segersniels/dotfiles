@@ -24,6 +24,7 @@ brew "cmake"
 brew "awscli"
 brew "rust"
 brew "postman"
+brew "mas"
 
 # Cask
 cask "fig" # Part of the dotfiles setup
