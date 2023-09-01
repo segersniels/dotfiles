@@ -26,6 +26,9 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 # Disable smart dashes as they’re annoying when typing code
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
+# Install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 # Install git if not available
 if git ! --version &>/dev/null; then
     brew install git
@@ -35,8 +38,7 @@ fi
 git clone $DOTFILES_REPO &>/dev/null
 pushd ./dotfiles
 
-# Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Update and install brew packages
 brew update
 brew upgrade
 brew bundle
