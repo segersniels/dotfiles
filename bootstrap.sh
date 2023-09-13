@@ -76,6 +76,8 @@ npm install --global --silent supdock
 npm install --global --silent ts-node
 npm install --global --silent typescript
 npm install --global --silent turbo
+npm install --global --silent yarn
+npm install --global --silent pnpm
 
 # Finishing up
 fig install --dotfiles
