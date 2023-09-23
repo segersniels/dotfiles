@@ -22,7 +22,6 @@ brew "svn" # Needed for fonts
 brew "cmake"
 brew "awscli"
 brew "rust"
-brew "postman"
 brew "mas"
 
 # Cask
@@ -45,3 +44,4 @@ cask "warp"
 cask "viscosity"
 cask "brooklyn"
 cask "maccy"
+cask "postman"
