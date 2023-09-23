@@ -74,7 +74,6 @@ rm -rf ./dotfiles
 
 # Node
 npm install --global --silent gitmoji-cli
-npm install --global --silent supdock
 npm install --global --silent ts-node
 npm install --global --silent typescript
 npm install --global --silent turbo
