@@ -14,7 +14,6 @@ brew "cask"
 brew "go"
 brew "coreutils"
 brew "findutils"
-brew "thefuck" # CLI failed command correction
 brew "ncdu" # Interactive diskspace overview
 brew "ffmpeg"
 brew "gifsicle"
