@@ -80,6 +80,10 @@ npm install --global --silent turbo
 npm install --global --silent yarn
 npm install --global --silent pnpm
 
+# Rust
+cargo install propr
+cargo install supdock
+
 # Finishing up
 fig install --dotfiles
 fig source
