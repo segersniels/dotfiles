@@ -26,8 +26,6 @@ brew "mas"
 
 # Cask
 cask "fig" # Part of the dotfiles setup
-cask "1password"
-cask "spectacle"
 cask "visual-studio-code"
 cask "tableplus"
 cask "docker"
