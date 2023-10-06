@@ -21,7 +21,6 @@ brew "tldr"
 brew "svn" # Needed for fonts
 brew "cmake"
 brew "awscli"
-brew "rust"
 brew "mas"
 brew "rbenv"
 
