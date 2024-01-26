@@ -1,4 +1,4 @@
-FILES?=vimrc gitconfig gitignore hyper.js
+FILES?=vimrc gitconfig gitignore
 
 backup-all: $(patsubst %, restore-%, $(FILES))
 backup-%:
