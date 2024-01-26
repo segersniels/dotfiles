@@ -1,0 +1,11 @@
+[
+  // Overrides
+  {
+    "context": "Editor",
+    "bindings": {
+      "alt-shift-f": "editor::Format",
+      "alt-up": "editor::MoveLineUp",
+      "alt-down": "editor::MoveLineDown"
+    }
+  }
+]
