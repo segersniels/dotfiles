@@ -1,6 +1,6 @@
 {
   // The name of the Zed theme to use for the UI
-  "theme": "Rosé Pine Dawn",
+  "theme": "Smooth Dark",
   // The name of a base set of key bindings to use.
   // This setting can take four values, each named after another
   // text editor:
@@ -23,7 +23,7 @@
     // "calt": false
   },
   // The default font size for text in the editor
-  "buffer_font_size": 15,
+  "buffer_font_size": 14,
   // Set the buffer's line height.
   // May take 3 values:
   //  1. Use a line height that's comfortable for reading (1.618)
@@ -36,14 +36,14 @@
   //         },
   "buffer_line_height": "comfortable",
   // The name of a font to use for rendering text in the UI
-  "ui_font_family": "Hack",
+  "ui_font_family": "SF Pro",
   // The OpenType features to enable for text in the UI
   "ui_font_features": {
     // Disable ligatures:
     "calt": false
   },
   // The default font size for text in the UI
-  "ui_font_size": 16,
+  "ui_font_size": 17,
   // The factor to grow the active pane by. Defaults to 1.0
   // which gives the same size as all other panes.
   "active_pane_magnification": 1.0,
@@ -508,58 +508,13 @@
       "initialization_options": {
         "preferences": {
           "includeInlayParameterNameHints": "all",
-          "includeInlayParameterNameHintsWhenArgumentMatchesName": true,
+          "includeInlayParameterNameHintsWhenArgumentMatchesName": false,
           "includeInlayFunctionParameterTypeHints": true,
-          "includeInlayVariableTypeHints": true,
+          "includeInlayVariableTypeHints": false,
           "includeInlayVariableTypeHintsWhenTypeMatchesName": false,
           "includeInlayPropertyDeclarationTypeHints": true,
-          "includeInlayFunctionLikeReturnTypeHints": true,
+          "includeInlayFunctionLikeReturnTypeHints": false,
           "includeInlayEnumMemberValueHints": true
-        }
-      }
-    }
-  },
-  // Language overrides (eg. formatting rules)
-  "language_overrides": {
-    "TypeScript": {
-      "format_on_save": "on",
-      "formatter": {
-        "external": {
-          "command": "eslint_d",
-          "arguments": [
-            "--stdin",
-            "--stdin-filename",
-            "{buffer_path}",
-            "--fix-to-stdout"
-          ]
-        }
-      }
-    },
-    "JavaScript": {
-      "format_on_save": "on",
-      "formatter": {
-        "external": {
-          "command": "eslint_d",
-          "arguments": [
-            "--stdin",
-            "--stdin-filename",
-            "{buffer_path}",
-            "--fix-to-stdout"
-          ]
-        }
-      }
-    },
-    "TSX": {
-      "format_on_save": "on",
-      "formatter": {
-        "external": {
-          "command": "eslint_d",
-          "arguments": [
-            "--stdin",
-            "--stdin-filename",
-            "{buffer_path}",
-            "--fix-to-stdout"
-          ]
         }
       }
     }
