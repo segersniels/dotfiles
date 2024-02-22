@@ -260,7 +260,7 @@
   // spaces.
   "hard_tabs": false,
   // How many columns a tab should occupy.
-  "tab_size": 4,
+  "tab_size": 2,
   // Control what info is collected by Zed.
   "telemetry": {
     // Send debug info like crash reports.
@@ -300,9 +300,7 @@
   "copilot": {
     // The set of glob patterns for which copilot should be disabled
     // in any matching file.
-    "disabled_globs": [
-      ".env"
-    ]
+    "disabled_globs": [".env"]
   },
   // Settings specific to journaling
   "journal": {
@@ -411,12 +409,7 @@
         // Default directories to search for virtual environments, relative
         // to the current working directory. We recommend overriding this
         // in your project's settings, rather than globally.
-        "directories": [
-          ".env",
-          "env",
-          ".venv",
-          "venv"
-        ],
+        "directories": [".env", "env", ".venv", "venv"],
         // Can also be 'csh', 'fish', and `nushell`
         "activate_script": "default"
       }
@@ -467,16 +460,25 @@
       "hard_tabs": true
     },
     "Markdown": {
-      "soft_wrap": "preferred_line_length"
+      "tab_size": 2
     },
     "JavaScript": {
-      "tab_size": 2
+      "tab_size": 2,
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
     },
     "TypeScript": {
-      "tab_size": 2
+      "tab_size": 2,
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
     },
     "TSX": {
-      "tab_size": 2
+      "tab_size": 2,
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
     },
     "YAML": {
       "tab_size": 2
@@ -490,10 +492,10 @@
   // project has no other Prettier installed.
   "prettier": {
     // Use regular Prettier json configuration:
-    "trailingComma": "all",
-    "singleQuote": true,
-    "tabWidth": 2,
-    "semi": true
+    // "trailingComma": "all",
+    // "singleQuote": true,
+    // "tabWidth": 2,
+    // "semi": true
   },
   // LSP Specific settings.
   "lsp": {

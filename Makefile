@@ -9,7 +9,6 @@ backup-warp:
 backup-zed:
 	@mkdir -p .config/zed
 	@cp ~/.config/zed/*.json .config/zed/
-	@rm -rf .config/zed/themes && cp -R ~/.config/zed/themes .config/zed/themes
 backup: backup-warp
 	@$(foreach file, $(FILES), make backup-$(file);)
 

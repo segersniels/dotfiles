@@ -5,7 +5,9 @@
     "bindings": {
       "alt-shift-f": "editor::Format",
       "alt-up": "editor::MoveLineUp",
-      "alt-down": "editor::MoveLineDown"
+      "alt-down": "editor::MoveLineDown",
+      "alt-shift-up": "editor::DuplicateLine",
+      "alt-shift-down": "editor::DuplicateLine"
     }
   }
 ]
