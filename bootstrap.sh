@@ -51,10 +51,7 @@ mas install 441258766 # Magnet
 
 # ZSH
 chsh -s $(which zsh)
-
-# Fig
-fig login
-touch $ZSHRC_FILE # Create the .zshrc file so NVM can install with it being present
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # NVM
 mkdir -p ${HOME}/.nvm
@@ -87,8 +84,3 @@ source "$HOME/.cargo/env"
 # Crates
 cargo install propr
 cargo install supdock
-
-# Finishing up
-fig install --dotfiles
-fig source
-echo "To finish the setup please run 'source $ZSHRC_FILE'! If something went wrong check if Fig sourced the dotfiles correctly or run 'fig source' and debug."

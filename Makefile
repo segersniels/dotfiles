@@ -1,4 +1,4 @@
-FILES?=vimrc gitconfig gitignore
+FILES?=vimrc gitconfig gitignore zshrc
 
 backup-all: $(patsubst %, restore-%, $(FILES))
 backup-%:
