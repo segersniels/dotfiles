@@ -23,6 +23,7 @@ brew "cmake"
 brew "awscli"
 brew "mas"
 brew "rbenv"
+brew "neovim"
 
 # Cask
 cask "fig" # Part of the dotfiles setup

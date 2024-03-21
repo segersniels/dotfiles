@@ -38,6 +38,7 @@ alias gcam='git add . && gitmoji commit'
 alias gcamp='git add -p && gitmoji commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
+alias vi="nvim"
 
 ## Exports
 
