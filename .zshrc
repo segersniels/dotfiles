@@ -42,7 +42,7 @@ alias vi="nvim"
 
 ## Exports
 
-export EDITOR="vi"
+export EDITOR="nvim"
 export NVM_DIR="$HOME/.nvm"
 
 ## Secrets
