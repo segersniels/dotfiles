@@ -33,12 +33,15 @@ alias rosetta='arch -x86_64'
 alias dcomp='docker compose'
 alias search='history |grep'
 alias docker='supdock'
-alias zshrc='code $HOME/.zshrc'
+alias zshrc='vi $HOME/.zshrc'
 alias gcam='git add . && gitmoji commit'
 alias gcamp='git add -p && gitmoji commit'
+alias vcam='git add . && convit commit'
+alias vcamp='git add -p && convit commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
 alias vi="nvim"
+alias code="cursor"
 
 ## Exports
 
@@ -80,5 +83,5 @@ zstyle ':completion:*:descriptions' format '%B%d%b'
 
 ## NVM
 
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion

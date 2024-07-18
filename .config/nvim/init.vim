@@ -17,10 +17,12 @@ set ttyfast " Speed up scrolling in Vim
 
 syntax on
 filetype on
-filetype plugin on
-filetype indent on
+filetype plugin indent on
 
 autocmd FileType make setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd Filetype javascript setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd BufRead,BufNewFile *.conf setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd FileType json setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
+
+call plug#begin()
+call plug#end()
