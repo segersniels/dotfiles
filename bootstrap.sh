@@ -73,9 +73,7 @@ rm -rf ./dotfiles
 npm install --global --silent gitmoji-cli
 npm install --global --silent ts-node
 npm install --global --silent typescript
-npm install --global --silent turbo
 npm install --global --silent yarn
-npm install --global --silent pnpm
 
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
