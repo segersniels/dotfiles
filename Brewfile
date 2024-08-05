@@ -25,7 +25,6 @@ brew "mas"
 brew "neovim"
 
 # Cask
-cask "fig" # Part of the dotfiles setup
 cask "tableplus"
 cask "docker"
 cask "spotify"
