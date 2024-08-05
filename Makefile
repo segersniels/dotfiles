@@ -1,6 +1,7 @@
 FILES?=gitconfig gitignore zshrc
 
-backup-all: $(patsubst %, restore-%, $(FILES))
+backup-all: $(patsubst %, backup-%, $(FILES))
+
 backup-%:
 	@cp -Rv ~/.$* .$*
 backup-warp:
