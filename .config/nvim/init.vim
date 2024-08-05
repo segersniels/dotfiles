@@ -12,7 +12,7 @@ set mouse=a " Allow to use the mouse in the editor
 set number " Shows the line numbers
 set title " Show file title
 set wildmenu " Show a more advance menu
-set spell " enable spell check (may need to download language package)
+set spell " Enable spell check (may need to download language package)
 set ttyfast " Speed up scrolling in Vim
 
 syntax on
@@ -23,3 +23,5 @@ autocmd FileType make setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd Filetype javascript setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd BufRead,BufNewFile *.conf setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd FileType json setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
+
+hi Normal ctermbg=none guibg=none " Disable weird background and respect terminal theme
