@@ -22,15 +22,12 @@ brew "svn" # Needed for fonts
 brew "cmake"
 brew "awscli"
 brew "mas"
-brew "rbenv"
 brew "neovim"
 
 # Cask
 cask "fig" # Part of the dotfiles setup
-cask "visual-studio-code"
 cask "tableplus"
 cask "docker"
-cask "google-chrome"
 cask "spotify"
 cask "slack"
 cask "discord"
@@ -42,7 +39,6 @@ cask "font-hack"
 cask "font-sf-pro"
 cask "warp"
 cask "viscosity"
-cask "brooklyn"
 cask "maccy"
 cask "postman"
 cask "cursor"
