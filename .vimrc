@@ -1,4 +1,3 @@
-" Options
 set tabstop=2
 set shiftwidth=2
 set softtabstop=2
@@ -23,5 +22,3 @@ autocmd FileType make setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd Filetype javascript setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd BufRead,BufNewFile *.conf setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
 autocmd FileType json setlocal shiftwidth=4 softtabstop=4 tabstop=4 noexpandtab
-
-hi Normal ctermbg=none guibg=none " Disable weird background and respect terminal theme

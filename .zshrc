@@ -40,12 +40,11 @@ alias vcam='git add . && convit commit'
 alias vcamp='git add -p && convit commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
-alias vi="nvim"
 alias code="cursor"
 
 ## Exports
 
-export EDITOR="nvim"
+export EDITOR="vi"
 export NVM_DIR="$HOME/.nvm"
 
 ## Secrets
