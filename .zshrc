@@ -41,6 +41,7 @@ alias vcamp='git add -p && convit commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
 alias code="cursor"
+alias obsidian="open -a Obsidian $(pwd)/"
 
 ## Exports
 
