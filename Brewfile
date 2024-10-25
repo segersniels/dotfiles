@@ -22,6 +22,7 @@ brew "svn" # Needed for fonts
 brew "cmake"
 brew "awscli"
 brew "mas"
+brew "neovim"
 
 # Cask
 cask "tableplus"

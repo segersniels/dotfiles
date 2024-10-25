@@ -1,0 +1,5 @@
+return {
+	{
+		"APZelos/blamer.nvim",
+	},
+}

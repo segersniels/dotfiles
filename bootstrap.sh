@@ -9,9 +9,9 @@ sudo -v
 
 # Keep-alive: update existing `sudo` time stamp until the script has finished.
 while true; do
-    sudo -n true
-    sleep 60
-    kill -0 "$$" || exit
+  sudo -n true
+  sleep 60
+  kill -0 "$$" || exit
 done 2>/dev/null &
 
 # Allow apps from anywhere
@@ -28,12 +28,15 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # Install Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ${HOME}/.zprofile
+(
+  echo
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+) >>${HOME}/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Install git if not available
 if git ! --version &>/dev/null; then
-    brew install git
+  brew install git
 fi
 
 # Clone the repository
@@ -84,4 +87,4 @@ cargo install supdock
 
 # Golang packages
 curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/install.sh | sudo bash -s /usr/local/bin
-curl -sSL https://raw.githubusercontent.com/segersniels/convit/master/scripts/install.sh | sudo bash -s /usr/local/bin
+curl -sSL https://raw.githubusercontent.com/segersniels/cmt/master/scripts/install.sh | sudo bash -s /usr/local/bin

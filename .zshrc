@@ -34,16 +34,17 @@ alias dcomp='docker compose'
 alias search='history |grep'
 alias docker='supdock'
 alias zshrc='vi $HOME/.zshrc'
-alias gcam='git add . && convit commit'
-alias gcamp='git add -p && convit commit'
+alias gcam='git add . && cmt commit'
+alias gcamp='git add -p && cmt commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
 alias code="cursor"
 alias obsidian="open -a Obsidian $(pwd)/"
+alias vi="nvim"
 
 ## Exports
 
-export EDITOR="vi"
+export EDITOR="nvim"
 export NVM_DIR="$HOME/.nvm"
 
 ## Secrets
@@ -83,3 +84,10 @@ zstyle ':completion:*:descriptions' format '%B%d%b'
 
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# bun completions
+[ -s "/Users/segersniels/.bun/_bun" ] && source "/Users/segersniels/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
