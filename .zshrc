@@ -40,11 +40,10 @@ alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
 alias code="cursor"
 alias obsidian="open -a Obsidian $(pwd)/"
-alias vi="nvim"
 
 ## Exports
 
-export EDITOR="nvim"
+export EDITOR="vim"
 export NVM_DIR="$HOME/.nvm"
 
 ## Secrets
