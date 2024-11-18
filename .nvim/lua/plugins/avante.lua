@@ -3,7 +3,7 @@ return {
 		"yetone/avante.nvim",
 		event = "VeryLazy",
 		lazy = false,
-		version = false,
+		version = "*",
 		opts = {
 			provider = "claude",
 			auto_suggestions_provider = "copilot",
@@ -11,8 +11,6 @@ return {
 				model = "claude-3-5-sonnet-latest",
 			},
 			behaviour = {
-				-- We currently rely on Supermaven for suggestions but if we want to use this
-				-- use a low cost provider like copilot instead.
 				auto_suggestions = false,
 				auto_set_highlight_group = true,
 				auto_set_keymaps = true,
@@ -20,9 +18,9 @@ return {
 				support_paste_from_clipboard = false,
 			},
 			mappings = {
-				suggestion = {
-					accept = "<Tab>",
-				},
+				-- suggestion = {
+				-- 	accept = "<Tab>",
+				-- },
 			},
 		},
 		build = "make",
@@ -33,7 +31,7 @@ return {
 			"MunifTanjim/nui.nvim",
 			"nvim-tree/nvim-web-devicons",
 			-- Enable if using auto_suggestions with copilot
-			-- "zbirenbaum/copilot.lua",
+			"zbirenbaum/copilot.lua",
 			{
 				-- support for image pasting
 				"HakonHarnes/img-clip.nvim",

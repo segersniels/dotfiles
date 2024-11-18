@@ -12,10 +12,26 @@ vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Copy whole line to system cl
 -- Insert console.log with cursor in position
 vim.keymap.set("n", "<leader>cL", 'iconsole.log("------>", );<Esc>hi', { desc = "Insert a new log" })
 
+-- Insert JSON.stringify console.log with cursor in position
+vim.keymap.set(
+	"n",
+	"<leader>cJ",
+	'iconsole.log("------>", JSON.stringify( , null, 2));<Esc>12hi',
+	{ desc = "Insert a new JSON log" }
+)
+
 -- Select word and create console.log below with the word
 vim.keymap.set(
 	"v",
 	"<leader>cL",
 	'yoconsole.log("------>", { <Esc>p<S-a> });<Esc>',
 	{ desc = "Log the selected variable" }
+)
+
+-- Select word and create JSON.stringify console.log below with the word
+vim.keymap.set(
+	"v",
+	"<leader>cJ",
+	'yoconsole.log("------>", JSON.stringify({ <Esc>p<S-a> }, null, 2));<Esc>',
+	{ desc = "JSON log the selected variable" }
 )
