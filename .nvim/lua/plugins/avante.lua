@@ -3,24 +3,28 @@ return {
 		"yetone/avante.nvim",
 		event = "VeryLazy",
 		lazy = false,
-		version = "*",
+		version = false,
 		opts = {
-			provider = "claude",
-			auto_suggestions_provider = "copilot",
+			-- we use copilot with claude 3.5 enabled as our chat provider
+			provider = "copilot",
+			auto_suggestions_provider = "claude",
 			claude = {
 				model = "claude-3-5-sonnet-latest",
+			},
+			copilot = {
+				model = "claude-3.5-sonnet",
 			},
 			behaviour = {
 				auto_suggestions = false,
 				auto_set_highlight_group = true,
 				auto_set_keymaps = true,
 				auto_apply_diff_after_generation = false,
-				support_paste_from_clipboard = false,
+				support_paste_from_clipboard = true,
 			},
 			mappings = {
-				-- suggestion = {
-				-- 	accept = "<Tab>",
-				-- },
+				suggestion = {
+					accept = "<Tab>",
+				},
 			},
 		},
 		build = "make",
@@ -30,7 +34,7 @@ return {
 			"nvim-lua/plenary.nvim",
 			"MunifTanjim/nui.nvim",
 			"nvim-tree/nvim-web-devicons",
-			-- Enable if using auto_suggestions with copilot
+			-- we use copilot with claude 3.5 enabled as our chat provider
 			"zbirenbaum/copilot.lua",
 			{
 				-- support for image pasting
