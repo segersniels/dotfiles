@@ -3,7 +3,9 @@ return {
 		"segersniels/smooth.nvim",
 		name = "smooth",
 		lazy = true,
-		opts = {},
+		opts = {
+			style = "dark",
+		},
 	},
 	{
 		"LazyVim/LazyVim",

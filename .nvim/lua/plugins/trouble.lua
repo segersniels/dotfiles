@@ -1,3 +1,4 @@
+-- Used to show diagnostics and error reporting of the current file (eg. linting)
 return {
 	"folke/trouble.nvim",
 	cmd = "Trouble",

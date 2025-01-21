@@ -5,16 +5,19 @@ return {
 		lazy = false,
 		version = false,
 		opts = {
-			-- we use copilot with claude 3.5 enabled as our chat provider
+			-- We have claude enabled as our AI provider on GitHub so use it for free
 			provider = "copilot",
+			-- We use claude for auto complete, turn it off if costs are too high
 			auto_suggestions_provider = "claude",
 			claude = {
-				model = "claude-3-5-sonnet-latest",
+				-- model = "claude-3-5-sonnet-latest",
+				model = "claude-3-5-haiku-latest",
 			},
 			copilot = {
 				model = "claude-3.5-sonnet",
 			},
 			behaviour = {
+				-- Disabled at the moment because it's too slow
 				auto_suggestions = false,
 				auto_set_highlight_group = true,
 				auto_set_keymaps = true,
@@ -34,7 +37,6 @@ return {
 			"nvim-lua/plenary.nvim",
 			"MunifTanjim/nui.nvim",
 			"nvim-tree/nvim-web-devicons",
-			-- we use copilot with claude 3.5 enabled as our chat provider
 			"zbirenbaum/copilot.lua",
 			{
 				-- support for image pasting
