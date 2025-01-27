@@ -3,7 +3,12 @@ return {
 	"neovim/nvim-lspconfig",
 	opts = {
 		servers = {
-			eslint = {},
+			eslint = {
+				settings = {
+					-- Helps eslint find the eslintrc when it's placed in a subfolder instead of the cwd root
+					workingDirectory = { mode = "auto" },
+				},
+			},
 			vtsls = {
 				settings = {
 					typescript = {
@@ -21,13 +26,10 @@ return {
 		},
 		setup = {
 			eslint = function()
-				require("lazyvim.util").lsp.on_attach(function(client)
-					if client.name == "eslint" then
-						client.server_capabilities.documentFormattingProvider = true
-					elseif client.name == "tsserver" then
-						client.server_capabilities.documentFormattingProvider = false
-					end
-				end)
+				-- Automatically fix linting errors on save (but otherwise do not format the document)
+				vim.cmd([[
+          autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
+        ]])
 			end,
 		},
 	},
