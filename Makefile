@@ -14,7 +14,12 @@ backup-nvim:
 	@cp -Rv ~/.config/nvim/* .nvim
 	@rm -rf .nvim/pack
 
-backup: backup-warp backup-nvim
+backup-ghostty:
+	@mkdir -p .ghostty
+	@cp -Rv ~/.config/ghostty/* .ghostty
+	@cp ~/Library/Application\ Support/com.mitchellh.ghostty/config	.ghostty/config
+
+backup: backup-warp backup-nvim backup-ghostty
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -30,6 +35,11 @@ restore-nvim:
 	@mkdir -p ~/.config/nvim
 	@cp -Rv .nvim/* ~/.config/nvim
 
+restore-ghostty:
+	@mkdir -p ~/.config/ghostty
+	@cp -Rv .ghostty/* ~/.config/ghostty
+	@cp .ghostty/config ~/Library/Application\ Support/com.mitchellh.ghostty/config
+
 restore-secrets:
 	@if [ ! -f ~/.secrets ]; then \
 		cp -v .secrets ~/.secrets; \
@@ -37,5 +47,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-warp restore-nvim restore-secrets
+restore: restore-warp restore-nvim restore-ghostty restore-secrets
 	@$(foreach file, $(FILES), make restore-$(file);)
