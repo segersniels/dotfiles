@@ -9,17 +9,6 @@ vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Copy to system clip
 -- Copy whole line to system clipboard in normal mode
 vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Copy whole line to system clipboard" })
 
--- Insert console.log with cursor in position
-vim.keymap.set("n", "<leader>cL", 'iconsole.log("------>", );<Esc>hi', { desc = "Insert a new log" })
-
--- Insert JSON.stringify console.log with cursor in position
-vim.keymap.set(
-	"n",
-	"<leader>cJ",
-	'iconsole.log("------>", JSON.stringify( , null, 2));<Esc>12hi',
-	{ desc = "Insert a new JSON log" }
-)
-
 -- Select word and create console.log below with the word
 vim.keymap.set(
 	"v",

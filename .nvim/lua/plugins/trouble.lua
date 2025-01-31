@@ -4,6 +4,7 @@ return {
 	cmd = "Trouble",
 	opts = {
 		auto_preview = true,
+		multiline = true,
 		modes = {
 			diagnostics = { auto_open = true },
 		},

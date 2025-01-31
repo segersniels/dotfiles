@@ -5,9 +5,8 @@ return {
 		lazy = false,
 		version = false,
 		opts = {
-			-- We have claude enabled as our AI provider on GitHub so use it for free
 			provider = "copilot",
-			auto_suggestions_provider = "deepseek",
+			auto_suggestions_provider = "copilot",
 			claude = {
 				model = "claude-3-5-sonnet-latest",
 			},
@@ -21,11 +20,6 @@ return {
 				auto_apply_diff_after_generation = false,
 				support_paste_from_clipboard = false,
 				minimize_diff = true, -- Whether to remove unchanged lines when applying a code block
-			},
-			mappings = {
-				suggestion = {
-					accept = "<S-Tab>",
-				},
 			},
 			vendors = {
 				deepseek = {
@@ -45,36 +39,13 @@ return {
 		},
 		build = "make",
 		dependencies = {
-			"nvim-treesitter/nvim-treesitter",
 			"stevearc/dressing.nvim",
 			"nvim-lua/plenary.nvim",
 			"MunifTanjim/nui.nvim",
 			"nvim-tree/nvim-web-devicons",
-			"zbirenbaum/copilot.lua",
-			{
-				-- support for image pasting
-				"HakonHarnes/img-clip.nvim",
-				event = "VeryLazy",
-				opts = {
-					-- recommended settings
-					default = {
-						embed_image_as_base64 = false,
-						prompt_for_file_name = false,
-						drag_and_drop = {
-							insert_mode = true,
-						},
-						-- required for Windows users
-						use_absolute_path = true,
-					},
-				},
-			},
-			{
-				"MeanderingProgrammer/render-markdown.nvim",
-				opts = {
-					file_types = { "markdown", "Avante" },
-				},
-				ft = { "markdown", "Avante" },
-			},
+			"hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
+			"ibhagwan/fzf-lua", -- for file_selector provider fzf
+			"zbirenbaum/copilot.lua", -- for providers='copilot'
 		},
 	},
 }
