@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NODE_VERSION=20
+NODE_VERSION=22
 DOTFILES_REPO=https://github.com/segersniels/dotfiles
 ZSHRC_FILE=$HOME/.zshrc
 
