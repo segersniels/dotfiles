@@ -73,18 +73,8 @@ popd
 rm -rf ./dotfiles
 
 # Node
-npm install --global --silent gitmoji-cli
-npm install --global --silent ts-node
-npm install --global --silent typescript
-npm install --global --silent yarn
+npm install -g yarn supdock @segersniels/propr @segersniels/cmt
 
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 source "$HOME/.cargo/env"
-
-# Crates
-cargo install supdock
-
-# Golang packages
-curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/install.sh | sudo bash -s /usr/local/bin
-curl -sSL https://raw.githubusercontent.com/segersniels/cmt/master/scripts/install.sh | sudo bash -s /usr/local/bin
