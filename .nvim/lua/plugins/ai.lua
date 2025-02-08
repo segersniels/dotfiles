@@ -5,8 +5,8 @@ return {
 		lazy = false,
 		version = false,
 		opts = {
-			provider = "copilot",
-			auto_suggestions_provider = "copilot",
+			provider = "copilot", -- or copilot with sonnet
+			auto_suggestions_provider = "deepseek",
 			claude = {
 				model = "claude-3-5-sonnet-latest",
 			},
@@ -15,11 +15,6 @@ return {
 			},
 			behaviour = {
 				auto_suggestions = false,
-				auto_set_highlight_group = true,
-				auto_set_keymaps = true,
-				auto_apply_diff_after_generation = false,
-				support_paste_from_clipboard = false,
-				minimize_diff = true, -- Whether to remove unchanged lines when applying a code block
 			},
 			vendors = {
 				deepseek = {
@@ -44,7 +39,6 @@ return {
 			"MunifTanjim/nui.nvim",
 			"nvim-tree/nvim-web-devicons",
 			"hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
-			"ibhagwan/fzf-lua", -- for file_selector provider fzf
 			"zbirenbaum/copilot.lua", -- for providers='copilot'
 		},
 	},
