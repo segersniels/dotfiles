@@ -23,6 +23,7 @@ brew "cmake"
 brew "awscli"
 brew "mas"
 brew "neovim"
+brew "fnm"
 
 # Cask
 cask "docker"

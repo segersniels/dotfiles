@@ -56,15 +56,6 @@ mas install 441258766 # Magnet
 chsh -s $(which zsh)
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# NVM
-mkdir -p ${HOME}/.nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-nvm install $NODE_VERSION
-nvm alias default $NODE_VERSION
-
 # Finalize
 make restore
 
@@ -73,7 +64,8 @@ popd
 rm -rf ./dotfiles
 
 # Node
-npm install -g yarn supdock @segersniels/propr @segersniels/cmt
+fnm install --lts
+npm install -g supdock @segersniels/propr @segersniels/cmt
 
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

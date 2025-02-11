@@ -29,7 +29,6 @@ source $ZSH/oh-my-zsh.sh
 
 alias personal='cd $HOME/personal'
 alias reload='source $HOME/.zshrc'
-alias rosetta='arch -x86_64'
 alias dcomp='docker compose'
 alias search='history |grep'
 alias docker='supdock'
@@ -38,13 +37,12 @@ alias gcam='git add . && cmt commit'
 alias gcamp='git add -p && cmt commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
-alias code="cursor"
-alias obsidian="open -a Obsidian $(pwd)/"
+alias code="nvim"
+alias nvm="fnm"
 
 ## Exports
 
 export EDITOR="vim"
-export NVM_DIR="$HOME/.nvm"
 
 ## Secrets
 
@@ -79,11 +77,6 @@ zstyle ':completion:*:make:*' tag-order targets
 zstyle ':completion:*:make:*' group-name ''
 zstyle ':completion:*:descriptions' format '%B%d%b'
 
-## NVM
-
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
 # bun completions
 [ -s "/Users/segersniels/.bun/_bun" ] && source "/Users/segersniels/.bun/_bun"
 
@@ -94,3 +87,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# fnm
+eval "$(fnm env --use-on-cd --shell zsh)"
