@@ -14,13 +14,11 @@ brew "cask"
 brew "go"
 brew "coreutils"
 brew "findutils"
-brew "ncdu" # Interactive diskspace overview
 brew "ffmpeg"
 brew "gifsicle"
 brew "tldr"
 brew "svn" # Needed for fonts
 brew "cmake"
-brew "awscli"
 brew "mas"
 brew "neovim"
 brew "fnm"
@@ -31,7 +29,8 @@ cask "spotify"
 cask "slack"
 cask "discord"
 cask "font-hack-nerd-font"
-cask "viscosity"
-cask "maccy"
-cask "arc"
-cask "ghostty"
+cask "viscosity" # VPN
+cask "maccy" # Clipboard manager
+cask "arc" # Browser
+cask "ghostty" # Terminal
+cask "cursor" # IDE
