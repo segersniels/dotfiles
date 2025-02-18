@@ -37,7 +37,7 @@ alias gcam='git add . && cmt commit'
 alias gcamp='git add -p && cmt commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
-alias code="nvim"
+alias code="cursor"
 alias nvm="fnm"
 
 ## Exports
