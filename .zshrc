@@ -42,7 +42,8 @@ alias nvm="fnm"
 
 ## Exports
 
-export EDITOR="vim"
+export EDITOR="cursor"
+export GIT_EDITOR="vim"
 
 ## Secrets
 
@@ -84,9 +85,11 @@ zstyle ':completion:*:descriptions' format '%B%d%b'
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-
 # fnm
 eval "$(fnm env --use-on-cd --shell zsh)"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/segersniels/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
