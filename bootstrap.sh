@@ -65,7 +65,9 @@ rm -rf ./dotfiles
 
 # Node
 fnm install --lts
-npm install -g supdock @segersniels/propr @segersniels/cmt
+npm install -g supdock
+npm install -g @segersniels/cmt
+npm install -g @anthropic-ai/claude-code
 
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
