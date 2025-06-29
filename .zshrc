@@ -78,6 +78,9 @@ zstyle ':completion:*:make:*' tag-order targets
 zstyle ':completion:*:make:*' group-name ''
 zstyle ':completion:*:descriptions' format '%B%d%b'
 
+# Tinybird
+export PATH="$HOME/.local/bin:$PATH"
+
 # bun completions
 [ -s "/Users/segersniels/.bun/_bun" ] && source "/Users/segersniels/.bun/_bun"
 
@@ -93,3 +96,6 @@ if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+# Claude Code
+alias claude="~/.claude/local/claude"
