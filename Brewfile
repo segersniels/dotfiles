@@ -19,9 +19,9 @@ brew "gifsicle"
 brew "tldr"
 brew "svn" # Needed for fonts
 brew "cmake"
-brew "mas"
+brew "mas" # App store
 brew "neovim"
-brew "fnm"
+brew "fnm" # Node version manager
 
 # Cask
 cask "docker"
@@ -31,6 +31,6 @@ cask "discord"
 cask "font-hack-nerd-font"
 cask "viscosity" # VPN
 cask "maccy" # Clipboard manager
-cask "arc" # Browser
-cask "ghostty" # Terminal
-cask "cursor" # IDE
+cask "ghostty"
+cask "cursor"
+cask "tableplus"
