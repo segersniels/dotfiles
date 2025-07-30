@@ -1,4 +1,8 @@
-Analyze the current PR's code changes and suggest coding style and readability improvements.
+---
+description: "Analyze the current PR's code changes and suggest coding style and readability improvements."
+allowed-tools: ["Bash", "Read", "Edit", "TodoWrite"]
+argument-hint: "[optional: specific patterns to focus on]"
+---
 
 # Instructions
 

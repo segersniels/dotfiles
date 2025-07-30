@@ -1,4 +1,8 @@
-Look at the changes on the branch and identify business logic that needs testing.
+---
+description: "Look at the changes on the branch and identify business logic that needs testing."
+allowed-tools: ["Bash", "Read", "Edit", "TodoWrite"]
+argument-hint: "[optional: specific patterns to focus on]"
+---
 
 - Create a plan listing specific functions that need tests and why, then ask for confirmation before implementing.
 - Use the existing testing framework and follow the project's testing conventions.
