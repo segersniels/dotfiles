@@ -10,5 +10,3 @@ window-inherit-working-directory = true
 window-padding-balance = true
 adjust-cursor-thickness = 3
 keybind = shift+enter=text:\n
-background-opacity = 0.95
-background-blur=true
