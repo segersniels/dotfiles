@@ -17,8 +17,9 @@ Analyze CodeRabbit/review comments to identify genuinely valuable feedback vs. n
 3. **Create action plan** - Todo list for worthwhile fixes only
 4. **Fix individually** - Address each high-value issue separately  
 5. **Commit atomically** - Individual commits with descriptive messages
-6. **Push changes** - Push all commits to remote before replying
-7. **Reply to comments** - Respond to each fixed comment with confirmation and commit reference
+6. **Follow style** - Ensure you run linting or type-checking to adhere to the project's style rules
+7. **Push changes** - Push all commits to remote before replying
+8. **Reply to comments** - Respond to each fixed comment with confirmation and commit reference
 
 ## Focus Areas:
 
@@ -49,6 +50,8 @@ git push origin [branch-name]
 ```
 
 ## Comment Replies:
+
+> For best results, initiate chat on the files or code changes.
 
 After pushing all fixes, reply to the original comments with:
 - ✅ **Confirmation** that the issue was addressed
