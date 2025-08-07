@@ -99,3 +99,6 @@ if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc' ]; th
 
 # Claude Code
 alias claude="~/.claude/local/claude"
+
+# opencode
+export PATH=/Users/segersniels/.opencode/bin:$PATH
