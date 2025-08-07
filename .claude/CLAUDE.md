@@ -53,7 +53,7 @@ I want you to utilize a checkpoint system to track your progress to make it easi
 
 - Use the `git commit` command to create checkpoints.
 - ALWAYS create a checkpoint when you're done with a TODO task.
-- Checkpoins should be made as atomic as possible.
+- Checkpoints should be made as atomic as possible.
 - When asked to revert to a previous state you can then simply reset to a previous checkpoint.
 - NEVER create checkpoints when fixing rebase/merge conflicts.
 

@@ -16,10 +16,11 @@ backup-ghostty:
 	@cp ~/Library/Application\ Support/com.mitchellh.ghostty/config	.ghostty/config
 
 backup-claude:
-	@mkdir -p .claude/commands
+	@mkdir -p .claude/commands .claude/agents
 	@cp -v ~/.claude/CLAUDE.md .claude/CLAUDE.md
 	@cp -v ~/.claude/settings.json .claude/settings.json
 	@cp -Rv ~/.claude/commands/* .claude/commands
+	@cp -Rv ~/.claude/agents/* .claude/agents
 
 backup: backup-nvim backup-ghostty backup-claude
 	@$(foreach file, $(FILES), make backup-$(file);)

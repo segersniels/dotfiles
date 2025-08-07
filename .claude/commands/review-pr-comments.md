@@ -64,12 +64,12 @@ After pushing all fixes, reply to the original comments with:
 
 [Brief description of the change made]
 
-Thanks for catching this!
+Thanks for catching this @<username>.
 ```
 
 For skipped comments, optionally reply explaining why:
 ```
-Thanks for the suggestion! This appears to be a style preference rather than a functional issue, so I'm leaving it as-is for now to focus on runtime safety fixes.
+Thanks for the suggestion @<username>. This appears to be a style preference rather than a functional issue, so I'm leaving it as-is for now to focus on runtime safety fixes.
 ```
 
 ## Usage:
