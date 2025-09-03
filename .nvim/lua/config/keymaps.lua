@@ -6,9 +6,6 @@ vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without yanking" })
 -- Copy to system clipboard in normal and visual mode
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Copy to system clipboard" })
 
--- Copy whole line to system clipboard in normal mode
-vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Copy whole line to system clipboard" })
-
 -- Select word and create console.log below with the word
 vim.keymap.set(
 	"v",
