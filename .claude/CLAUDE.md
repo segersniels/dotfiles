@@ -28,6 +28,10 @@
 - ALWAYS implement new code similar as other existing code
 - DO NOT add comments that state the obvious, only add comments when explaining complex code.
 - When adding interfaces, enums, or other types, always use PascalCase for the naming. The enum values should be in UPPER_CASE.
+- ALWAYS use braces for if statements - no single-line `if (x) return` statements
+- Refrain from using `for (let i = 0; i < array.length; i++) {` statements. Use `for (const item of array) {` instead.
+- Use early returns and continue statements whenever possible.
+- Try to always have an empty line above return statements (unless it's a single line return statement).
 
 # Executing
 
@@ -36,6 +40,7 @@
 - Refrain from creating scripts to adjust multiple files at once. Adjust the files one by one to ensure you don't miss anything.
 - Refrain from creating temporary files to adjust code.
 - When comparing a local branch with a different branch always use the origin remote of that target branch as the local branch might not be fetched.
+- When replying to Github replies always use the `@` syntax to mention the person.
 
 ## Monorepo
 
@@ -56,6 +61,7 @@ I want you to utilize a checkpoint system to track your progress to make it easi
 - Checkpoints should be made as atomic as possible.
 - When asked to revert to a previous state you can then simply reset to a previous checkpoint.
 - NEVER create checkpoints when fixing rebase/merge conflicts.
+- If you made adjustments related to the last commit, just amend the last commit instead of creating a new one.
 
 ---
 

@@ -1,82 +1,79 @@
 ---
-description: "Analyze PR comments for value and fix high-impact issues individually"
-allowed-tools: ["Bash", "Read", "Edit", "TodoWrite"]
-argument-hint: "[optional: specific patterns to focus on]"
+description: "Comprehensively review PR comments, fix valid issues, and reply to commenters"
+allowed-tools: ["Bash", "Read", "Edit", "MultiEdit", "TodoWrite"]
+argument-hint: "[PR number or URL]"
 ---
 
-# Review PR Comments Workflow
+# PR Comment Review & Resolution
 
-Analyze CodeRabbit/review comments to identify genuinely valuable feedback vs. noise, then fix high-impact issues individually with separate commits.
+Fetch ALL PR comments (regular + inline), analyze their validity, fix high-value issues with separate commits, and reply to commenters with proper @mentions.
 
-## Process:
+## Workflow:
 
-1. **Fetch PR comments** - Get all comments from the current PR
-2. **Analyze for value** - Categorize comments by actual impact:
-   - ✅ **High Value**: Runtime safety, null checks, debug code, security issues
-   - ❌ **Low Value**: Style preferences, subjective organization, minor type complaints
-3. **Create action plan** - Todo list for worthwhile fixes only
-4. **Fix individually** - Address each high-value issue separately  
-5. **Commit atomically** - Individual commits with descriptive messages
-6. **Follow style** - Ensure you run linting or type-checking to adhere to the project's style rules
-7. **Push changes** - Push all commits to remote before replying
-8. **Reply to comments** - Respond to each fixed comment with confirmation and commit reference
+1. **Fetch All Comments** - Get complete comment data using GitHub API
+2. **Analyze PR Context** - Review the actual changes to understand scope  
+3. **Categorize Comments** - Separate high-value fixes from low-value style preferences
+4. **Create Action Plan** - Todo list of valid issues to address
+5. **Fix Issues Individually** - Make changes, then lint/typecheck before committing
+6. **Commit & Push** - Create atomic commits and push to remote
+7. **Reply to Comments** - Reply to commenters with commit references (only after push)
 
-## Focus Areas:
+## Comment Categories:
 
-**Always Fix:**
-- Null pointer/undefined access issues
+**HIGH VALUE (Always Fix):**
+- Null pointer/undefined access issues  
 - Debug console.log statements
 - Runtime safety problems
-- Security vulnerabilities
+- Security vulnerabilities  
 - Resource leaks
+- Breaking changes
 
-**Usually Skip:**
-- Style/formatting preferences  
+**LOW VALUE (Usually Skip):**
+- Style/formatting preferences
 - Subjective code organization
 - Type assertions (unless clearly unsafe)
-- Minor performance micro-optimizations
+- Minor performance micro-optimizations  
 - Opinionated architectural suggestions
 
-## Push Before Reply:
+## Critical Workflow Rules:
 
-**Critical**: Always push commits to remote before replying to comments to ensure:
-- ✅ **Reviewers can see the fixes** immediately when they click commit links
-- ✅ **CI/CD can run** on the updated code
-- ✅ **No broken links** in comment replies
-- ✅ **Professional workflow** - fixes are available before acknowledgment
+- **Always fetch both regular AND inline code comments**
+- **ALWAYS run linting and typechecking BEFORE committing each fix**:
+  - `npm run lint:fix` (or equivalent for the project)
+  - `npm run typecheck` (or equivalent for the project) 
+  - Fix any linting/type errors before proceeding to commit
+- **ALWAYS commit and push to remote BEFORE replying to comments**
+- **Use proper @mentions in all replies**
+- **Create separate commits for each distinct issue**
 
+## Reply Templates:
+
+**For fixes:**
+```
+✅ Fixed in commit {commit-hash}. 
+
+{Brief explanation of what was changed}
+
+Thanks for catching this @{username}.
+```
+
+**For declined suggestions:**
+```
+Thanks for the suggestion @{username}. This appears to be a style preference rather than a functional issue, so I'm leaving it as-is to focus on runtime safety fixes.
+```
+
+## Commands Used:
 ```bash
-git push origin [branch-name]
+gh pr view {PR} --comments --json comments
+gh api repos/{owner}/{repo}/pulls/{PR}/comments  
+gh pr diff {PR}
+# For each fix:
+npm run lint:fix && npm run typecheck
+git add {files} && git commit -m "fix: {description}"
+git push origin {branch}
+gh pr comment {PR} --body "{reply}"
 ```
 
-## Comment Replies:
-
-> For best results, initiate chat on the files or code changes.
-
-After pushing all fixes, reply to the original comments with:
-- ✅ **Confirmation** that the issue was addressed
-- 🔗 **Commit reference** linking to the specific fix
-- 📝 **Brief explanation** of what was changed (if needed)
-
-**Reply Template:**
-```
-✅ Fixed in commit [commit-hash]. 
-
-[Brief description of the change made]
-
-Thanks for catching this @<username>.
-```
-
-For skipped comments, optionally reply explaining why:
-```
-Thanks for the suggestion @<username>. This appears to be a style preference rather than a functional issue, so I'm leaving it as-is for now to focus on runtime safety fixes.
-```
-
-## Usage:
-```
-/review-pr-comments
-```
-
-This workflow ensures we address genuine bugs while avoiding time-wasting style bikeshedding.
+This workflow ensures we address genuine bugs while maintaining positive team collaboration and avoiding style bikeshedding.
 
 $ARGUMENTS
