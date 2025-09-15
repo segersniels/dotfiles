@@ -1,7 +1,7 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 
 -- Paste without yanking - paste over selection while preserving clipboard content
-vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without yanking" })
+vim.keymap.set("x", "<leader>P", [["_dP]], { desc = "Paste without yanking" })
 
 -- Copy to system clipboard in normal and visual mode
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Copy to system clipboard" })

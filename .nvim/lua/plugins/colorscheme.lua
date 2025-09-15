@@ -5,6 +5,7 @@ return {
 		lazy = true,
 		opts = {
 			style = "light",
+			auto = true,
 		},
 	},
 	{
