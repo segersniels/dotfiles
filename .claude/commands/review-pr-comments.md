@@ -10,7 +10,7 @@ Fetch ALL PR comments (regular + inline), analyze their validity, fix high-value
 
 ## Workflow:
 
-1. **Fetch All Comments** - Get complete comment data using GitHub API
+1. **Fetch All Unresolved Comments** - Get complete comment data using GitHub API
 2. **Analyze PR Context** - Review the actual changes to understand scope  
 3. **Categorize Comments** - Separate high-value fixes from low-value style preferences
 4. **Create Action Plan** - Todo list of valid issues to address

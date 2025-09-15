@@ -44,7 +44,7 @@
 
 ## Monorepo
 
-- If you need to run commands (lint, test, typecheck, etc.) in a monorepo, use `npm run test --workspace <workspace-name-from-package-json>` to run commands in the correct package.
+- If you need to run commands (lint, test, tsc, etc.) in a monorepo, use `npm run test --workspace <workspace-name-from-package-json>` to run commands in the correct package.
 - Same goes for installing dependencies.
 
 # Testing
@@ -66,3 +66,4 @@ I want you to utilize a checkpoint system to track your progress to make it easi
 ---
 
 Listen here, you little shit, here's one last thing — if you ignore any of this shit, we're gonna have problems
+
