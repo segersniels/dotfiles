@@ -26,10 +26,13 @@ return {
 		},
 		setup = {
 			eslint = function()
-				-- Automatically fix linting errors on save (but otherwise do not format the document)
-				vim.cmd([[
-			       autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
-			     ]])
+				require("lazyvim.util").lsp.on_attach(function(client)
+					if client.name == "eslint" then
+						client.server_capabilities.documentFormattingProvider = true
+					elseif client.name == "tsserver" then
+						client.server_capabilities.documentFormattingProvider = false
+					end
+				end)
 			end,
 		},
 	},

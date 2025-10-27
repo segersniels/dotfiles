@@ -2,7 +2,7 @@
 	rebase = true
 [user]
 	name = segersniels
-	email = segers.n@hotmail.com
+	email = github@niels.foo
 [core]
 	excludesfile = ~/.gitignore
 [push]

@@ -22,7 +22,12 @@ backup-claude:
 	@cp -Rv ~/.claude/commands/* .claude/commands
 	@cp -Rv ~/.claude/agents/* .claude/agents
 
-backup: backup-nvim backup-ghostty backup-claude
+backup-codex:
+	@mkdir -p .codex/prompts
+	@cp -v ~/.codex/AGENTS.md .codex/AGENTS.md
+	@cp -Rv ~/.codex/prompts/* .codex/prompts
+
+backup: backup-nvim backup-ghostty backup-claude backup-codex
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -43,6 +48,10 @@ restore-claude:
 	@mkdir -p ~/.claude
 	@cp -Rv .claude/* ~/.claude
 
+restore-codex:
+	@mkdir -p ~/.codex
+	@cp -Rv .codex/* ~/.codex
+
 restore-secrets:
 	@if [ ! -f ~/.secrets ]; then \
 		cp -v .secrets ~/.secrets; \
@@ -50,5 +59,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-nvim restore-ghostty restore-secrets restore-claude
+restore: restore-nvim restore-ghostty restore-secrets restore-claude restore-codex
 	@$(foreach file, $(FILES), make restore-$(file);)
