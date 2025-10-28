@@ -11,7 +11,7 @@ vim.opt.mouse = "a"
 vim.opt.mousehide = false
 
 -- Disable CMP AI-based code completion suggestions so Tab works
-vim.g.ai_cmp = false
+-- vim.g.ai_cmp = false
 
 -- Disable list characters (e.g., showing tabs and trailing spaces)
 vim.opt.list = false

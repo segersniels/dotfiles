@@ -4,9 +4,9 @@ return {
 	opts = {
 		picker = {
 			sources = {
-				files = { hidden = true, ignored = false },
-				grep = { hidden = true, ignored = false },
-				explorer = { hidden = true, ignored = false },
+				files = { hidden = true, ignored = true },
+				grep = { hidden = true, ignored = true },
+				explorer = { hidden = true, ignored = true },
 			},
 			win = {
 				input = {
@@ -31,9 +31,9 @@ return {
 		{
 			"<leader><space>",
 			function()
-				local instance = Snacks.picker.get({ source = "explorer" })[1]
-				if instance then
-					instance.input.win:focus()
+				local pickers = Snacks.picker.get({ source = "explorer" })
+				if pickers and #pickers > 0 then
+					pickers[1].input.win:focus()
 				else
 					Snacks.explorer({ focus = "input" })
 				end

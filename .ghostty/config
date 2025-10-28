@@ -1,8 +1,10 @@
 theme = light:smooth-light,dark:smooth-dark
 auto-update-channel = tip
 copy-on-select = false
-font-size = 16
-font-family = Hack Nerd Font
+font-size = 15
+font-family = Hack
+font-thicken = true
+font-thicken-strength = 0
 window-vsync = true
 window-padding-x = 12
 window-padding-y = 12
