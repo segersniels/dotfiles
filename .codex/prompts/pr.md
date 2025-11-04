@@ -9,6 +9,7 @@ argument-hint: "[origin] [draft]"
 Create a pull request by analyzing code changes and commit history.
 
 ## Process
+
 1. Run `git fetch --all --prune` to ensure the latest changes are fetched
 2. Check git status and current branch
 3. Get commit history from [origin] to HEAD
@@ -16,11 +17,14 @@ Create a pull request by analyzing code changes and commit history.
 5. Create a pull request with a descriptive title and body based on actual code changes
 
 ## Analysis
+
 - Examine modified files and functionality changes
 - Understand technical implementation and business impact
 - Focus on what changed, not just commit messages
 
 ## Rules
+
+- If [origin] was not provided by the user, prompt the user for the base branch (don't make assumptions)
 - Respect [origin] as the base branch and preferably prefix it with origin/[origin] if not already present so we check against the latest changes (local might be stale)
 - Write meaningful descriptions based on diff analysis
 - Never include checkboxes, test plans, or checklists

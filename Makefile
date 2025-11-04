@@ -26,6 +26,7 @@ backup-codex:
 	@mkdir -p .codex/prompts
 	@cp -v ~/.codex/AGENTS.md .codex/AGENTS.md
 	@cp -Rv ~/.codex/prompts/* .codex/prompts
+	@cp -v ~/.codex/config.toml .codex/config.toml
 
 backup: backup-nvim backup-ghostty backup-claude backup-codex
 	@$(foreach file, $(FILES), make backup-$(file);)

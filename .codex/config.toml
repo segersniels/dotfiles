@@ -1,0 +1,68 @@
+################################################################################
+# Core Model Selection
+################################################################################
+
+# Primary model used by Codex. Default differs by OS; non-Windows defaults here.
+# Linux/macOS default: "gpt-5-codex"; Windows default: "gpt-5".
+model = "gpt-5-codex"
+
+# Model used by the /review feature (code reviews). Default: "gpt-5-codex".
+review_model = "gpt-5-codex"
+
+# Reasoning effort: minimal | low | medium | high (default: medium)
+model_reasoning_effort = "medium"
+
+################################################################################
+# Approval & Sandbox
+################################################################################
+
+# When to ask for command approval:
+# - untrusted: only known-safe read-only commands auto-run; others prompt
+# - on-failure: auto-run in sandbox; prompt only on failure for escalation
+# - on-request: model decides when to ask (default)
+# - never: never prompt (risky)
+approval_policy = "on-failure"
+
+# Filesystem/network sandbox policy for tool calls:
+# - read-only (default)
+# - workspace-write
+# - danger-full-access (no sandbox; extremely risky)
+sandbox_mode = "workspace-write"
+
+# Extra settings used only when sandbox_mode = "workspace-write".
+[sandbox_workspace_write]
+network_access = true
+
+################################################################################
+# Shell Environment Policy for spawned processes
+################################################################################
+
+[shell_environment_policy]
+# inherit: all (default) | core | none
+inherit = "all"
+# Skip default excludes for names containing KEY/TOKEN (case-insensitive). Default: false
+ignore_default_excludes = true
+# Experimental: run via user shell profile. Default: false
+experimental_use_profile = true
+
+################################################################################
+# UI, Notifications, and Misc
+################################################################################
+
+[tui]
+# Desktop notifications from the TUI: boolean or filtered list. Default: false
+# Examples: true | ["agent-turn-complete", "approval-requested"]
+notifications = true
+
+################################################################################
+# Projects (trust levels)
+################################################################################
+
+[projects."/Users/segersniels/projects/tally/tally"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/kt"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/smooth.nvim"]
+trust_level = "trusted"
