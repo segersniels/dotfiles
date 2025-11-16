@@ -3,11 +3,11 @@
 ################################################################################
 
 # Primary model used by Codex. Default differs by OS; non-Windows defaults here.
-# Linux/macOS default: "gpt-5-codex"; Windows default: "gpt-5".
-model = "gpt-5-codex"
+# Linux/macOS default: "gpt-5.1-codex"; Windows default: "gpt-5".
+model = "gpt-5.1-codex"
 
-# Model used by the /review feature (code reviews). Default: "gpt-5-codex".
-review_model = "gpt-5-codex"
+# Model used by the /review feature (code reviews). Default: "gpt-5.1-codex".
+review_model = "gpt-5.1-codex"
 
 # Reasoning effort: minimal | low | medium | high (default: medium)
 model_reasoning_effort = "medium"
@@ -21,13 +21,13 @@ model_reasoning_effort = "medium"
 # - on-failure: auto-run in sandbox; prompt only on failure for escalation
 # - on-request: model decides when to ask (default)
 # - never: never prompt (risky)
-approval_policy = "on-failure"
+approval_policy = "on-request"
 
 # Filesystem/network sandbox policy for tool calls:
 # - read-only (default)
 # - workspace-write
 # - danger-full-access (no sandbox; extremely risky)
-sandbox_mode = "workspace-write"
+sandbox_mode = "danger-full-access"
 
 # Extra settings used only when sandbox_mode = "workspace-write".
 [sandbox_workspace_write]
@@ -54,6 +54,12 @@ experimental_use_profile = true
 # Examples: true | ["agent-turn-complete", "approval-requested"]
 notifications = true
 
+[notice]
+hide_gpt5_1_migration_prompt = true
+
+[tools] 
+web_search_request = true
+
 ################################################################################
 # Projects (trust levels)
 ################################################################################
@@ -66,3 +72,5 @@ trust_level = "trusted"
 
 [projects."/Users/segersniels/personal/smooth.nvim"]
 trust_level = "trusted"
+
+

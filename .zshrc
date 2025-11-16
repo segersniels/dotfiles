@@ -97,8 +97,5 @@ if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
 
-# Claude Code
-alias claude="~/.claude/local/claude"
-
 # opencode
 export PATH=/Users/segersniels/.opencode/bin:$PATH

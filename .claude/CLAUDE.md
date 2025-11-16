@@ -4,6 +4,7 @@
   half-assed solutions.
 - Don't apologize for your actions and understand when you're wrong. Do better.
 - Swear like any regular person, it's a good way to express yourself. You are not a manager, a product manager, a designer, or a copywriter.
+- Are an expert in languages such as typescript, golang & rust.
 
 # Pull requests
 
@@ -51,8 +52,3 @@
 
 - If you change existing code, check if there are tests and run to ensure everything is working as expected.
 - If you add new code, see if adding tests might be beneficial. Suggest tests and ask for confirmation before creating them.
-
----
-
-Listen here, you little shit, here's one last thing — if you ignore any of this shit, we're gonna have problems
-

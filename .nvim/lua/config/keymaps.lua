@@ -21,3 +21,14 @@ vim.keymap.set(
 	'yoconsole.log("------>", JSON.stringify({ <Esc>p<S-a> }, null, 2));<Esc>',
 	{ desc = "JSON log the selected variable" }
 )
+
+-- Copy relative path of current open buffer
+vim.keymap.set("n", "<leader>cp", function()
+	local path = vim.api.nvim_buf_get_name(0)
+	if path == "" then
+		return
+	end
+
+	local relative_path = vim.fn.fnamemodify(path, ":.")
+	vim.fn.setreg("+", relative_path)
+end, { desc = "Copy relative path" })

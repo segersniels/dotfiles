@@ -1,4 +1,3 @@
--- Primarily used to tell a specific LSP how to behave
 return {
 	"neovim/nvim-lspconfig",
 	opts = {
@@ -25,11 +24,28 @@ return {
 			},
 		},
 		setup = {
-			eslint = function()
-				Snacks.util.lsp.on({ name = "eslint" }, function(_, client)
-					client.server_capabilities.documentFormattingProvider = true
-				end)
+			vtsls = function()
+				vim.api.nvim_create_autocmd("LspAttach", {
+					callback = function(args)
+						local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+						if client and client.name == "eslint" then
+							client.server_capabilities.documentFormattingProvider = true
+						elseif client and client.name == "vtsls" then
+							client.server_capabilities.documentFormattingProvider = false
+						end
+					end,
+				})
 			end,
+			-- eslint = function()
+			-- 	Snacks.util.lsp.on({}, function(_, client)
+			-- 		if client.name == "eslint" then
+			-- 			client.server_capabilities.documentFormattingProvider = true
+			-- 		elseif client.name == "vtsls" then
+			-- 			client.server_capabilities.documentFormattingProvider = false
+			-- 		end
+			-- 	end)
+			-- end,
 		},
 	},
 }

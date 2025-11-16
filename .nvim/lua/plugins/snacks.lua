@@ -1,22 +1,26 @@
 return {
 	"folke/snacks.nvim",
 	priority = 1000,
+	lazy = false,
 	opts = {
+		scroll = { enabled = true },
 		picker = {
 			sources = {
-				files = { hidden = true, ignored = true },
-				grep = { hidden = true, ignored = true },
-				explorer = { hidden = true, ignored = true },
+				files = { hidden = true, ignored = false },
+				grep = { hidden = true, ignored = false },
+				explorer = { hidden = true, ignored = false },
 			},
 			win = {
 				input = {
 					keys = {
 						["<Esc>"] = false,
+						["<c-s>"] = false, -- Disable ctrl+s in input window
 					},
 				},
 				list = {
 					keys = {
 						["<Esc>"] = false,
+						["<c-s>"] = false, -- Disable ctrl+s in list window
 					},
 				},
 				preview = {

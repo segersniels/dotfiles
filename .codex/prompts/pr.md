@@ -30,3 +30,11 @@ Create a pull request by analyzing code changes and commit history.
 - Never include checkboxes, test plans, or checklists
 - Avoid ANSI codes in descriptions
 - Pass markdown directly to gh, never use heredoc
+
+## Template
+
+### Summary
+### Added
+### Changed
+### Fixed
+### Removed
