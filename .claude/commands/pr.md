@@ -15,6 +15,8 @@ Create a pull request by analyzing code changes and commit history.
 3. Get commit history from [origin] to HEAD
 4. Analyze `git diff [origin]...HEAD` to understand changes
 5. Create a pull request with a descriptive title and body based on actual code changes
+6. Use `gh` to create the PR
+7. Assign the current git user to the created PR
 
 ## Analysis
 
@@ -30,11 +32,7 @@ Create a pull request by analyzing code changes and commit history.
 - Never include checkboxes, test plans, or checklists
 - Avoid ANSI codes in descriptions
 - Pass markdown directly to gh, never use heredoc
+- When writing PR titles or bodies, wrap every code identifier (variable names, params, functions, keys, enum values) in backticks.
+- The title of the PR should follow conventional commit standards
+- Use markdown and differentiate between sections using ###
 
-## Template
-
-### Summary
-### Added
-### Changed
-### Fixed
-### Removed

@@ -3,11 +3,10 @@
 ################################################################################
 
 # Primary model used by Codex. Default differs by OS; non-Windows defaults here.
-# Linux/macOS default: "gpt-5.1-codex"; Windows default: "gpt-5".
-model = "gpt-5.1-codex"
+model = "gpt-5.1-codex-max"
 
-# Model used by the /review feature (code reviews). Default: "gpt-5.1-codex".
-review_model = "gpt-5.1-codex"
+# Model used by the /review feature (code reviews).
+review_model = "gpt-5.1-codex-max"
 
 # Reasoning effort: minimal | low | medium | high (default: medium)
 model_reasoning_effort = "medium"
@@ -21,7 +20,7 @@ model_reasoning_effort = "medium"
 # - on-failure: auto-run in sandbox; prompt only on failure for escalation
 # - on-request: model decides when to ask (default)
 # - never: never prompt (risky)
-approval_policy = "on-request"
+approval_policy = "on-failure"
 
 # Filesystem/network sandbox policy for tool calls:
 # - read-only (default)
@@ -56,21 +55,18 @@ notifications = true
 
 [notice]
 hide_gpt5_1_migration_prompt = true
+"hide_gpt-5.1-codex-max_migration_prompt" = true
 
-[tools] 
+[features] 
+streamable_shell = true
 web_search_request = true
 
 ################################################################################
 # Projects (trust levels)
 ################################################################################
 
-[projects."/Users/segersniels/projects/tally/tally"]
+[projects."/Users/segersniels/projects"]
 trust_level = "trusted"
 
-[projects."/Users/segersniels/personal/kt"]
+[projects."/Users/segersniels/personal"]
 trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/smooth.nvim"]
-trust_level = "trusted"
-
-
