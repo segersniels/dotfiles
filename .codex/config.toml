@@ -26,7 +26,7 @@ approval_policy = "on-failure"
 # - read-only (default)
 # - workspace-write
 # - danger-full-access (no sandbox; extremely risky)
-sandbox_mode = "danger-full-access"
+sandbox_mode = "workspace-write"
 
 # Extra settings used only when sandbox_mode = "workspace-write".
 [sandbox_workspace_write]

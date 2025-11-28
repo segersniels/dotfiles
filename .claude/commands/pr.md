@@ -14,8 +14,8 @@ Create a pull request by analyzing code changes and commit history.
 2. Check git status and current branch
 3. Get commit history from [origin] to HEAD
 4. Analyze `git diff [origin]...HEAD` to understand changes
-5. Create a pull request with a descriptive title and body based on actual code changes
-6. Use `gh` to create the PR
+5. Prompt the user for the [origin] (don't make assumptions)
+6. Create a pull request with a descriptive title and body based on actual code changes (`gh`)
 7. Assign the current git user to the created PR
 
 ## Analysis
@@ -26,13 +26,12 @@ Create a pull request by analyzing code changes and commit history.
 
 ## Rules
 
-- If [origin] was not provided by the user, prompt the user for the base branch (don't make assumptions)
-- Respect [origin] as the base branch and preferably prefix it with origin/[origin] if not already present so we check against the latest changes (local might be stale)
+- **PR title MUST use Conventional Commits format**: `type(scope): description`
+  - Lowercase, imperative mood (same as commit messages)
+  - Optional Notion ticket ID in brackets at end: `[TL-1234]`
 - Write meaningful descriptions based on diff analysis
 - Never include checkboxes, test plans, or checklists
 - Avoid ANSI codes in descriptions
 - Pass markdown directly to gh, never use heredoc
-- When writing PR titles or bodies, wrap every code identifier (variable names, params, functions, keys, enum values) in backticks.
-- The title of the PR should follow conventional commit standards
 - Use markdown and differentiate between sections using ###
-
+- When writing PR titles or bodies, wrap every code identifier (variable names, params, functions, keys, enum values) in backticks.
