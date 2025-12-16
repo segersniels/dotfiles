@@ -1,4 +1,4 @@
-theme = light:smooth-light,dark:smooth-dark
+theme = smooth-dark
 auto-update-channel = tip
 copy-on-select = false
 font-size = 15

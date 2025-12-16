@@ -3,13 +3,13 @@
 ################################################################################
 
 # Primary model used by Codex. Default differs by OS; non-Windows defaults here.
-model = "gpt-5.1-codex-max"
+model = "gpt-5.2"
 
 # Model used by the /review feature (code reviews).
 review_model = "gpt-5.1-codex-max"
 
 # Reasoning effort: minimal | low | medium | high (default: medium)
-model_reasoning_effort = "medium"
+model_reasoning_effort = "low"
 
 ################################################################################
 # Approval & Sandbox
@@ -60,6 +60,7 @@ hide_gpt5_1_migration_prompt = true
 [features] 
 streamable_shell = true
 web_search_request = true
+skills = true
 
 ################################################################################
 # Projects (trust levels)

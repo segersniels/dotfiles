@@ -1,0 +1,12 @@
+prefix_rule(
+  pattern = ["npm", ["run", "install", "uninstall", "test"]],
+  decision = "allow",
+  match = [["npm", "run", "dev", "--workspace", "foo"]],
+)
+
+prefix_rule(
+  pattern = ["npm", "run", "build"],
+  decision = "forbidden",
+  match = [["npm", "run", "build"]],
+  not_match = [["npm", "run", "dev", "--workspace", "foo"]]
+)

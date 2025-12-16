@@ -1,18 +1,14 @@
 ---
-description: "Create atomic commits following conventional commit format."
-allowed-tools: ["Bash", "Read", "Edit", "MultiEdit", "TodoWrite"]
-argument-hint: "[instructions]"
+name: commit
+description: Create atomic commits following conventional commit format
 ---
-
-# commit
-
-Create atomic commits following conventional commit format.
 
 ## Process
 
-1. Review current changes with `git status` and `git diff`
-2. Stage changes if needed
-3. Create focused, atomic commits with clear messages
+- Look at the current staged and unstaged changes with `git status` and `git diff`
+- Stage changes if needed using `git add .`
+- Create focused, atomic commits with clear messages
+- Refrain from adding one big commit, instead create multiple smaller atomic commits when it makes sense to do so
 
 ## Scope Guidelines
 

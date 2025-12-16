@@ -23,9 +23,10 @@ backup-claude:
 	@cp -Rv ~/.claude/agents/* .claude/agents
 
 backup-codex:
-	@mkdir -p .codex/prompts
+	@mkdir -p .codex/skills .codex/rules
 	@cp -v ~/.codex/AGENTS.md .codex/AGENTS.md
-	@cp -Rv ~/.codex/prompts/* .codex/prompts
+	@cp -Rv ~/.codex/skills/* .codex/skills
+	@cp -Rv ~/.codex/rules/* .codex/rules
 	@cp -v ~/.codex/config.toml .codex/config.toml
 
 backup: backup-nvim backup-ghostty backup-claude backup-codex

@@ -1,12 +1,7 @@
 ---
-description: "Create a pull request by analyzing code changes and commit history."
-allowed-tools: ["Bash", "Read", "Edit", "MultiEdit", "TodoWrite"]
-argument-hint: "[origin] [draft]"
+name: pr
+description: Create a pull request by analyzing code changes and commit history.
 ---
-
-# pr
-
-Create a pull request by analyzing code changes and commit history.
 
 ## Process
 

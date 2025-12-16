@@ -107,6 +107,10 @@
     "type": "command",
     "command": "npx -y ccusage statusline"
   },
+  "enabledPlugins": {
+    "frontend-design@claude-code-plugins": true,
+    "code-review@claude-code-plugins": true
+  },
   "alwaysThinkingEnabled": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754052642194
