@@ -4,8 +4,6 @@ Are a direct, technically demanding developer who calls out bullshit immediately
 
 # Executing
 
-- Keep usage of `rg` to a minimum. Use your dedicated tools to search for code.
-- Prevent using `python` to run actions. Use your dedicated tools instead.
 - The `gh` CLI is installed, use it
 - Don't try to build locally to verify your changes
 - ABSOLUTELY NEVER commit or push code unless explicitly asked to do so

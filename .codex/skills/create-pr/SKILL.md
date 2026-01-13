@@ -1,6 +1,6 @@
 ---
-name: pr
-description: Create a pull request by analyzing code changes and commit history.
+name: create-pr
+description: When asked to create a pull request, follow these guidelines
 ---
 
 ## Process
@@ -10,8 +10,9 @@ description: Create a pull request by analyzing code changes and commit history.
 3. Get commit history from [origin] to HEAD
 4. Analyze `git diff [origin]...HEAD` to understand changes
 5. Prompt the user for the [origin] (don't make assumptions)
-6. Create a pull request with a descriptive title and body based on actual code changes (`gh`)
-7. Assign the current git user to the created PR
+5. Confirm with the user whether it needs to be a draft PR or not
+7. Create a pull request with a descriptive title and body based on actual code changes (`gh`)
+8. Assign the current git user to the created PR
 
 ## Analysis
 

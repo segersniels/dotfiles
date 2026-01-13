@@ -1,0 +1,18 @@
+prefix_rule(
+  pattern = ["bun", ["run", "install", "add", "remove", "test"]],
+  decision = "allow",
+  match = [["bun", "run", "dev", "--workspace", "foo"]],
+)
+
+prefix_rule(
+  pattern = ["bun", "run", "build"],
+  decision = "forbidden",
+  match = [["bun", "run", "build"]],
+  not_match = [["bun", "run", "dev", "--workspace", "foo"]]
+)
+
+prefix_rule(
+  pattern = ["bun", "publish"],
+  decision = "forbidden",
+  match = [["bun", "publish"]],
+)

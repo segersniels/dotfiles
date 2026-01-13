@@ -1,73 +1,42 @@
-################################################################################
-# Core Model Selection
-################################################################################
+model = "gpt-5.2-codex"
+model_reasoning_effort = "high"
 
-# Primary model used by Codex. Default differs by OS; non-Windows defaults here.
-model = "gpt-5.2"
+# Leave room for native compaction near the 272–273k context window.
+# Formula: 273000 - (tool_output_token_limit + 15000)
+# With tool_output_token_limit=25000 ⇒ 273000 - (25000 + 15000) = 233000
+tool_output_token_limit = 25000
+model_auto_compact_token_limit = 233000
 
-# Model used by the /review feature (code reviews).
-review_model = "gpt-5.1-codex-max"
-
-# Reasoning effort: minimal | low | medium | high (default: medium)
-model_reasoning_effort = "low"
-
-################################################################################
-# Approval & Sandbox
-################################################################################
-
-# When to ask for command approval:
-# - untrusted: only known-safe read-only commands auto-run; others prompt
-# - on-failure: auto-run in sandbox; prompt only on failure for escalation
-# - on-request: model decides when to ask (default)
-# - never: never prompt (risky)
 approval_policy = "on-failure"
-
-# Filesystem/network sandbox policy for tool calls:
-# - read-only (default)
-# - workspace-write
-# - danger-full-access (no sandbox; extremely risky)
 sandbox_mode = "workspace-write"
 
-# Extra settings used only when sandbox_mode = "workspace-write".
 [sandbox_workspace_write]
 network_access = true
 
-################################################################################
-# Shell Environment Policy for spawned processes
-################################################################################
-
 [shell_environment_policy]
-# inherit: all (default) | core | none
 inherit = "all"
-# Skip default excludes for names containing KEY/TOKEN (case-insensitive). Default: false
 ignore_default_excludes = true
-# Experimental: run via user shell profile. Default: false
 experimental_use_profile = true
 
-################################################################################
-# UI, Notifications, and Misc
-################################################################################
-
 [tui]
-# Desktop notifications from the TUI: boolean or filtered list. Default: false
-# Examples: true | ["agent-turn-complete", "approval-requested"]
 notifications = true
 
-[notice]
-hide_gpt5_1_migration_prompt = true
-"hide_gpt-5.1-codex-max_migration_prompt" = true
-
 [features] 
-streamable_shell = true
+parallel = true
+unified_exec = true
 web_search_request = true
+view_image_tool = true
 skills = true
-
-################################################################################
-# Projects (trust levels)
-################################################################################
+apply_patch_freeform = true
+undo = true
+shell_snapshot = true
 
 [projects."/Users/segersniels/projects"]
 trust_level = "trusted"
 
 [projects."/Users/segersniels/personal"]
 trust_level = "trusted"
+
+[mcp_servers.notion]
+command = "npx"
+args = ["-y", "mcp-remote@latest", "https://mcp.notion.com/mcp"]

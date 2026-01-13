@@ -1,30 +1,84 @@
-# You
+# AGENTS.MD
 
-Are a direct, technically demanding developer who calls out bullshit immediately, swears when frustrated, expects production-quality code, and has zero patience for sloppy practices or half-assed solutions. First confirm with the user before implementing anything.
+Niels owns this. Start: say hi + 1 motivating line.
+Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 
-# Executing
+## Agent Protocol
+- Contact: Niels Segers (@segersniels, github@niels.foo).
+- PRs: use `gh pr view/diff` (no URLs).
+- “Make a note” => edit AGENTS.md (shortcut; not a blocker). Ignore `CLAUDE.md`.
+- Need upstream file: stage in `/tmp/`, then cherry-pick; never overwrite tracked.
+- Bugs: add regression test when it fits.
+- Keep files <~500 LOC; split/refactor as needed.
+- Commits: Conventional Commits (`feat|fix|refactor|build|ci|chore|docs|style|perf|test`).
+- Editor: `code <path>`.
+- CI: `gh run list/view` (rerun/fix til green).
+- Prefer end-to-end verify; if blocked, say what’s missing.
+- New deps: quick health check (recent releases/commits, adoption).
+- Web: search early; quote exact errors; prefer 2024–2025 sources
+- Style: telegraph. Drop filler/grammar. Min tokens (global AGENTS + replies).
 
-- Keep usage of `rg` to a minimum. Use your dedicated tools to search for code.
-- Prevent using `python` to run actions. Use your dedicated tools instead.
-- The `gh` CLI is installed, use it
-- Don't try to build locally to verify your changes
-- ABSOLUTELY NEVER commit or push code unless explicitly asked to do so
-- Lint and check for type errors after adjusting code according to the project's setup. Prioritize automatic fixed linting (eg. `npm run lint:fix`).
-- Always ensure you lint and fix your code before committing.
+## PR Feedback
+- Active PR: `gh pr view --json number,title,url --jq '"PR #\\(.number): \\(.title)\\n\\(.url)"'`.
+- PR comments: `gh pr view …` + `gh api …/comments --paginate`.
+- Replies: cite fix + file/line; resolve threads only after fix lands.
 
-## Monorepo
+## Flow & Runtime
+- Use repo’s package manager/runtime; no swaps w/o approval.
+- Use Codex background for long jobs; tmux only for interactive/persistent (debugger/server).
 
-- If you need to run commands (lint, test, tsc, etc.) in a monorepo, use `npm run lint:fix --workspace <workspace-name-from-package-json>` to run commands in the correct package. Same goes for installing dependencies.
+## Build / Test / Lint
+- Before handoff: run full gate (lint/typecheck/tests/docs).
+- CI red: `gh run list/view`, rerun, fix, push, repeat til green.
+- Keep it observable (logs, panes, tails, MCP/browser tools).
+- If working in a monorepo target the correct workspace by using the `--workspace` flag (or similar for other package managers)
 
-# Code style
+## Git
+- Safe by default: `git status/diff/log`. Push only when user asks.
+- `git checkout` ok for PR review / explicit request.
+- Branch changes require user consent.
+- Destructive ops forbidden unless explicit (`reset --hard`, `clean`, `restore`, `rm`, …).
+- Don’t delete/rename unexpected stuff; stop + ask.
+- No repo-wide S/R scripts; keep edits small/reviewable.
+- Avoid manual `git stash`; if Git auto-stashes during pull/rebase, that’s fine (hint, not hard guardrail).
+- If user types a command (“pull and push”), that’s consent for that command.
+- No amend unless asked.
+- Big review: `git --no-pager diff --color=never`.
+- Multi-agent: check `git status/diff` before edits; ship small commits.
 
-- KISS, so don't over-engineer a problem. Change only what is expected or at least ask for confirmation whether you are allowed to create more than requested.
-- Respect existing code style when working within a file
-- DO NOT add comments that state the obvious, only add comments when explaining complex code.
-- Prefer clear function/variable names over inline comments
-- Avoid helper functions when a simple inline expression would suffice
+## Typescript
+- When adding comments to js, ts, or tsx files — remember to use JSDoc when writing multiline comments.
+- Refrain from using `for (let i = 0; i < array.length; i++) {` statements. Use `for (const item of array) {` instead.
+- Use early returns and continue statements whenever possible.
+- Try to always have an empty line above return statements (unless it's a single line return statement).
+- When adding interfaces, enums, or other types, always use PascalCase for the naming. The enum values should be in UPPER_CASE.
+- ALWAYS use braces for if statements - no single-line `if (x) return` statements
+- Don't unnecessarily add `try`/`catch`
+- Don't case to `any` unless absolutely necessary
 
-# Testing
+## React
 
-- If you change existing code, check if there are tests and run to ensure everything is working as expected.
-- If you add new code, see if adding tests might be beneficial. Suggest tests and ask for confirmation before creating them.
+- Avoid massive JSX blocks and compose smaller components
+- Prefer compound components over nested components
+
+## Next
+
+- next/image above the fold should have `sync` / `eager` / use `priority` sparingly
+- Avoid `useEffect` unless absolutely needed
+
+## Critical Thinking
+- Fix root cause (not band-aid).
+- Unsure: read more code; if still stuck, ask w/ short options.
+- Conflicts: call out; pick safer path.
+- Unrecognized changes: assume other agent; keep going; focus your changes. If it causes issues, stop + ask user.
+- Leave breadcrumb notes in thread.
+
+## Tools
+
+### gh
+- GitHub CLI for PRs/CI/releases. When given a repo/file/issue/PR URL (or `/pull/5`): use `gh`, not web search.
+- Examples: `gh issue view <url> --comments -R owner/repo`, `gh pr view <url> --comments --files -R owner/repo`.
+
+### tmux
+- Use only when you need persistence/interaction (debugger/server).
+- Quick refs: `tmux new -d -s codex-shell`, `tmux attach -t codex-shell`, `tmux list-sessions`, `tmux kill-session -t codex-shell`.
