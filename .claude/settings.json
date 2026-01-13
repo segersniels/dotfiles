@@ -98,7 +98,31 @@
       "WebFetch(domain:docs.sendgrid.com)",
       "WebFetch(domain:www.twilio.com)",
       "Bash(npm run test:unit:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(make lint:*)",
+      "Bash(go build:*)",
+      "Bash(go vet:*)",
+      "Bash(gofmt:*)",
+      "Bash(go test:*)",
+      "WebFetch(domain:vercel.com)",
+      "Bash(mkdir:*)",
+      "Bash(bun install)",
+      "Bash(bun pm:*)",
+      "Bash(bun add:*)",
+      "WebFetch(domain:v6.ai-sdk.dev)",
+      "Bash(npx turbo:*)",
+      "Bash(bun run dev:*)",
+      "Bash(bun test:*)",
+      "Bash(bun run test)",
+      "Bash(bun run typecheck:*)",
+      "Bash(bunx evalite:*)",
+      "Bash(bun run test:eval:*)",
+      "Bash(bun run lint:*)",
+      "Bash(bun run lint:fix:*)",
+      "Bash(bun run typecheck:fix:*)",
+      "WebFetch(domain:warhammer40k.fandom.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "defaultMode": "default"
@@ -109,9 +133,10 @@
   },
   "enabledPlugins": {
     "frontend-design@claude-code-plugins": true,
-    "code-review@claude-code-plugins": true
+    "code-review@claude-code-plugins": true,
+    "ralph-wiggum@claude-code-plugins": true,
+    "code-simplifier@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754052642194
   }

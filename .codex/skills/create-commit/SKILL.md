@@ -1,6 +1,6 @@
 ---
-name: commit
-description: Create atomic commits following conventional commit format
+name: create-commit
+description: When asked to commit the codebase, follow these guidelines
 ---
 
 ## Process

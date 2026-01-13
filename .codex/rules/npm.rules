@@ -10,3 +10,9 @@ prefix_rule(
   match = [["npm", "run", "build"]],
   not_match = [["npm", "run", "dev", "--workspace", "foo"]]
 )
+
+prefix_rule(
+  pattern = ["npm", "publish"],
+  decision = "forbidden",
+  match = [["npm", "publish"]],
+)
