@@ -12,6 +12,7 @@
       "*": "ask",
       "node *": "allow",
       "python *": "allow",
+      "python3 *": "allow",
       "go *": "allow",
       "git *": "allow",
       "git push *": "deny",
