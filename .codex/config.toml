@@ -9,6 +9,7 @@ model_auto_compact_token_limit = 233000
 
 approval_policy = "on-failure"
 sandbox_mode = "workspace-write"
+personality = "pragmatic"
 
 [sandbox_workspace_write]
 network_access = true
@@ -21,10 +22,11 @@ experimental_use_profile = true
 [tui]
 notifications = true
 
+suppress_unstable_features_warning = true
+
 [features] 
 parallel = true
 unified_exec = true
-web_search_request = true
 view_image_tool = true
 skills = true
 apply_patch_freeform = true
@@ -38,5 +40,4 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [mcp_servers.notion]
-command = "npx"
-args = ["-y", "mcp-remote@latest", "https://mcp.notion.com/mcp"]
+url = "https://mcp.notion.com/mcp"

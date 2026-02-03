@@ -1,5 +1,5 @@
 prefix_rule(
-  pattern = ["git", ["pull", "commit", "add", "status", "diff", "checkout", "fetch", "branch"]],
+  pattern = ["git", ["pull", "commit", "add", "status", "diff", "checkout", "fetch", "branch", "stash"]],
   decision = "allow",
   match = [["git", "pull"], ["git", "checkout", "-b", "foo/bar"]],
   not_match = [["git", "push"]]
