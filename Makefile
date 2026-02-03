@@ -6,36 +6,34 @@ backup-%:
 	@cp -Rv ~/.$* .$*
 
 backup-nvim:
-	@mkdir -p .nvim
-	@cp -Rv ~/.config/nvim/* .nvim
-	@rm -rf .nvim/pack
+	@rm -rf .nvim
+	@rsync -av --exclude='pack' ~/.config/nvim/ .nvim/
 
 backup-ghostty:
-	@mkdir -p .ghostty
-	@cp -Rv ~/.config/ghostty/* .ghostty
-	@cp ~/Library/Application\ Support/com.mitchellh.ghostty/config	.ghostty/config
+	@rm -rf .ghostty
+	@rsync -av ~/.config/ghostty/ .ghostty/
+	@rsync -av ~/Library/Application\ Support/com.mitchellh.ghostty/config .ghostty/config
 
 backup-claude:
-	@mkdir -p .claude/commands .claude/agents
-	@cp -v ~/.claude/CLAUDE.md .claude/CLAUDE.md
-	@cp -v ~/.claude/settings.json .claude/settings.json
-	@cp -Rv ~/.claude/commands/* .claude/commands
-	@cp -Rv ~/.claude/agents/* .claude/agents
+	@rm -rf .claude
+	@rsync -av ~/.claude/CLAUDE.md .claude/
+	@rsync -av ~/.claude/settings.json .claude/
+	@rsync -av ~/.claude/commands/ .claude/commands/
+	@rsync -av ~/.claude/agents/ .claude/agents/
 
 backup-codex:
-	@mkdir -p .codex/skills .codex/rules .codex/prompts
-	@cp -v ~/.codex/config.toml .codex/config.toml
-	@cp -v ~/.codex/AGENTS.md .codex/AGENTS.md
-	@cp -Rv ~/.codex/skills/* .codex/skills
-	@cp -Rv ~/.codex/rules/* .codex/rules
-	@cp -Rv ~/.codex/prompts/* .codex/prompts
+	@rm -rf .codex
+	@rsync -av ~/.codex/config.toml .codex/
+	@rsync -av ~/.codex/AGENTS.md .codex/
+	@rsync -av ~/.codex/skills/ .codex/skills/
+	@rsync -av ~/.codex/rules/ .codex/rules/
 
 backup-opencode:
-	@mkdir -p .opencode/commands .opencode/skill
-	@cp -v ~/.config/opencode/opencode.jsonc .opencode/opencode.jsonc
-	@cp -v ~/.config/opencode/AGENTS.md .opencode/AGENTS.md
-	@cp -Rv ~/.config/opencode/commands/* .opencode/commands
-	@cp -Rv ~/.config/opencode/skill/* .opencode/skill
+	@rm -rf .opencode
+	@rsync -av ~/.config/opencode/opencode.jsonc .opencode/
+	@rsync -av ~/.config/opencode/AGENTS.md .opencode/
+	@rsync -av ~/.config/opencode/commands/ .opencode/commands/
+	@rsync -av ~/.config/opencode/skill/ .opencode/skill/
 
 backup: backup-nvim backup-ghostty backup-claude backup-codex
 	@$(foreach file, $(FILES), make backup-$(file);)
@@ -46,25 +44,20 @@ restore-%:
 	@cp -v .$* ~/.$*
 
 restore-nvim:
-	@mkdir -p ~/.config/nvim
-	@cp -Rv .nvim/* ~/.config/nvim
+	@rsync -av .nvim/ ~/.config/nvim/
 
 restore-ghostty:
-	@mkdir -p ~/.config/ghostty
-	@cp -Rv .ghostty/* ~/.config/ghostty
-	@cp .ghostty/config ~/Library/Application\ Support/com.mitchellh.ghostty/config
+	@rsync -av .ghostty/ ~/.config/ghostty/
+	@rsync -av .ghostty/config ~/Library/Application\ Support/com.mitchellh.ghostty/config
 
 restore-claude:
-	@mkdir -p ~/.claude
-	@cp -Rv .claude/* ~/.claude
+	@rsync -av .claude/ ~/.claude/
 
 restore-codex:
-	@mkdir -p ~/.codex
-	@cp -Rv .codex/* ~/.codex
+	@rsync -av .codex/ ~/.codex/
 
 restore-opencode:
-	@mkdir -p ~/.config/opencode
-	@cp -Rv .opencode/* ~/.config/opencode
+	@rsync -av .opencode/ ~/.config/opencode/
 
 restore-secrets:
 	@if [ ! -f ~/.secrets ]; then \
