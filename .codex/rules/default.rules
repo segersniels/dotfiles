@@ -2,7 +2,11 @@ prefix_rule(
   pattern = ["apply_patch"],
   decision = "allow",
 )
-prefix_rule(pattern=["gh", "pr", "view"], decision="allow")
-prefix_rule(pattern=["gh", "pr", "diff"], decision="allow")
-prefix_rule(pattern=["gh", "api"], decision="allow")
-prefix_rule(pattern=["gh", "pr", "checkout"], decision="allow")
+prefix_rule(pattern=["python3"], decision="allow")
+prefix_rule(pattern=["tmux"], decision="allow")
+prefix_rule(pattern=["cat"], decision="allow")
+prefix_rule(pattern=["git", "reset", "--soft", "HEAD~1"], decision="allow")
+prefix_rule(pattern=["git", "mv", "apps/web/src/components/_pages/forms/[id]/_tabs/summary/styled.tsx", "apps/web/src/components/_pages/forms/[id]/_tabs/analytics/_tabs/answers/styled.tsx"], decision="allow")
+prefix_rule(pattern=["rm", "-rf", ".next"], decision="allow")
+prefix_rule(pattern=["git", "reset"], decision="allow")
+prefix_rule(pattern=["/bin/zsh", "-lc", "PYTHONPATH=/tmp/codex-skill-creator-pyyaml python3 '/Users/segersniels/.codex/skills/.system/skill-creator/scripts/init_skill.py' create-compound-component --path '/Users/segersniels/.codex/skills' --interface 'display_name=Create Compound Component' --interface 'short_description=Build React compound components with repo aligned patterns' --interface 'default_prompt=Create or refactor a React compound component to match repo patterns.'"], decision="allow")

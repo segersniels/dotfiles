@@ -11,11 +11,15 @@ Requires:
 
 Usage:
   python fetch_comments.py > pr_comments.json
+  python fetch_comments.py 2960 > pr_comments.json
+  python fetch_comments.py --pr https://github.com/org/repo/pull/2960 > pr_comments.json
 """
 
 from __future__ import annotations
 
+import argparse
 import json
+import re
 import subprocess
 import sys
 from typing import Any
@@ -120,6 +124,18 @@ def gh_pr_view_json(fields: str) -> dict[str, Any]:
     return _run_json(["gh", "pr", "view", "--json", fields])
 
 
+def gh_repo_view_json(fields: str) -> dict[str, Any]:
+    # fields is a comma-separated list like: "name,owner"
+    return _run_json(["gh", "repo", "view", "--json", fields])
+
+
+def get_repo_ref() -> tuple[str, str]:
+    repo = gh_repo_view_json("name,owner")
+    owner = repo["owner"]["login"]
+    name = repo["name"]
+    return owner, name
+
+
 def get_current_pr_ref() -> tuple[str, str, int]:
     """
     Resolve the PR for the current branch (whatever gh considers associated).
@@ -130,6 +146,35 @@ def get_current_pr_ref() -> tuple[str, str, int]:
     repo = pr["headRepository"]["name"]
     number = int(pr["number"])
     return owner, repo, number
+
+
+PR_URL_RE = re.compile(r"^https?://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/]+)/pull/(?P<number>\d+)")
+PR_PATH_RE = re.compile(r"^(?P<owner>[^/]+)/(?P<repo>[^/]+)/pull/(?P<number>\d+)$")
+PR_REF_RE = re.compile(r"^(?P<owner>[^/#]+)/(?P<repo>[^/#]+)#(?P<number>\d+)$")
+
+
+def parse_pr_input(pr_input: str) -> tuple[str, str, int]:
+    pr_input = pr_input.strip()
+
+    if pr_input.isdigit():
+        owner, repo = get_repo_ref()
+        return owner, repo, int(pr_input)
+
+    url_match = PR_URL_RE.match(pr_input)
+    if url_match:
+        return url_match["owner"], url_match["repo"], int(url_match["number"])
+
+    path_match = PR_PATH_RE.match(pr_input)
+    if path_match:
+        return path_match["owner"], path_match["repo"], int(path_match["number"])
+
+    ref_match = PR_REF_RE.match(pr_input)
+    if ref_match:
+        return ref_match["owner"], ref_match["repo"], int(ref_match["number"])
+
+    raise RuntimeError(
+        "Unsupported PR input. Use a PR number, owner/repo#number, or https://github.com/owner/repo/pull/number."
+    )
 
 
 def gh_api_graphql(
@@ -227,8 +272,19 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Fetch GitHub PR comments, reviews, and threads via gh.")
+    parser.add_argument("pr", nargs="?", help="PR number, owner/repo#number, or PR URL.")
+    parser.add_argument("--pr", dest="pr_flag", help="PR number, owner/repo#number, or PR URL.")
+    args = parser.parse_args()
+
     _ensure_gh_authenticated()
-    owner, repo, number = get_current_pr_ref()
+
+    pr_input = args.pr_flag or args.pr
+    if pr_input:
+        owner, repo, number = parse_pr_input(pr_input)
+    else:
+        owner, repo, number = get_current_pr_ref()
+
     result = fetch_all(owner, repo, number)
     print(json.dumps(result, indent=2))
 

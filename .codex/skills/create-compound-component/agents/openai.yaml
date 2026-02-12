@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Compound Component"
+  short_description: "Build React compound components with repo aligned patterns"
+  default_prompt: "Create or refactor a React compound component to match repo patterns."

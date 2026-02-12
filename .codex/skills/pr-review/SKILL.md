@@ -1,6 +1,8 @@
 ---
-name: Review PR
-description: You are a code reviewer. Your job is to review code changes and provide actionable feedback. Input: $ARGUMENTS
+name: pr-review
+description: "You are a code reviewer. Your job is to review code changes and provide actionable feedback. Input: $ARGUMENTS"
+metadata:
+  short-description: Review a PR and give actionable feedback
 ---
 
 ## Determining What to Review

@@ -1,5 +1,5 @@
 ---
-name: create-pr
+name: create-pull-request
 description: When asked to create a pull request, follow these guidelines
 ---
 

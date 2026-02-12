@@ -1,5 +1,5 @@
 ---
-name: Actionable Comments
+name: convert-review-into-actionable-comments
 description: Transform all of your review findings into actionable PR comments.
 ---
 

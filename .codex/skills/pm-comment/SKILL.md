@@ -1,5 +1,5 @@
 ---
-name: Place Project Manager Comments
+name: insert-project-manager-comments
 description: Add high level project manager comments for current changes.
 ---
 

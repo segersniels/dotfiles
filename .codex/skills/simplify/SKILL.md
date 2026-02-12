@@ -1,5 +1,5 @@
 ---
-name: Simplify Code
+name: simplify-code
 description: Simplify and refine uncommitted changes - remove slop, fix patterns, improve clarity
 ---
 
