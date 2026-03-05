@@ -27,6 +27,7 @@ backup-codex:
 	@rsync -av ~/.codex/AGENTS.md .codex/
 	@rsync -av ~/.codex/skills/ .codex/skills/
 	@rsync -av ~/.codex/rules/ .codex/rules/
+	@rsync -av ~/.codex/agents/ .codex/agents/
 
 backup-opencode:
 	@rm -rf .opencode
