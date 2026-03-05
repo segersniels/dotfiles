@@ -1,7 +1,7 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
 ################################################################################
-# UI, Notifications, and Misc
+# UI, and Misc
 ################################################################################
 
 suppress_unstable_features_warning = true
@@ -13,13 +13,7 @@ personality = "friendly"
 ################################################################################
 
 model = "gpt-5.3-codex"
-model_reasoning_effort = "medium"
-
-# Leave room for native compaction near the 272–273k context window.
-# Formula: 273000 - (tool_output_token_limit + 15000)
-# With tool_output_token_limit=25000 ⇒ 273000 - (25000 + 15000) = 233000
-tool_output_token_limit = 25000
-model_auto_compact_token_limit = 233000
+model_reasoning_effort = "high"
 
 ################################################################################
 # Approval & Sandbox
@@ -40,17 +34,24 @@ inherit = "all"
 ignore_default_excludes = true
 
 ################################################################################
-# UI, Notifications, and Misc
+# Notifications
 ################################################################################
 
 [tui]
 notifications = true
 
 ################################################################################
+# Features
+################################################################################
+
+[features]
+
+################################################################################
 # Define MCP servers under this table. Leave empty to disable.
 ################################################################################
 
 [mcp_servers.notion]
+enabled = true
 url = "https://mcp.notion.com/mcp"
 
 [mcp_servers.figma]

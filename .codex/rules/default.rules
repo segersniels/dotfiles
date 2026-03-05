@@ -10,3 +10,4 @@ prefix_rule(pattern=["git", "mv", "apps/web/src/components/_pages/forms/[id]/_ta
 prefix_rule(pattern=["rm", "-rf", ".next"], decision="allow")
 prefix_rule(pattern=["git", "reset"], decision="allow")
 prefix_rule(pattern=["/bin/zsh", "-lc", "PYTHONPATH=/tmp/codex-skill-creator-pyyaml python3 '/Users/segersniels/.codex/skills/.system/skill-creator/scripts/init_skill.py' create-compound-component --path '/Users/segersniels/.codex/skills' --interface 'display_name=Create Compound Component' --interface 'short_description=Build React compound components with repo aligned patterns' --interface 'default_prompt=Create or refactor a React compound component to match repo patterns.'"], decision="allow")
+prefix_rule(pattern=["git", "restore", "apps/web/src/components/_pages/forms/[id]/_tabs/insights/_tabs/answers/index.tsx", "apps/web/src/components/_pages/forms/[id]/_tabs/insights/_tabs/answers/views/median.tsx"], decision="allow")
