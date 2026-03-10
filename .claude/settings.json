@@ -127,6 +127,7 @@
     "deny": [],
     "defaultMode": "default"
   },
+  "hooks": {},
   "statusLine": {
     "type": "command",
     "command": "npx -y ccusage statusline"
@@ -137,6 +138,7 @@
     "ralph-wiggum@claude-code-plugins": true,
     "code-simplifier@claude-plugins-official": true
   },
+  "skipDangerousModePermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754052642194
   }
