@@ -4,8 +4,8 @@ return {
 		name = "smooth",
 		lazy = true,
 		opts = {
-			style = "light",
-			auto = true,
+			style = "dark",
+			auto = false,
 		},
 	},
 	{
