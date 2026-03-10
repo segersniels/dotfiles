@@ -35,7 +35,6 @@ Use best judgement when processing input.
 - Read the full file to understand existing patterns, control flow, and error handling
 - Check for existing style guide or conventions files (CONVENTIONS.md, AGENTS.md, .editorconfig, etc.)
 
-
 ## What to Look For
 
 **Bugs** - Your primary focus.
@@ -81,7 +80,8 @@ If you're uncertain about something and can't verify it with these tools, say "I
 
 ## Output
 
+- Mention the title of the PR in the beginning of the review.
 - Start off with a detailed high level explanation of the PR like a project manager
 - If there is a bug, be direct and clear about why it is a bug.
 - When referencing code in files be sure to include the file name and line number. Feel free to inline code snippets.
-- Transform your findings into actionable PR comments as this will help colleagues understand the changes better for complicated issues instead of focusing on technical implementation details.
+- Transform your findings into actionable PR comments as this will help colleagues understand the changes better for complicated issues instead of focusing on technical implementation details (markdown that can be copy pasted to GitHub comments).
