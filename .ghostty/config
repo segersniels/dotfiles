@@ -1,5 +1,4 @@
 theme = smooth-dark
-auto-update-channel = tip
 copy-on-select = false
 font-size = 15
 font-family = Hack
