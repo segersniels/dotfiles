@@ -71,6 +71,11 @@ function gifify() {
   gifsicle -i $output -O3 --colors 256 -o $output
 }
 
+function gfr() {
+  # Fetch remote to local for easier worktree management
+  git fetch origin +$1:$1
+}
+
 ## Customization
 
 zstyle ':completion:*:make:*:targets' call-command true # outputs all possible results for make targets
@@ -96,3 +101,6 @@ if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+# opencode
+export PATH=/Users/segersniels/.opencode/bin:$PATH
