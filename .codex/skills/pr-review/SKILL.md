@@ -21,16 +21,30 @@ Based on the input provided, determine which type of review to perform:
    - Run: `git diff $ARGUMENTS...HEAD`
 
 4. **PR URL or number** (contains "github.com" or "pull" or looks like a PR number): Review the pull request
-   - Run: `gh pr view $ARGUMENTS` to get PR context
-   - Run: `gh pr diff $ARGUMENTS` to get the diff
+   - Run: `gh pr view $ARGUMENTS --json title,number,headRefName,baseRefName,files` to get PR context
+   - Then decide local-vs-remote source of truth:
+     - Run: `git rev-parse --is-inside-work-tree`
+     - If not in a git repo: use `gh` only
+     - If in a git repo:
+       - Run: `git branch --show-current`
+       - If current branch matches PR `headRefName`: treat local checkout as source of truth
+       - If current branch does not match: use `gh` diff/files from GitHub
+   - Local checkout path:
+     - Use the explorer agent to inspect changed files and surrounding code
+     - Read local files directly; do not use `gh api` for file contents
+     - Use PR `files` metadata only to know which paths changed
+   - Remote path:
+     - Run: `gh pr diff $ARGUMENTS` to get the diff
+     - Use `gh` / `gh api` to inspect changed files from GitHub when local branch is not checked out
 
 Use best judgement when processing input.
 
 ## Gathering Context
 
-**Diffs alone are not enough.** After getting the diff, read the entire file(s) being modified to understand the full context. Code that looks wrong in isolation may be correct given surrounding logic—and vice versa.
+**Diffs alone are not enough.** After getting the diff or changed-file list, read the entire file(s) being modified to understand the full context. Code that looks wrong in isolation may be correct given surrounding logic—and vice versa.
 
 - Use the diff to identify which files changed
+- For PRs on the checked-out branch, use local files as the primary source
 - Use `git status --short` to identify untracked files, then read their full contents
 - Read the full file to understand existing patterns, control flow, and error handling
 - Check for existing style guide or conventions files (CONVENTIONS.md, AGENTS.md, .editorconfig, etc.)
@@ -72,7 +86,7 @@ Use best judgement when processing input.
 
 Use these to inform your review:
 
-- **Explore agent** - Find how existing code handles similar problems. Check patterns, conventions, and prior art before claiming something doesn't fit.
+- **Explore agent** - Default for PR reviews when the PR head branch is checked out locally. Use it to inspect changed files, surrounding code, patterns, conventions, and prior art before claiming something doesn't fit.
 - **Exa Code Context** - Verify correct usage of libraries/APIs before flagging something as wrong.
 - **Exa Web Search** - Research best practices if you're unsure about a pattern.
 
