@@ -3,6 +3,7 @@
 Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 
 ## Agent Protocol
+
 - PRs: use `gh pr view/diff` (no URLs).
 - Need upstream file: stage in `/tmp/`, then cherry-pick; never overwrite tracked.
 - Keep files <~500 LOC; split/refactor as needed.
@@ -23,8 +24,12 @@ Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 - PRs: use `gh pr view/diff` (no URLs).
 - CI: `gh run list/view`; rerun/fix till green.
 - Monorepo: use `npm run <cmd> --workspace <name>`.
+- Before commit: run full gate (lint, typecheck) - evaluate warnings
+- Tests: run if present; ask before adding new tests
+- Bugs: add regression tests when it makes sense
 
 ## Critical Thinking
+
 - Fix root cause (not band-aid).
 - Unsure: read more code; if still stuck, ask w/ short options.
 - Conflicts: call out; pick safer path.
@@ -32,6 +37,10 @@ Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 - Leave breadcrumb notes in thread.
 
 ## Tools
+
+### git
+
+- Do not use in parallel to prevent getting stuck on `index.lock` during commit
 
 ### gh
 
