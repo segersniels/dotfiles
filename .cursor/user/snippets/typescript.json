@@ -1,16 +1,16 @@
 {
-  "Print to console": {
-    "prefix": "clog",
-    "body": [
-      "console.log('------>', ${1});"
-    ],
-    "description": "Log output to console"
-  },
-  "Print stringified object to console": {
-    "prefix": "jlog",
-    "body": [
-      "console.log('------>', JSON.stringify(${1}, null, 2));"
-    ],
-    "description": "Log output to console"
-  }
+	"Print to console": {
+		"prefix": "clog",
+		"body": [
+			"console.log('------>', ${1});"
+		],
+		"description": "Log output to console"
+	},
+	"Print stringified object to console": {
+		"prefix": "jlog",
+		"body": [
+			"console.log('------>', JSON.stringify(${1}, null, 2));"
+		],
+		"description": "Log output to console"
+	}
 }
