@@ -12,7 +12,6 @@ backup-nvim:
 backup-ghostty:
 	@rm -rf .ghostty
 	@rsync -av ~/.config/ghostty/ .ghostty/
-	@rsync -av ~/Library/Application\ Support/com.mitchellh.ghostty/config .ghostty/config
 
 backup-claude:
 	@rm -rf .claude
@@ -28,13 +27,6 @@ backup-codex:
 	@rsync -av --exclude='.system/' ~/.codex/skills/ .codex/skills/
 	@rsync -av ~/.codex/rules/ .codex/rules/
 	@rsync -av ~/.codex/agents/ .codex/agents/
-
-backup-opencode:
-	@rm -rf .opencode
-	@rsync -av ~/.config/opencode/opencode.jsonc .opencode/
-	@rsync -av ~/.config/opencode/AGENTS.md .opencode/
-	@rsync -av ~/.config/opencode/commands/ .opencode/commands/
-	@rsync -av ~/.config/opencode/skill/ .opencode/skill/
 
 backup-cursor:
 	@rm -rf .cursor
@@ -58,16 +50,12 @@ restore-nvim:
 
 restore-ghostty:
 	@rsync -av .ghostty/ ~/.config/ghostty/
-	@rsync -av .ghostty/config ~/Library/Application\ Support/com.mitchellh.ghostty/config
 
 restore-claude:
 	@rsync -av .claude/ ~/.claude/
 
 restore-codex:
 	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/
-
-restore-opencode:
-	@rsync -av .opencode/ ~/.config/opencode/
 
 restore-cursor:
 	@mkdir -p ~/Library/Application\ Support/Cursor/User/snippets
