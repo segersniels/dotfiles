@@ -1,0 +1,62 @@
+{
+  "window.autoDetectColorScheme": false,
+  "workbench.colorTheme": "Smooth (dark)",
+  "workbench.preferredDarkColorTheme": "Smooth (dark)",
+  "workbench.preferredHighContrastColorTheme": "Smooth (dark)",
+  "workbench.preferredHighContrastLightColorTheme": "Smooth (light)",
+  "workbench.preferredLightColorTheme": "Smooth (light)",
+  "editor.fontSize": 14,
+  "editor.fontFamily": "Hack, Menlo, Monaco, 'Courier New', monospace",
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "jsonc"
+  ],
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+  "javascript.inlayHints.enumMemberValues.enabled": true,
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "javascript.inlayHints.parameterNames.enabled": "literals",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmPasteNative": false,
+  "security.promptForLocalFileProtocolHandling": false,
+  "cursor.chat.terminalShowHoverHint": false,
+  "cursor.cpp.disabledLanguages": [],
+  "go.toolsManagement.autoUpdate": true,
+  "workbench.editor.editorActionsLocation": "titleBar",
+  "extensions.ignoreRecommendations": true,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "*.pipe": "tinybird"
+  },
+  "cursor.composer.shouldChimeAfterChatFinishes": true,
+  "editor.minimap.enabled": true,
+  "editor.minimap.renderCharacters": false,
+  "editor.accessibilitySupport": "off",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "workbench.editorAssociations": {
+    "git-rebase-todo": "default"
+  },
+  "git.mergeEditor": true
+}

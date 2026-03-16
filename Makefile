@@ -36,7 +36,16 @@ backup-opencode:
 	@rsync -av ~/.config/opencode/commands/ .opencode/commands/
 	@rsync -av ~/.config/opencode/skill/ .opencode/skill/
 
-backup: backup-nvim backup-ghostty backup-claude backup-codex
+backup-cursor:
+	@rm -rf .cursor
+	@mkdir -p .cursor/user/snippets
+	@rsync -av ~/Library/Application\ Support/Cursor/User/settings.json .cursor/user/
+	@rsync -av ~/Library/Application\ Support/Cursor/User/keybindings.json .cursor/user/
+	@rsync -av ~/Library/Application\ Support/Cursor/User/snippets/ .cursor/user/snippets/
+	@rsync -av ~/.cursor/settings.json .cursor/
+	@rsync -av ~/.cursor/cli-config.json .cursor/
+
+backup: backup-nvim backup-ghostty backup-claude backup-codex backup-cursor
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -60,6 +69,15 @@ restore-codex:
 restore-opencode:
 	@rsync -av .opencode/ ~/.config/opencode/
 
+restore-cursor:
+	@mkdir -p ~/Library/Application\ Support/Cursor/User/snippets
+	@mkdir -p ~/.cursor
+	@rsync -av .cursor/user/settings.json ~/Library/Application\ Support/Cursor/User/
+	@rsync -av .cursor/user/keybindings.json ~/Library/Application\ Support/Cursor/User/
+	@rsync -av .cursor/user/snippets/ ~/Library/Application\ Support/Cursor/User/snippets/
+	@rsync -av .cursor/settings.json ~/.cursor/
+	@rsync -av .cursor/cli-config.json ~/.cursor/
+
 restore-secrets:
 	@if [ ! -f ~/.secrets ]; then \
 		cp -v .secrets ~/.secrets; \
@@ -67,5 +85,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-nvim restore-ghostty restore-secrets restore-claude restore-codex
+restore: restore-nvim restore-ghostty restore-secrets restore-claude restore-codex restore-cursor
 	@$(foreach file, $(FILES), make restore-$(file);)
