@@ -28,14 +28,16 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # Install Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-(
-  echo
-  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"'
-) >>${HOME}/.zprofile
+if ! grep -q 'brew shellenv zsh' "${ZSHRC_FILE}" 2>/dev/null; then
+  (
+    echo
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"'
+  ) >>"${ZSHRC_FILE}"
+fi
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Install git if not available
-if git ! --version &>/dev/null; then
+if ! command -v git >/dev/null 2>&1; then
   brew install git
 fi
 
@@ -53,8 +55,16 @@ brew cleanup
 mas install 441258766 # Magnet
 
 # ZSH
-chsh -s $(which zsh)
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+chsh -s "$(which zsh)"
+
+if [ ! -d "${HOME}/.oh-my-zsh" ]; then
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+
+if [ ! -d "${HOME}/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]; then
+  git clone https://github.com/zsh-users/zsh-autosuggestions \
+    "${HOME}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+fi
 
 # Finalize
 make restore
@@ -67,7 +77,6 @@ rm -rf ./dotfiles
 fnm install --lts
 npm install -g supdock
 npm install -g @segersniels/cmt
-npm install -g @anthropic-ai/claude-code
 
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
