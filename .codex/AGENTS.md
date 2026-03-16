@@ -46,3 +46,9 @@ Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 
 - GitHub CLI for PRs/CI/releases. Given issue/PR URL (or `/pull/5`): use `gh`, not web search.
 - Examples: `gh issue view <url> --comments -R owner/repo`, `gh pr view <url> --comments --files -R owner/repo`.
+
+### fracture (worktree management)
+
+- Prefer worktree usage over dozens of `gh` commands to read remote branch files.
+- Examples: `fracture --skip-install --no-spawn <branch_name>` (skips dependency install & no subshell spawn after creation)
+- Worktrees are stored in `~/.fracture/<org>/<slug>`
