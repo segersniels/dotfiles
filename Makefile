@@ -25,7 +25,7 @@ backup-codex:
 	@rm -rf .codex
 	@rsync -av ~/.codex/config.toml .codex/
 	@rsync -av ~/.codex/AGENTS.md .codex/
-	@rsync -av ~/.codex/skills/ .codex/skills/
+	@rsync -av --exclude='.system/' ~/.codex/skills/ .codex/skills/
 	@rsync -av ~/.codex/rules/ .codex/rules/
 	@rsync -av ~/.codex/agents/ .codex/agents/
 
@@ -64,7 +64,7 @@ restore-claude:
 	@rsync -av .claude/ ~/.claude/
 
 restore-codex:
-	@rsync -av .codex/ ~/.codex/
+	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/
 
 restore-opencode:
 	@rsync -av .opencode/ ~/.config/opencode/
