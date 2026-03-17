@@ -16,6 +16,7 @@ brew "cmake"
 brew "mas" # App store
 brew "neovim"
 brew "fnm" # Node version manager
+brew "btop" # System monitor
 
 # Cask
 cask "docker-desktop"
