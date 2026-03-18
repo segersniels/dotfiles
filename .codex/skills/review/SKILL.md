@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review code changes with repo-aware context, architecture scrutiny, claim verification, and actionable findings. Use for uncommitted changes, commits, branches, or PRs when you want a thorough but low-noise review.
+description: "Review code changes with repo-aware context, architecture scrutiny, claim verification, and actionable findings. Use for uncommitted changes, commits, branches, or PRs when you want a thorough but low-noise review."
 metadata:
   short-description: Repo-aware code review
 ---

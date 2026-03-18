@@ -1,6 +1,6 @@
 ---
 name: create-commit
-description: Create focused git commits with conventional commit messages and sensible scopes. Use when Codex needs to review staged or unstaged changes, group them into atomic commits, stage the right files, and write commit titles in `type(scope): description` format without changing code.
+description: "Create focused git commits with conventional commit messages and sensible scopes. Use when Codex needs to review staged or unstaged changes, group them into atomic commits, stage the right files, and write commit titles in `type(scope): description` format without changing code."
 ---
 
 ## Process

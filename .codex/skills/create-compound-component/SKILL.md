@@ -1,6 +1,6 @@
 ---
 name: create-compound-component
-description: Create, refactor, or review React compound components with practical construction rules. Use when a feature needs composable subcomponents, shared context state, predictable API shape, and consistent accessibility behavior. Prefer Base UI / Radix-style namespace exports such as `Select.Trigger`, `Select.Content`, and `const Select = Object.assign(Root, { ... })` unless the task explicitly preserves a different public API.
+description: "Create, refactor, or review React compound components with practical construction rules. Use when a feature needs composable subcomponents, shared context state, predictable API shape, and consistent accessibility behavior. Prefer Base UI / Radix-style namespace exports such as `Select.Trigger`, `Select.Content`, and `const Select = Object.assign(Root, { ... })` unless the task explicitly preserves a different public API."
 ---
 
 # Create Compound Component

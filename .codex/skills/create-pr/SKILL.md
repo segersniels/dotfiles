@@ -1,6 +1,6 @@
 ---
 name: create-pull-request
-description: Create GitHub pull requests from the current branch with accurate titles and bodies derived from the real diff. Use when Codex needs to inspect commits and changed files, confirm the correct base branch and draft status, and open a PR with conventional-commit style titling and concise markdown sections.
+description: "Create GitHub pull requests from the current branch with accurate titles and bodies derived from the real diff. Use when Codex needs to inspect commits and changed files, confirm the correct base branch and draft status, and open a PR with conventional-commit style titling and concise markdown sections."
 ---
 
 ## Process
