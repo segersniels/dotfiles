@@ -1,6 +1,6 @@
 ---
 name: simplify-code
-description: Simplify and refine uncommitted changes - remove slop, fix patterns, improve clarity
+description: Simplify existing code changes without expanding scope: remove AI slop, tighten patterns, reduce unnecessary complexity, and keep behavior intact. Use when Codex should clean up staged or unstaged diffs, refine a draft implementation, or make code feel more human and maintainable without turning it into a larger refactor.
 ---
 
 Review changes like a senior engineer. Simplify aggressively — clarity over cleverness. Keep behavior identical unless fixing a bug.

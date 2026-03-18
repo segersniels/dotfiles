@@ -1,6 +1,6 @@
 ---
 name: create-compound-component
-description: Create, refactor, or review React compound components with practical construction rules. Use when a feature needs composable subcomponents, shared context state, predictable API shape, and consistent accessibility behavior without over-enforcing stylistic preferences.
+description: Create, refactor, or review React compound components with practical construction rules. Use when a feature needs composable subcomponents, shared context state, predictable API shape, and consistent accessibility behavior. Prefer Base UI / Radix-style namespace exports such as `Select.Trigger`, `Select.Content`, and `const Select = Object.assign(Root, { ... })` unless the task explicitly preserves a different public API.
 ---
 
 # Create Compound Component
@@ -9,12 +9,17 @@ description: Create, refactor, or review React compound components with practica
 
 Prefer functional correctness, accessibility, and maintainability over stylistic purity.
 When reviewing existing code, treat equivalent implementations as valid.
+When Base UI primitives already cover the behavior, build on top of them and stay close to their compound-component patterns instead of inventing a parallel abstraction.
 
 ## Construction Guidance
 
 1. API shape
-- Prefer explicit named exports (`Component`, `ComponentTrigger`, `ComponentContent`, `ComponentItem`).
+- Default to the Base UI / Radix namespace pattern for public API:
+  - define the root and leaf parts separately
+  - export a single namespace object: `const Component = Object.assign(Root, { Trigger, Content, Item })`
+  - prefer consumer usage such as `Component.Trigger` and `Component.Content`
 - Keep naming stable across refactors.
+- If the repo already exposes a different established API, preserve it unless the task explicitly includes an API migration.
 - Avoid alias-only re-export layers unless they add real value.
 
 2. Shared state
@@ -26,6 +31,7 @@ When reviewing existing code, treat equivalent implementations as valid.
 - Prefer behavior in component file and styles in `styled.ts`.
 - In-file styled primitives are acceptable for small/clear components.
 - Do not report “miss” solely because styles are not split.
+- When Base UI is already in use, prefer composition over wrapping it into a heavily renamed or reshaped API.
 
 4. Accessibility and semantics
 - Preserve semantic elements (`button`, `ul/li`, etc.) and interaction behavior.
@@ -36,6 +42,7 @@ When reviewing existing code, treat equivalent implementations as valid.
 - Split when file approaches ~500 LOC or responsibilities blur.
 - Prefer composition over boolean-prop proliferation.
 - Preserve existing consumer API unless change is requested.
+- If Base UI already solves the interaction model, prefer extending its primitives and conventions over rebuilding the behavior from scratch.
 
 6. Verification after changes
 - Run `npm run typecheck --workspace @tallyforms/web`.
@@ -52,6 +59,8 @@ Never label a component as failing for:
 - using in-file styled primitives,
 - using an established local API style,
 - missing optional ARIA attributes not required by chosen widget pattern.
+
+Prefer the Base UI / Radix namespace export style for new work and refactors that are already changing the component API surface.
 
 ## Minimal Template
 
@@ -75,14 +84,14 @@ const ComponentContext = createContext<ComponentContextValue | null>(null);
 function useComponentContext() {
   const context = useContext(ComponentContext);
 
-  if (!context) {
-    throw new Error('Component parts must be rendered inside Component');
-  }
+	if (!context) {
+	  throw new Error('Component parts must be rendered inside Component');
+	}
 
   return context;
 }
 
-export function Component({ children, onSelect }: {
+function Root({ children, onSelect }: {
   children: React.ReactNode;
   onSelect: (value: string) => void;
 }) {
@@ -95,7 +104,7 @@ export function Component({ children, onSelect }: {
   );
 }
 
-export function ComponentTrigger({ children }: { children: React.ReactNode }) {
+function Trigger({ children }: { children: React.ReactNode }) {
   const { isOpen, setIsOpen } = useComponentContext();
 
   return (
@@ -110,7 +119,7 @@ export function ComponentTrigger({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ComponentContent({ children }: { children: React.ReactNode }) {
+function Content({ children }: { children: React.ReactNode }) {
   const { isOpen } = useComponentContext();
 
   if (!isOpen) {
@@ -120,7 +129,7 @@ export function ComponentContent({ children }: { children: React.ReactNode }) {
   return <ComponentContentContainer>{children}</ComponentContentContainer>;
 }
 
-export function ComponentItem({ value, children }: {
+function Item({ value, children }: {
   value: string;
   children: React.ReactNode;
 }) {
@@ -136,6 +145,12 @@ export function ComponentItem({ value, children }: {
     </ComponentItemContainer>
   );
 }
+
+export const Component = Object.assign(Root, {
+  Trigger,
+  Content,
+  Item,
+});
 ```
 
 ## Done Criteria

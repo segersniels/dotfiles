@@ -1,6 +1,6 @@
 ---
 name: create-pull-request
-description: When asked to create a pull request, follow these guidelines
+description: Create GitHub pull requests from the current branch with accurate titles and bodies derived from the real diff. Use when Codex needs to inspect commits and changed files, confirm the correct base branch and draft status, and open a PR with conventional-commit style titling and concise markdown sections.
 ---
 
 ## Process
@@ -31,3 +31,10 @@ description: When asked to create a pull request, follow these guidelines
 - Pass markdown directly to gh, never use heredoc
 - Use markdown and differentiate between sections using ###
 - When writing PR titles or bodies, wrap every code identifier (variable names, params, functions, keys, enum values) in backticks.
+
+## Common Failure Modes
+
+- Assuming the base branch instead of asking the user
+- Writing the PR body from commit messages instead of the actual diff
+- Forgetting to confirm whether the PR should be draft or ready
+- Including checklists or test-plan boilerplate that the repo does not want

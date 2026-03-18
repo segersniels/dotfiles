@@ -36,6 +36,12 @@ Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 - Unrecognized changes: assume other agent; keep going; focus your changes. If it causes issues, stop + ask user.
 - Leave breadcrumb notes in thread.
 
+## Agents
+
+### explorer
+
+- Read-only codebase explorer for targeted file reads.
+
 ## Tools
 
 ### git
