@@ -26,7 +26,7 @@ description: "Create GitHub pull requests from the current branch with accurate 
   - Lowercase, imperative mood (same as commit messages)
   - Optional Notion ticket ID in brackets at end: `[TL-1234]`
 - Write meaningful descriptions based on diff analysis
-- Never include checkboxes, test plans, or checklists
+- Never include checkboxes, test plans, checklists or testing sections
 - Avoid ANSI codes in descriptions
 - Pass markdown directly to gh, never use heredoc
 - Use markdown and differentiate between sections using ###

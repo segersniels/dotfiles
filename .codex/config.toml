@@ -85,3 +85,9 @@ trust_level = "trusted"
 
 [projects."/Users/segersniels/personal"]
 trust_level = "trusted"
+
+[projects."/Users/segersniels/.fracture"]
+trust_level = "trusted"
+
+[projects."/tmp"]
+trust_level = "trusted"

@@ -1,6 +1,5 @@
 {
   "window.autoDetectColorScheme": false,
-  "workbench.colorTheme": "Smooth (dark)",
   "workbench.preferredDarkColorTheme": "Smooth (dark)",
   "workbench.preferredHighContrastColorTheme": "Smooth (dark)",
   "workbench.preferredHighContrastLightColorTheme": "Smooth (light)",
@@ -58,5 +57,7 @@
   "workbench.editorAssociations": {
     "git-rebase-todo": "default"
   },
-  "git.mergeEditor": true
+  "git.mergeEditor": true,
+  "workbench.colorTheme": "Smooth (dark)",
+  "update.releaseTrack": "dev",
 }

@@ -26,9 +26,13 @@ Pick the narrowest source of truth that matches the input:
    - Run `git diff $ARGUMENTS...HEAD`
 
 4. PR URL or number:
-   - Run `gh pr view $ARGUMENTS --json title,number,body,headRefName,baseRefName,files`
-   - If inside the repo and current branch matches `headRefName`, treat local checkout as source of truth
-   - Otherwise use `gh pr diff $ARGUMENTS`
+   - Run `gh pr view $ARGUMENTS --json title,number,body,headRefName,headRefOid,baseRefName,files,isCrossRepository,headRepository`
+   - If inside the PR repository and either the current branch matches `headRefName` or local `HEAD` matches `headRefOid`, treat local checkout as source of truth
+   - Otherwise, if inside the PR repository, `isCrossRepository` is false, and the branch is not already checked out locally, follow the [`create-worktree`](../create-worktree/SKILL.md) skill to create a temporary read-only fracture worktree for `headRefName`.
+   - Review files from that fracture worktree instead of relying on `gh pr diff`
+   - Ensure the fracture is up to date with the remote branch
+   - After the review, remove only the fracture worktree created during the current review run with `fracture rm <headRefName>`
+   - If the PR cannot be materialized locally, fall back to `gh pr diff $ARGUMENTS`
 
 Use best judgment if input is ambiguous.
 
@@ -56,6 +60,10 @@ Diffs are not enough.
   - `gh api repos/{owner}/{repo}/issues/{number}/comments`
 
 If the branch is checked out locally, prefer local files over remote file contents.
+
+If you created a temporary fracture worktree for the review, switch your file reads, searches, repo-context loading, and validation to that worktree root for the rest of the review.
+
+Only clean up fracture worktrees that you created during the current review run. If cleanup fails or the worktree is no longer clean, report that instead of forcing removal.
 
 If the relevant code is available locally and the current environment allows sub-agents, prefer using the explorer subagent early to gather:
 
@@ -195,7 +203,7 @@ When the environment supports inline review directives, emit one `::code-comment
 - `git diff`
 - `git diff --cached`
 - `git show <sha>`
-- `gh pr view <pr> --json title,number,body,headRefName,baseRefName,files`
+- `gh pr view <pr> --json title,number,body,headRefName,headRefOid,baseRefName,files,isCrossRepository,headRepository`
 - `gh pr diff <pr>`
 - `gh api repos/{owner}/{repo}/pulls/{number}/comments`
 - `gh api repos/{owner}/{repo}/issues/{number}/comments`

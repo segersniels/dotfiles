@@ -1,4 +1,0 @@
-prefix_rule(
-  pattern = ["go", ["build", "run", "test", "fmt", "vet", "clean", "get", "mod", "tidy"]],
-  decision = "allow",
-)
