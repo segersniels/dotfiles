@@ -1,6 +1,6 @@
 ---
 name: create-worktree
-description: "Create a worktree for a given branch. Use when Codex needs to create a worktree for a given branch."
+description: "Create an isolated checkout for a non-current branch using `fracture`, not `git worktree add`. Use when Codex needs to review a PR branch, inspect another branch's files, or make edits without touching the current checkout. Fetch the branch locally if needed, use `fracture --no-spawn`, and remove the fracture worktree when finished. Do not use when the target branch is already checked out or no separate worktree is needed."
 ---
 
 ## Process

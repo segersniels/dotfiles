@@ -22,6 +22,7 @@
 - PRs: use `gh pr view/diff` (no URLs).
 - CI: `gh run list/view`; rerun/fix till green.
 - Monorepo: use `npm run <cmd> --workspace <name>`.
+- Shell paths: quote/escape any path with glob chars before first use, especially Next.js route segments like `[slug]`, `[...rest]`, `[[...rest]]`; never let zsh expand them first.
 - Before commit: run full gate (lint, typecheck) - evaluate warnings
 - Tests: run if present; ask before adding new tests
 - Bugs: add regression tests when it makes sense

@@ -61,22 +61,6 @@ description = "Read-only codebase explorer for gathering evidence before changes
 config_file = "agents/explorer.toml"
 
 ################################################################################
-# Define MCP servers under this table. Leave empty to disable.
-################################################################################
-
-[mcp_servers.notion]
-enabled = true
-url = "https://mcp.notion.com/mcp"
-
-[mcp_servers.figma]
-enabled = true
-url = "https://mcp.figma.com/mcp"
-
-[mcp_servers.sentry]
-enabled = true
-url = "https://mcp.sentry.dev/mcp"
-
-################################################################################
 # Projects (trust levels)
 ################################################################################
 
@@ -91,3 +75,18 @@ trust_level = "trusted"
 
 [projects."/tmp"]
 trust_level = "trusted"
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
+
+[plugins."notion@openai-curated"]
+enabled = true
+
+[plugins."figma@openai-curated"]
+enabled = true
+
+[plugins."sentry@openai-curated"]
+enabled = true

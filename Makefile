@@ -13,13 +13,6 @@ backup-ghostty:
 	@rm -rf .ghostty
 	@rsync -av ~/.config/ghostty/ .ghostty/
 
-backup-claude:
-	@rm -rf .claude
-	@rsync -av ~/.claude/CLAUDE.md .claude/
-	@rsync -av ~/.claude/settings.json .claude/
-	@rsync -av ~/.claude/commands/ .claude/commands/
-	@rsync -av ~/.claude/agents/ .claude/agents/
-
 backup-codex:
 	@rm -rf .codex
 	@rsync -av ~/.codex/config.toml .codex/
@@ -37,7 +30,7 @@ backup-cursor:
 	@rsync -av ~/.cursor/settings.json .cursor/
 	@rsync -av ~/.cursor/cli-config.json .cursor/
 
-backup: backup-nvim backup-ghostty backup-claude backup-codex backup-cursor
+backup: backup-nvim backup-ghostty backup-codex backup-cursor
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -50,9 +43,6 @@ restore-nvim:
 
 restore-ghostty:
 	@rsync -av .ghostty/ ~/.config/ghostty/
-
-restore-claude:
-	@rsync -av .claude/ ~/.claude/
 
 restore-codex:
 	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/
@@ -73,5 +63,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-claude restore-codex restore-cursor
+restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-codex restore-cursor
 	@$(foreach file, $(FILES), make restore-$(file);)
