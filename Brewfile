@@ -23,8 +23,6 @@ cask "docker-desktop"
 cask "spotify"
 cask "slack"
 cask "discord"
-cask "claude-code"
-cask "codex"
 cask "font-hack"
 cask "viscosity" # VPN
 cask "maccy" # Clipboard manager
