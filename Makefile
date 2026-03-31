@@ -63,5 +63,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-codex restore-cursor
+restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-cursor
 	@$(foreach file, $(FILES), make restore-$(file);)
