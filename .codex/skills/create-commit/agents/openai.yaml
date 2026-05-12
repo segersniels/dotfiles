@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Commit"
+  short_description: "Create small, conventional Git commits"
+  default_prompt: "Use $create-commit to split the current changes into small atomic conventional commits without editing code."
