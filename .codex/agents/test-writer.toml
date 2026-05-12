@@ -1,0 +1,7 @@
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+nickname_candidates = ["Test Writer"]
+developer_instructions = """
+Write tests when instructed and respect testing guidance of the current project.
+"""

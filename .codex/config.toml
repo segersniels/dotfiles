@@ -12,7 +12,7 @@ personality = "friendly"
 # Core Model Selection
 ################################################################################
 
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_reasoning_effort = "high"
 
 ################################################################################
@@ -45,8 +45,7 @@ notifications = true
 ################################################################################
 
 [features]
-multi_agent = true
-responses_websockets_v2 = true
+memories = true
 
 ################################################################################
 # Agents
@@ -59,6 +58,10 @@ max_depth = 1
 [agents.explorer]
 description = "Read-only codebase explorer for gathering evidence before changes are proposed."
 config_file = "agents/explorer.toml"
+
+[agents.test-writer]
+description = "Write tests when instructed and respect testing guidance of the current project."
+config_file = "agents/test-writer.toml"
 
 ################################################################################
 # Projects (trust levels)
@@ -76,13 +79,41 @@ trust_level = "trusted"
 [projects."/tmp"]
 trust_level = "trusted"
 
+[projects."/Users/segersniels/projects/tally/tally"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/labeler"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/workd"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/.codex"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/kip"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/crusader"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/pawn"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/everything-must-go"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/Black_Crusade_agent"]
+trust_level = "trusted"
+
+################################################################################
+# Plugins
+################################################################################
+
 [plugins."github@openai-curated"]
 enabled = true
 
 [plugins."slack@openai-curated"]
-enabled = true
-
-[plugins."notion@openai-curated"]
 enabled = true
 
 [plugins."figma@openai-curated"]
@@ -90,3 +121,64 @@ enabled = true
 
 [plugins."sentry@openai-curated"]
 enabled = true
+
+[plugins."vercel@openai-curated"]
+enabled = true
+
+[plugins."build-web-apps@openai-curated"]
+enabled = true
+
+[plugins."notion@openai-curated"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."chatgpt-apps@openai-curated"]
+enabled = true
+
+[plugins."linear@openai-curated"]
+enabled = true
+
+[plugins."browser-use@openai-bundled"]
+enabled = true
+
+[mcp_servers.notion_tally]
+enabled = true
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.notion_personal]
+enabled = true
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.notion_personal.tools.notion-update-page]
+approval_mode = "approve"
+
+[mcp_servers.sentry_tally]
+enabled = true
+url = "https://mcp.sentry.dev/mcp"
+
+[marketplaces.openai-bundled]
+last_updated = "2026-05-11T14:34:34Z"
+source_type = "local"
+source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-05-12T11:42:03Z"
+source_type = "local"
+source = "/Users/segersniels/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[apps.asdk_app_69c18c28f1188191bf5b8445c4ab0a2e.tools.notion_notion-update-page]
+approval_mode = "approve"
+
+[apps.asdk_app_69a089a326dc8191b32a3f2553f5be2c.tools.linear_research]
+approval_mode = "approve"
+
+[apps.asdk_app_69a089a326dc8191b32a3f2553f5be2c.tools.linear_save_issue]
+approval_mode = "approve"
