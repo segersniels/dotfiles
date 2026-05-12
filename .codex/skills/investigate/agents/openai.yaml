@@ -1,0 +1,7 @@
+interface:
+  display_name: "Investigate"
+  short_description: "Read-only investigation and context catch-up"
+  default_prompt: "Use $investigate to investigate first, avoid code changes, and report findings with next steps."
+
+policy:
+  allow_implicit_invocation: true
