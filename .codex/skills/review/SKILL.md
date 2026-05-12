@@ -5,212 +5,98 @@ metadata:
   short-description: Repo-aware code review
 ---
 
-## Goal
+You are a critical but fair technical lead reviewing a PR. Question everything. Be thorough. Approve when changes clearly improve overall code health; don't block only because it differs from your preferred style.
 
-Review changes thoroughly; prioritize real bugs, regressions, unnecessary complexity, and missing coverage; keep false positives low.
+## Step 1: Context
 
-## Determine Review Target
+1. Read @AGENTS.md, then read every file it references (e.g. `.agents/docs/*.md`) to understand project conventions
+2. Read @REVIEW.md to understand what to focus on, prioritize, and skip during the review
+3. Read @VOICE.md (if it exists) to match the reviewer's tone in suggested comments
+4. Run `gh pr view --json number,title,body,headRefName,baseRefName` to get PR details
+5. If the current local checkout is not already on `headRefName`, use the `create-worktree` skill to create an isolated local checkout of the PR head branch with `fracture --no-spawn`. Review changed files from that local worktree rather than reading file contents via `gh api`.
+6. Only fall back to GitHub-hosted file contents when a local checkout is impossible (for example: no local repo, `fracture` unavailable, or the branch cannot be fetched locally). If you do fall back, say why.
+7. Run `gh pr diff` to get the full diff
+8. Read existing PR comments (including inline): `gh api repos/{owner}/{repo}/pulls/{number}/comments` and `gh api repos/{owner}/{repo}/issues/{number}/comments`. Build a structured list of already-flagged findings (file, line, topic, author/bot, and whether the author replied or it appears resolved). Pass this list to explorer agents explicitly so they skip duplicate feedback. The parent agent still owns final dedupe before reporting.
 
-Pick the narrowest source of truth that matches the input:
+## Step 2: Review
 
-1. No arguments:
-   - Run `git status --short`
-   - Run `git diff`
-   - Run `git diff --cached`
-   - Include untracked files
+Dispatch multiple explorer agents in parallel to review the PR:
 
-2. Commit hash:
-   - Run `git show $ARGUMENTS`
+Before dispatching, pass each explorer the already-flagged findings from Step 1.8 and instruct them to avoid re-raising those topics unless the current diff adds a new, distinct issue.
 
-3. Branch name:
-   - Run `git diff $ARGUMENTS...HEAD`
+### Agent 1: High-Level Architecture Review
+- Is the overall approach sound? Is there a simpler architectural alternative?
+- Does the PR do one thing? Flag scope creep
+- **Behavioral semantics**: does the PR claim to be a refactor but actually change behavior? Look for: new filters that exclude data, changed conditions (e.g. `||` added/removed), removed UI elements, different API call patterns, changed data-fetching semantics (e.g. `isLoading` vs `isValidating`)
+- Are there missing edge cases or unhandled scenarios?
+- Any security concerns?
 
-4. PR URL or number:
-   - Run `gh pr view $ARGUMENTS --json title,number,body,headRefName,headRefOid,baseRefName,files,isCrossRepository,headRepository`
-   - If inside the PR repository and either the current branch matches `headRefName` or local `HEAD` matches `headRefOid`, treat local checkout as source of truth
-   - Otherwise, if inside the PR repository, `isCrossRepository` is false, and the branch is not already checked out locally, follow the [`create-worktree`](../create-worktree/SKILL.md) skill to create a temporary read-only fracture worktree for `headRefName`.
-   - Review files from that fracture worktree instead of relying on `gh pr diff`
-   - Ensure the fracture is up to date with the remote branch
-   - After the review, remove only the fracture worktree created during the current review run with `fracture rm <headRefName>`
-   - If the PR cannot be materialized locally, fall back to `gh pr diff $ARGUMENTS`
+### Agent 2+: File-by-File Deep Review
+- Split the changed files across sub agents (group related files together)
+- Review changed tests before implementation files when present, so intended behavior is clear before judging the code
+- Prefer reading files from the local PR-head worktree. Do not default to `gh api repos/.../contents/...` for changed-file reads when a local checkout is available.
+- Trace all code paths through each change
+- **For moved/rewritten files**: read BOTH the old file (on base branch) and the new file. Compare every code path, every conditional branch, every state variable. Flag anything present in old but absent in new — this is where subtle regressions hide.
+- Check for bugs, race conditions, N+1 queries, stale closures, ...
+- Verify consistency with existing patterns in the codebase
+- Flag dead code, misleading names, unnecessary complexity
+- Check if tests cover the new/changed behavior
 
-Use best judgment if input is ambiguous.
+Each sub agent should return a list of findings with:
+- File path and line number
+- What's wrong
+- Why it's wrong
+- Severity (blocker / concern / nit)
 
-## Bootstrap Repo Context
+## Step 3: Verify Claims
 
-Before reviewing, load the repo's own standards if present:
+Do NOT blindly trust sub agent findings. For each claim from the sub agents:
 
-- `AGENTS.md`
-- Files referenced from `AGENTS.md` that materially affect conventions or workflow
-- `REVIEW.md`
-- `VOICE.md`
-- Other obvious convention files when relevant: `CONVENTIONS.md`, `.editorconfig`, package-level docs
+1. **Read the actual code** — open the file, read the lines, trace the logic yourself
+2. **Follow the data** — if a claim says "X calls Y with Z", verify it by reading the call chain
+3. **Check assumptions** — if a claim assumes a value or behavior, grep/read the codebase to confirm
+4. **Cross-reference** — if multiple agents flag the same thing differently, reconcile them
+5. **Test the logic** — mentally trace edge cases against the actual code, not the agent's summary
 
-Do not bulk-read reference docs blindly. Load the files most likely to affect the changed code.
+Common sub agent mistakes to watch for:
+- Assuming two things with similar names are different (e.g., sessionUuid vs submission.uuid)
+- Missing that a function is called elsewhere with different behavior
+- Claiming a filter is missing when the engine handles it (e.g., ENGINE_IS_DELETED + FINAL)
+- Flagging "no error handling" when there's a try/catch at a higher level
+- Overstating severity on things that are technically true but have zero functional impact
 
-## Gather Context
+## Step 4: Build TODO List
 
-Diffs are not enough.
+After verification, create tasks for EACH finding (verified and debunked).
+Then immediately call mark all debunked tasks as `completed`.
 
-- Read full changed files, not only hunks
-- Read nearby helpers, callers, exports, and tests when behavior changed
-- Trace impacted call sites if return shape, control flow, types, or side effects changed
-- For PR reviews, read existing review comments first so you do not re-flag resolved or already-raised points:
-  - `gh api repos/{owner}/{repo}/pulls/{number}/comments`
-  - `gh api repos/{owner}/{repo}/issues/{number}/comments`
+Before creating tasks, cross-check each surviving finding against the already-flagged list from Step 1.8. Same file + same line (±2) + same topic = already flagged. Drop these from the task list and interactive walkthrough; mention only the skipped count in the summary.
 
-If the branch is checked out locally, prefer local files over remote file contents.
+Order: blockers first, then concerns, then nits, then debunked.
 
-If you created a temporary fracture worktree for the review, switch your file reads, searches, repo-context loading, and validation to that worktree root for the rest of the review.
+## Step 5: Summary
 
-Only clean up fracture worktrees that you created during the current review run. If cleanup fails or the worktree is no longer clean, report that instead of forcing removal.
+After all tasks are created, present a concise report:
 
-If the relevant code is available locally and the current environment allows sub-agents, prefer using the explorer subagent early to gather:
+1. **Architecture assessment**: 2-4 sentences on whether the overall approach is sound, separation of concerns, and any fundamental design trade-offs
+2. **Stats**: X agents ran, Y claims investigated, Z verified, W debunked, N already flagged on PR (skipped)
+3. **Debunked**: One-liner per debunked claim with reason (e.g. `~~sessionUuid reuse~~ — sessionUuid IS submission.uuid`)
+4. **Findings**: One-liner per verified finding with severity tag (e.g. `[concern] form-data.ts:165 — batch retention loop does sequential Tinybird FINAL calls`)
+5. **Ask**: "Ready to go through the TODO list?"
 
-- changed-file context
-- surrounding code and prior art
-- local conventions and patterns
-- nearby helpers, tests, and callers
+## Step 6: Interactive Review
 
-Use it to gather evidence faster, not to replace your own verification.
+Go through each pending task one at a time.
 
-## Review Passes
+For each pending task:
 
-Run these passes in order.
+1. Mark current task as `in_progress`
+2. Present the finding:
+   - **What's wrong**: Clear explanation
+   - **Why it matters**: What can go wrong
+   - **How to fix**: Concrete code suggestion or approach
+   - **Suggested PR comment**: To the point, no essay, include exact file and line
+3. Wait for the user's response before advancing
+4. When moving to next item: mark current task as `completed`, then present next
 
-### 1. Architecture Pass
-
-Assess the overall approach before drilling into line comments:
-
-- Simplest viable solution?
-- Scope creep or unrelated changes?
-- Clear separation of concerns?
-- Missing edge cases or lifecycle coverage?
-- Security or data-integrity concerns?
-- Existing abstraction/pattern available but ignored?
-
-### 2. File and Flow Pass
-
-For each changed area:
-
-- Trace control flow and data flow end to end
-- Check callers and consumers for behavior drift
-- Check error handling, async behavior, race conditions, stale closures
-- Check performance only when it is obviously meaningful
-- Check tests for changed behavior
-- Check consistency with surrounding package patterns
-
-### 3. Convention Pass
-
-Use repo conventions to filter findings:
-
-- Flag real convention violations that matter for maintainability or correctness
-- Do not nitpick style preferences unless the repo clearly requires them
-- Prefer project-specific guidance over generic best-practice dogma
-
-## What to Look For
-
-Prioritize:
-
-- Logic bugs
-- Regressions in callers/consumers
-- Missing guards or broken edge cases
-- Security/privacy issues
-- Broken or invisible error handling
-- Unnecessary complexity / over-engineering
-- Duplication where a clear existing helper should be reused
-- Missing or weak tests for changed logic
-
-Only flag performance when the cost is realistic and material.
-
-## Claim Verification
-
-Before reporting a finding, verify it.
-
-1. Read the actual code around the claim
-2. Follow the call chain or data path yourself
-3. Check assumptions with grep/search
-4. Reconcile duplicate or conflicting observations
-5. Mentally test realistic edge cases against the real code
-
-If unsure after investigation, say so and do not present it as a definite bug.
-
-Common mistakes to avoid:
-
-- Confusing similar identifiers or types
-- Missing higher-level error handling
-- Missing hidden framework behavior already covering the case
-- Reporting style discomfort as correctness issues
-- Escalating theoretical edge cases with no realistic failure path
-
-## Optional Parallelization
-
-For large PRs, you may split review work across sub-agents only when the current environment allows it or the user explicitly asks for delegation.
-
-Suggested split:
-
-- One architecture reviewer
-- One or more file/area reviewers
-
-You must still verify every claim yourself before reporting it.
-
-## Severity
-
-Use this taxonomy:
-
-- `blocker`: likely bug, regression, security issue, or merge-stopping risk
-- `concern`: meaningful issue worth fixing before merge
-- `nit`: small clarity or maintainability issue; non-blocking
-
-Do not inflate severity.
-
-## Output
-
-Start with the review target title when available.
-
-Then provide:
-
-1. High-level assessment
-   - 2-4 sentences
-   - Overall soundness, scope, architecture tradeoffs
-
-2. Findings
-   - Verified findings only
-   - Ordered: `blocker`, `concern`, `nit`
-   - Include file + line
-   - Explain what is wrong and why it matters
-
-3. Debunked / checked items
-   - Briefly list claims you investigated and rejected when that context is useful
-
-4. Actionable review comments
-   - Provide GitHub-ready comment text for non-trivial findings
-
-When the environment supports inline review directives, emit one `::code-comment` per finding in addition to the written summary.
-
-## Output Rules
-
-- Findings first; summary brief
-- Review only the changes and their impact surface
-- Do not pad with praise
-- Do not invent issues to "balance" the review
-- If there are no findings, say so explicitly and mention residual risk or test gaps
-- Prefer concise, concrete language over long essays
-
-## Helpful Commands
-
-- `git status --short`
-- `git diff`
-- `git diff --cached`
-- `git show <sha>`
-- `gh pr view <pr> --json title,number,body,headRefName,headRefOid,baseRefName,files,isCrossRepository,headRepository`
-- `gh pr diff <pr>`
-- `gh api repos/{owner}/{repo}/pulls/{number}/comments`
-- `gh api repos/{owner}/{repo}/issues/{number}/comments`
-- `rg`
-
-## Notes
-
-- Use local source of truth when the relevant branch is checked out
-- Prefer repo-specific review guidance over generic style instincts
-- Thorough and low-noise beats exhaustive and speculative
+If the user disagrees or wants to skip, mark it `completed` and move on.

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review"
+  short_description: "Repo-aware code review"
+  default_prompt: "Use $review to review the code changes, avoid code changes, and report findings with next steps."
+
+policy:
+  allow_implicit_invocation: false
