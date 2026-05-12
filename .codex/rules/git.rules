@@ -1,3 +1,5 @@
+prefix_rule(pattern=["gh"], decision="allow")
+prefix_rule(pattern=["/bin/zsh", "-lc", "GIT_EDITOR=true git rebase --continue"], decision="allow")
 prefix_rule(
   pattern = ["git", ["pull", "commit", "add", "status", "diff", "checkout", "fetch", "branch", "stash", "rebase", "switch", "restore", "reset"]],
   decision = "allow",
@@ -10,5 +12,3 @@ prefix_rule(
   match = [["git", "push"], ["git", "push", "--force"]],
   not_match = [["git", "status"]]
 )
-prefix_rule(pattern=["gh"], decision="allow")
-prefix_rule(pattern=["/bin/zsh", "-lc", "GIT_EDITOR=true git rebase --continue"], decision="allow")

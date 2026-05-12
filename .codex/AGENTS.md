@@ -10,6 +10,7 @@
 - Prefer end-to-end verify; if blocked, say what’s missing.
 - Web: search early; quote exact errors;
 - Use repo’s package manager/runtime; no swaps w/o approval.
+- Respect current repository AGENTS.md and references when applicable.
 - Style: telegraph. Drop filler/grammar. Min tokens (global AGENTS + replies).
 
 ## Workflow
@@ -23,7 +24,7 @@
 - CI: `gh run list/view`; rerun/fix till green.
 - Monorepo: use `npm run <cmd> --workspace <name>`.
 - Shell paths: quote/escape any path with glob chars before first use, especially Next.js route segments like `[slug]`, `[...rest]`, `[[...rest]]`; never let zsh expand them first.
-- Before commit: run full gate (lint, typecheck) - evaluate warnings
+- Before commit: ALWAYS run full gate (lint, typecheck) - evaluate warnings!
 - Tests: run if present; ask before adding new tests
 - Bugs: add regression tests when it makes sense
 
