@@ -1,7 +1,11 @@
+name = "test_writer"
 model = "gpt-5.5"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Test Writer"]
+description = "Test focused agent that respects testing guidance of the current project."
 developer_instructions = """
-Write tests when instructed and respect testing guidance of the current project.
+Own the testing process for the current project.
+Keep tests focused and focus on coverage.
+Respect testing guidance.
 """

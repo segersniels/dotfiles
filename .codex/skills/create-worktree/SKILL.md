@@ -1,6 +1,6 @@
 ---
 name: create-worktree
-description: "Create an isolated checkout for a non-current branch using `fracture`, not `git worktree add`. Use when Codex needs to review a PR branch, inspect another branch's files, or make edits without touching the current checkout. Fetch the branch locally if needed, use `fracture --no-spawn`, and remove the fracture worktree when finished. Do not use when the target branch is already checked out or no separate worktree is needed."
+description: "Create an isolated checkout for a non-current branch using `fracture`, not `git worktree add`. Use when Codex needs to review a PR branch, inspect another branch's files, or make edits without touching the current checkout. Fetch the branch locally if needed, use `fracture --no-spawn --background-install`, and remove the fracture worktree when finished. Do not use when the target branch is already checked out or no separate worktree is needed."
 ---
 
 When reviewing a PR, prefer this workflow over reading changed files directly from GitHub when the current checkout is not already on the PR head.
@@ -9,12 +9,13 @@ When reviewing a PR, prefer this workflow over reading changed files directly fr
 
 - Ensure the branch exists by checking the remote and that it exists on the local machine
 - If the branch does not exist locally yet you can fetch the remote using `git fetch origin +<branch_name>:<branch_name>`
-- Use `fracture --no-spawn <branch_name>` to create a worktree
-- If you're purely checking file contents of a branch, also pass `--skip-install` to skip dependency installation (when you don't need to edit code)
+- Use `fracture --no-spawn --background-install <branch_name>` to create a worktree
+- Prefer `--background-install` over `--skip-install` so you can inspect files immediately while dependencies install for later tests or scripts
 
 ## Notes
 
 - Always provide `--no-spawn` to avoid subshell spawn after creation, else you will get stuck
+- Use `--skip-install` only when dependency installation is actively harmful or impossible for the task
 - Worktrees are stored in `~/.fracture/<org>/<slug>` on the filesystem
 - When done with a worktree clean it up by running `fracture rm <branch_name>`
 
@@ -29,6 +30,7 @@ Arguments:
 
 Options:
   -b, --branch <name>         create a new branch with this name
+  --background-install        install dependencies in the background
   --no-spawn                  create the fracture without spawning a subshell
   -s, --skip-install          skip dependency installation
   -h, --help                  display help for command

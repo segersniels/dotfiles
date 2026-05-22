@@ -26,6 +26,8 @@ model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 approval_policy = "on-failure"
 
+notify = ["/Users/segersniels/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+
 [sandbox_workspace_write]
 network_access = true
 
@@ -46,6 +48,7 @@ notifications = true
 
 [features]
 memories = true
+js_repl = false
 
 ################################################################################
 # Agents
@@ -56,12 +59,13 @@ max_threads = 6
 max_depth = 1
 
 [agents.explorer]
-description = "Read-only codebase explorer for gathering evidence before changes are proposed."
 config_file = "agents/explorer.toml"
 
 [agents.test-writer]
-description = "Write tests when instructed and respect testing guidance of the current project."
 config_file = "agents/test-writer.toml"
+
+[agents.reuse-finder]
+config_file = "agents/reuse-finder.toml"
 
 ################################################################################
 # Projects (trust levels)
@@ -106,6 +110,30 @@ trust_level = "trusted"
 [projects."/Users/segersniels/personal/Black_Crusade_agent"]
 trust_level = "trusted"
 
+[projects."/Users/segersniels/personal/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/fracture"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/Documents/Codex/2026-05-18/notion-plugin-notion-openai-curated-can"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/Documents/Codex/2026-05-18/files-mentioned-by-the-user-memolijst"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/Documents/Codex/2026-05-18/i-started-playing-pokemon-tcg-with"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/Documents/Codex/2026-05-19/in-vercel-is-there-a-way"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/Documents/Codex/2026-05-20/i-bought-the-pokemon-tcg-battle"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/Documents/Codex/2026-05-21/i-wonder-is-there-an-easier"]
+trust_level = "trusted"
+
 ################################################################################
 # Plugins
 ################################################################################
@@ -146,7 +174,10 @@ enabled = true
 [plugins."linear@openai-curated"]
 enabled = true
 
-[plugins."browser-use@openai-bundled"]
+[plugins."gmail@openai-curated"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
 enabled = true
 
 [mcp_servers.notion_tally]
@@ -157,6 +188,10 @@ url = "https://mcp.notion.com/mcp"
 enabled = true
 url = "https://mcp.notion.com/mcp"
 
+[mcp_servers.notion_shared_leen]
+enabled = true
+url = "https://mcp.notion.com/mcp"
+
 [mcp_servers.notion_personal.tools.notion-update-page]
 approval_mode = "approve"
 
@@ -164,13 +199,33 @@ approval_mode = "approve"
 enabled = true
 url = "https://mcp.sentry.dev/mcp"
 
+[mcp_servers.sentry_tally.tools.analyze_issue_with_seer]
+approval_mode = "approve"
+
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/Codex.app/Contents/Resources/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+BROWSER_USE_AVAILABLE_BACKENDS = "iab"
+BROWSER_USE_MARKETPLACE_NAME = "openai-bundled"
+CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
+CODEX_HOME = "/Users/segersniels/.codex"
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = ""
+NODE_REPL_NODE_PATH = "/Applications/Codex.app/Contents/Resources/node"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "167fdf579477181fba1773c1efb067b00c5a64fe85dafb50a2001bde198dc739"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
+NODE_REPL_UNTRUSTED_ENV_ALLOWLIST = "BROWSER_USE_MARKETPLACE_NAME"
+
 [marketplaces.openai-bundled]
-last_updated = "2026-05-11T14:34:34Z"
+last_updated = "2026-05-22T07:48:51Z"
 source_type = "local"
 source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-05-12T11:42:03Z"
+last_updated = "2026-05-22T08:02:58Z"
 source_type = "local"
 source = "/Users/segersniels/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -182,3 +237,176 @@ approval_mode = "approve"
 
 [apps.asdk_app_69a089a326dc8191b32a3f2553f5be2c.tools.linear_save_issue]
 approval_mode = "approve"
+
+[apps.connector_690a90ec05c881918afb6a55dc9bbaa1.tools.vercel_search_vercel_documentation]
+approval_mode = "approve"
+
+[desktop]
+appearanceTheme = "dark"
+appearanceLightCodeThemeId = "rose-pine"
+appearanceDarkCodeThemeId = "codex"
+followUpQueueMode = "steer"
+reviewDelivery = "inline"
+preventSleepWhileRunning = true
+keepRemoteControlAwakeWhilePluggedIn = true
+git-branch-prefix = "feat/"
+git-create-pull-request-as-draft = false
+git-show-sidebar-pr-icons = false
+git-commit-instructions = """
+Create commits only. Do not edit code, format files, or change generated output.
+
+## Workflow
+
+1. Inspect before staging
+- Run `git status --short`, `git diff --stat`, `git diff --cached --stat`, and targeted diffs as needed.
+- Identify unrelated user changes and leave them untouched.
+- Do not start with `git add .`.
+
+2. Plan commit buckets
+- Define the smallest valid commit set before staging anything.
+- Make each commit one reason to revert.
+- Prefer extra small commits over one broad commit when either would work.
+- If the diff mixes independent concerns, split them.
+
+3. Split by change type
+- Put added, removed, or updated runtime dependencies in `chore(deps): ...`.
+- Put added, removed, or updated dev, test, or build dependencies in `chore(deps-dev): ...`.
+- Keep manifest and lockfile changes with the dependency commit, not with `feat(...)` or `fix(...)`.
+- Put pure tooling, config, or setup changes in `chore(scope): ...`.
+- Put refactors with no behavior change in `refactor(scope): ...`.
+- Put docs-only changes in `docs(scope): ...`.
+- Keep tests with the behavior change they prove unless the test harness or test-only plumbing changed; then split `test(scope): ...`.
+
+4. Stage one bucket at a time
+- Use explicit paths or `git add -p`.
+- Re-check the staged diff before each commit with `git diff --cached`.
+- If one file contains multiple concerns, split hunks instead of bundling the whole file.
+
+5. Commit
+- Use `type(scope): description`.
+- Prefer feature or domain scopes; fall back to package names only when no clearer scope exists.
+- Use `deps` or `deps-dev` scopes for dependency updates.
+- Keep the title under 100 characters and describe the outcome, not the implementation.
+
+## Atomic Commit Heuristics
+
+Split commits when any of these are true:
+
+- A dependency or lockfile change appears beside app code.
+- Two files support different user-visible changes.
+- A mechanical rename or move sits beside logic changes.
+- Config or CI changes only enable later feature work.
+- Part of the diff could be reverted safely without the rest.
+
+Keep changes together only when separating them would leave the repo broken or misleading.
+
+## Examples
+
+Use examples to reason about commit boundaries, not to justify bundling.
+
+Example: mixed feature and dependency diff
+- If `package.json` and lockfiles add a new package for password reset and app code adds the flow, split it:
+- `chore(deps): add nodemailer`
+- `feat(auth): add password reset flow`
+
+Example: pure dependency update
+- If the change is only upgrading a runtime package and its lockfile, use:
+- `chore(deps): update react-native to 0.72.0`
+
+Example: fix plus unrelated setup
+- If Android NFC timeout logic changes and CI or Gradle config also changes, split it:
+- `chore(ci): update Android build configuration`
+- `fix(scanner): resolve NFC timeout on Android`
+
+Example: behavior-preserving cleanup
+- If the change only consolidates duplicate API error handling with no user-visible behavior change, use:
+- `refactor(api): simplify error handling`
+
+Prefer title-only commits by default. Add a commit body only when it adds important context such as why the change was necessary, a migration note, or a non-obvious constraint.
+
+## Guardrails
+
+- Never use `git add .` unless the whole worktree is already verified as one atomic change.
+- Never commit unrelated staged changes just because they are present.
+- Never rewrite code to make commits cleaner.
+- Avoid `--no-verify`; reserve it for docs-only commits when hooks are clearly irrelevant.
+- Never use heredoc or `cat` for commit messages.
+- Avoid ANSI codes in commit messages.
+- If the split is ambiguous, choose the smaller commits and state the assumption.
+
+## Common Failure Modes
+
+- Bundling dependency changes into `feat(...)` or `fix(...)`.
+- Grouping setup, refactor, and behavior changes into one commit.
+- Using package names as scopes when a clearer domain scope exists.
+- Treating "same feature" as "same commit" even when the work has separable steps.
+"""
+git-pr-instructions = """
+## Process
+
+1. Run `git fetch --all --prune` to ensure the latest changes are fetched
+2. Check git status and current branch
+3. Get commit history from [origin] to HEAD
+4. Analyze `git diff [origin]...HEAD` to understand changes
+5. Prompt the user for the [origin] (don't make assumptions)
+5. Confirm with the user whether it needs to be a draft PR or not
+7. Create a pull request with a descriptive title and body based on actual code changes (`gh`)
+8. Assign the current git user to the created PR
+
+## Analysis
+
+- Examine modified files and functionality changes
+- Understand technical implementation and business impact
+- Focus on what changed, not just commit messages
+
+## Rules
+
+- **PR title MUST use Conventional Commits format**: `type(scope): description`
+  - Lowercase, imperative mood (same as commit messages)
+  - Optional Notion ticket ID in brackets at end: `[TL-1234]`
+- Write meaningful descriptions based on diff analysis
+- Never include checkboxes, test plans, checklists or testing sections
+- Avoid ANSI codes in descriptions
+- Pass markdown directly to gh, never use heredoc
+- Use markdown and differentiate between sections using ###
+- When writing PR titles or bodies, wrap every code identifier (variable names, params, functions, keys, enum values) in backticks.
+
+## Common Failure Modes
+
+- Assuming the base branch instead of asking the user
+- Writing the PR body from commit messages instead of the actual diff
+- Forgetting to confirm whether the PR should be draft or ready
+- Including checklists or test-plan boilerplate that the repo does not want
+"""
+selected-avatar-id = "bsod"
+default-service-tier = "priority"
+
+[desktop.appearanceLightChromeTheme]
+accent = "#d7827e"
+contrast = 45
+ink = "#575279"
+opaqueWindows = false
+surface = "#faf4ed"
+
+[desktop.appearanceLightChromeTheme.fonts]
+
+[desktop.appearanceLightChromeTheme.semanticColors]
+diffAdded = "#56949f"
+diffRemoved = "#797593"
+skill = "#907aa9"
+
+[desktop.appearanceDarkChromeTheme]
+accent = "#0169cc"
+contrast = 50
+ink = "#fcfcfc"
+opaqueWindows = false
+surface = "#1f1f1f"
+
+[desktop.appearanceDarkChromeTheme.fonts]
+code = '"Jetbrains Mono"'
+ui = "Inter"
+
+[desktop.appearanceDarkChromeTheme.semanticColors]
+diffAdded = "#00a240"
+diffRemoved = "#e02e2a"
+skill = "#b06dff"
