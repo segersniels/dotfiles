@@ -195,7 +195,7 @@ NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
 NODE_REPL_UNTRUSTED_ENV_ALLOWLIST = "BROWSER_USE_MARKETPLACE_NAME"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-05-26T13:51:44Z"
+last_updated = "2026-05-26T15:10:49Z"
 source_type = "local"
 source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
@@ -214,6 +214,9 @@ approval_mode = "approve"
 approval_mode = "approve"
 
 [apps.connector_690a90ec05c881918afb6a55dc9bbaa1.tools.vercel_search_vercel_documentation]
+approval_mode = "approve"
+
+[apps.connector_76869538009648d5b282a4bb21c3d157.tools.github_update_pull_request]
 approval_mode = "approve"
 
 [desktop]

@@ -12,19 +12,20 @@ Ask Cursor for an external opinion by giving it explicit context and a bounded q
 ## Workflow
 
 1. Confirm `agent` exists with `command -v agent` if it has not been checked in the current turn.
-2. Check authentication with `agent status`. Continue only when it reports a logged-in user; otherwise quote the exact output and ask the user to authenticate.
-   - If the command fails because the sandbox blocks Cursor's auth, keychain, or metadata access, rerun the same check with elevated filesystem permissions. Do not move the working directory, rewrite `HOME`, or create temp-home workarounds.
-3. Gather the smallest useful context:
+2. Run Cursor through Codex's macOS sandbox wrapper with `:danger-full-access`. Direct `agent` calls from Codex can fail to see macOS Keychain-backed auth even when the same command works in the user's terminal.
+3. Check authentication through the wrapper:
+   `codex sandbox macos --permissions-profile :danger-full-access --cd "$PWD" agent status`
+   Continue only when it reports a logged-in user; otherwise quote the exact output and ask the user to authenticate.
+4. Gather the smallest useful context:
    - user question, proposed approach, or decision to review
    - relevant file paths and snippets
    - `git diff` or focused diff when reviewing recent edits
    - screenshots or UI notes summarized in text when reviewing frontend work
    - constraints such as "KISS", "read-only", "do not suggest broad refactors"
-4. Do not send secrets, credentials, private customer data, or large unrelated files.
-5. Run Cursor directly in print mode with the prompt as the command argument.
-   - If the CLI fails with a sandbox permission/auth/keychain/metadata error, rerun the same command with elevated filesystem permissions and quote the original error.
-6. Wait for the command to complete and use stdout as Cursor's answer in the current context.
-7. Summarize Cursor's agreement, disagreement, and alternative approach ideas. Do not blindly adopt Cursor's conclusion.
+5. Do not send secrets, credentials, private customer data, or large unrelated files.
+6. Run Cursor through the wrapper in print mode with the prompt as the command argument.
+7. Wait for the command to complete and use stdout as Cursor's answer in the current context.
+8. Summarize Cursor's agreement, disagreement, and alternative approach ideas. Do not blindly adopt Cursor's conclusion.
 
 ## Prompt Shape
 
@@ -65,7 +66,7 @@ Return:
 Prefer the user's requested model when provided. Otherwise default to `composer-2.5`.
 
 ```bash
-agent prompt --print --yolo --model composer-2.5 --mode ask --output-format text 'You are giving a second opinion only.
+codex sandbox macos --permissions-profile :danger-full-access --cd "$PWD" agent prompt --print --yolo --model composer-2.5 --mode ask --output-format text 'You are giving a second opinion only.
 Do not edit files. Do not run commands unless explicitly asked.
 
 Question:
