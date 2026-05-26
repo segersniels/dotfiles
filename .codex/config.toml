@@ -19,17 +19,12 @@ model_reasoning_effort = "high"
 # Approval & Sandbox
 ################################################################################
 
-# Filesystem/network sandbox policy for tool calls:
-# - read-only (default)
-# - workspace-write
-# - danger-full-access (no sandbox; extremely risky)
-sandbox_mode = "workspace-write"
-approval_policy = "on-failure"
+# Full filesystem access for local tool calls, while keeping command approval
+# and rules active. Do not use --yolo / dangerously-bypass-approvals-and-sandbox.
+default_permissions = ":danger-full-access"
+approval_policy = "on-request"
 
 notify = ["/Users/segersniels/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
-
-[sandbox_workspace_write]
-network_access = true
 
 [shell_environment_policy]
 inherit = "all"
@@ -80,9 +75,6 @@ trust_level = "trusted"
 [projects."/Users/segersniels/.fracture"]
 trust_level = "trusted"
 
-[projects."/tmp"]
-trust_level = "trusted"
-
 [projects."/Users/segersniels/projects/tally/tally"]
 trust_level = "trusted"
 
@@ -90,9 +82,6 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/segersniels/personal/workd"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/.codex"]
 trust_level = "trusted"
 
 [projects."/Users/segersniels/personal/kip"]
@@ -114,24 +103,6 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/segersniels/personal/fracture"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/Documents/Codex/2026-05-18/notion-plugin-notion-openai-curated-can"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/Documents/Codex/2026-05-18/files-mentioned-by-the-user-memolijst"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/Documents/Codex/2026-05-18/i-started-playing-pokemon-tcg-with"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/Documents/Codex/2026-05-19/in-vercel-is-there-a-way"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/Documents/Codex/2026-05-20/i-bought-the-pokemon-tcg-battle"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/Documents/Codex/2026-05-21/i-wonder-is-there-an-easier"]
 trust_level = "trusted"
 
 ################################################################################
@@ -180,6 +151,10 @@ enabled = true
 [plugins."browser@openai-bundled"]
 enabled = true
 
+[mcp_servers.tally]
+enabled = true
+url = "https://api.tally.so/mcp"
+
 [mcp_servers.notion_tally]
 enabled = true
 url = "https://mcp.notion.com/mcp"
@@ -220,7 +195,7 @@ NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
 NODE_REPL_UNTRUSTED_ENV_ALLOWLIST = "BROWSER_USE_MARKETPLACE_NAME"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-05-22T09:19:51Z"
+last_updated = "2026-05-26T13:51:44Z"
 source_type = "local"
 source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
