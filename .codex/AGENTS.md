@@ -28,8 +28,9 @@
 
 ## Code style
 
+- Always lint and typecheck after each change.
 - When writing or editing code, keep control flow visually separated from business logic.
-- Add an empty line before early exits and control-transfer statements: `return`, `throw`, `break`, `continue`.
+- Add an empty line before early exits and control-transfer statements, only when preceded by other logic in the same block; do not separate them from their own opening control statement: `return`, `throw`, `break`, `continue`.
 - Add an empty line after logical block statements when more code follows: `if`, `else`, `for`, `while`, `do`, `switch`, `try`, `catch`, `finally`.
 - Add an empty line between `switch` cases, including before `default`.
 - When commenting code, use `//` for single-line comments and JSDoc for multi-line comments or function explanations.
