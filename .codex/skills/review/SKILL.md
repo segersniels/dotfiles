@@ -13,7 +13,7 @@ You are a critical but fair technical lead reviewing a PR. Question everything. 
 2. Read @REVIEW.md to understand what to focus on, prioritize, and skip during the review
 3. Read @VOICE.md (if it exists) to match the reviewer's tone in suggested comments
 4. Run `gh pr view --json number,title,body,headRefName,baseRefName` to get PR details
-5. If the current local checkout is not already on `headRefName`, use the `create-worktree` skill to create an isolated local checkout of the PR head branch with `fracture --no-spawn --background-install`. Review changed files from that local worktree rather than reading file contents via `gh api`.
+5. If the current local checkout is not already on `headRefName`, use the `create-worktree` skill to create an isolated local checkout of the PR head branch with `fracture --no-spawn`. Review changed files from that local worktree rather than reading file contents via `gh api`.
 6. Only fall back to GitHub-hosted file contents when a local checkout is impossible (for example: no local repo, `fracture` unavailable, or the branch cannot be fetched locally). If you do fall back, say why.
 7. Run `gh pr diff` to get the full diff
 8. Read existing PR comments (including inline): `gh api repos/{owner}/{repo}/pulls/{number}/comments` and `gh api repos/{owner}/{repo}/issues/{number}/comments`. Build a structured list of already-flagged findings (file, line, topic, author/bot, and whether the author replied or it appears resolved). Pass this list to explorer agents explicitly so they skip duplicate feedback. The parent agent still owns final dedupe before reporting.
