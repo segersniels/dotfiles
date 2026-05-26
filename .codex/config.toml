@@ -22,7 +22,7 @@ model_reasoning_effort = "high"
 # Full filesystem access for local tool calls, while keeping command approval
 # and rules active. Do not use --yolo / dangerously-bypass-approvals-and-sandbox.
 default_permissions = ":danger-full-access"
-approval_policy = "on-request"
+approval_policy = "on-failure"
 
 notify = ["/Users/segersniels/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
 
