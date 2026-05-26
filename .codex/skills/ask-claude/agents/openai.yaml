@@ -1,4 +1,0 @@
-interface:
-  display_name: "Ask Claude"
-  short_description: "Ask Claude for a read-only second look"
-  default_prompt: "Use $ask-claude to ask Claude for a read-only second look at this code."

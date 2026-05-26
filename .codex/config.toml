@@ -62,6 +62,12 @@ config_file = "agents/test-writer.toml"
 [agents.reuse-finder]
 config_file = "agents/reuse-finder.toml"
 
+[agents.claude]
+config_file = "agents/claude.toml"
+
+[agents.cursor]
+config_file = "agents/cursor.toml"
+
 ################################################################################
 # Projects (trust levels)
 ################################################################################
