@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ask Cursor"
+  short_description: "Ask Cursor for a read-only second look"
+  default_prompt: "Use $ask-cursor to ask Cursor for a read-only second look at this code."
