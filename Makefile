@@ -13,6 +13,11 @@ backup-ghostty:
 	@rm -rf .ghostty
 	@rsync -av ~/.config/ghostty/ .ghostty/
 
+backup-cmux: backup-ghostty
+	@rm -rf .cmux
+	@mkdir -p .cmux
+	@rsync -av ~/.config/cmux/cmux.json .cmux/
+
 backup-codex:
 	@rm -rf .codex
 	@rsync -av ~/.codex/config.toml .codex/
@@ -31,7 +36,7 @@ backup-cursor:
 	@rsync -av ~/.cursor/settings.json .cursor/
 	@rsync -av ~/.cursor/cli-config.json .cursor/
 
-backup: backup-nvim backup-ghostty backup-codex backup-cursor
+backup: backup-nvim backup-cmux backup-codex backup-cursor
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -44,6 +49,10 @@ restore-nvim:
 
 restore-ghostty:
 	@rsync -av .ghostty/ ~/.config/ghostty/
+
+restore-cmux: restore-ghostty
+	@mkdir -p ~/.config/cmux
+	@rsync -av .cmux/cmux.json ~/.config/cmux/
 
 restore-codex:
 	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/
@@ -64,5 +73,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-cursor
+restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-cursor
 	@$(foreach file, $(FILES), make restore-$(file);)
