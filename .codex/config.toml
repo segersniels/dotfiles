@@ -364,6 +364,7 @@ git-pr-instructions = """
 - Including checklists or test-plan boilerplate that the repo does not want"""
 selected-avatar-id = "bsod"
 default-service-tier = "priority"
+show-context-window-usage = true
 
 [desktop.appearanceLightChromeTheme]
 accent = "#d7827e"
