@@ -37,14 +37,6 @@ Make code read like a careful human wrote it. Focus on how the logic is expresse
 
 ## Code style
 
-For eligible JavaScript and TypeScript codebases, run the bundled oxlint check on the edited files to identify mechanical code style improvements:
-
-```sh
-oxlint -c "$HOME/.codex/skills/human-code/assets/oxlint.config.json" --no-error-on-unmatched-pattern <edited-js-ts-files>
-```
-
-Skip this check for non-JS/TS codebases such as Go, Rust, and C#. This is additive to project linting, formatting, typechecking, and tests. Do not install `oxlint` or use autofix flags unless asked. When cleaning current edits only, act only on diagnostics that overlap changed hunks.
-
 ### Spacing
 
 - Add an empty line before early exits and control-transfer statements when preceded by other logic in the same block: `return`, `throw`, `break`, `continue`.

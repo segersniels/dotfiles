@@ -20,6 +20,7 @@ backup-codex:
 	@rsync -av --exclude='.system/' ~/.codex/skills/ .codex/skills/
 	@rsync -av ~/.codex/rules/ .codex/rules/
 	@rsync -av ~/.codex/agents/ .codex/agents/
+	@rsync -av ~/.codex/hooks/ .codex/hooks/
 	@rsync -av --exclude='target/' --exclude='.git/' ~/.codex/clis/ .codex/clis/
 
 backup-cursor:

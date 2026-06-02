@@ -395,3 +395,8 @@ ui = "Inter"
 diffAdded = "#00a240"
 diffRemoved = "#e02e2a"
 skill = "#b06dff"
+
+[hooks.state]
+
+[hooks.state."/Users/segersniels/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:9e24dccb8fb60bc0d0d362459446ecd34262a29980ceebab6fc466f725200501"

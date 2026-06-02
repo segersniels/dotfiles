@@ -1,0 +1,32 @@
+{
+  "jsPlugins": ["./human-code-style.mjs"],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/.turbo/**"
+  ],
+  "plugins": ["eslint", "jsdoc"],
+  "categories": {
+    "correctness": "off",
+    "suspicious": "off",
+    "pedantic": "off",
+    "perf": "off",
+    "restriction": "off",
+    "style": "off"
+  },
+  "rules": {
+    "human-code-style/blank-line-after-logical-block": "warn",
+    "human-code-style/blank-line-before-control-transfer": "warn",
+    "human-code-style/blank-line-between-switch-cases": "warn",
+    "human-code-style/blank-line-before-logical-block-after-multiline": "warn",
+    "human-code-style/use-jsdoc-for-multiline-block-comments": "warn",
+    "human-code-style/use-jsdoc-for-multiline-line-comments": "warn",
+    "human-code-style/use-line-comment-for-single-line-comments": "warn",
+    "no-irregular-whitespace": "warn",
+    "no-multi-str": "warn",
+    "no-unexpected-multiline": "warn"
+  }
+}
