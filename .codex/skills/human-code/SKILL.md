@@ -35,7 +35,17 @@ Make code read like a careful human wrote it. Focus on how the logic is expresse
 - Use temporary names when they make existing logic easier to read; avoid adding names that obscure the flow.
 - Prefer names that make the rule readable at scan speed.
 
-## Spacing
+## Code style
+
+For eligible JavaScript and TypeScript codebases, run the bundled oxlint check on the edited files to identify mechanical code style improvements:
+
+```sh
+oxlint -c "$HOME/.codex/skills/human-code/assets/oxlint.config.json" --no-error-on-unmatched-pattern <edited-js-ts-files>
+```
+
+Skip this check for non-JS/TS codebases such as Go, Rust, and C#. This is additive to project linting, formatting, typechecking, and tests. Do not install `oxlint` or use autofix flags unless asked. When cleaning current edits only, act only on diagnostics that overlap changed hunks.
+
+### Spacing
 
 - Add an empty line before early exits and control-transfer statements when preceded by other logic in the same block: `return`, `throw`, `break`, `continue`.
 - Do not separate a control-transfer statement from its own opening control statement.
@@ -44,7 +54,7 @@ Make code read like a careful human wrote it. Focus on how the logic is expresse
 - Keep one-line setup attached to the following control flow.
 - Add a blank line between any multi-line statement and the next logical block.
 
-## Comments
+### Comments
 
 - Comments should help a reviewer follow the higher-level flow and intent of the code.
 - Comment why a guard exits or why a branch exists.
@@ -52,15 +62,3 @@ Make code read like a careful human wrote it. Focus on how the logic is expresse
 - Use `//` for single-line comments.
 - Use JSDoc for multi-line comments or function explanations.
 - Keep broad rationale in the PR, commit message, or final explanation instead of inline code.
-
-## Mechanical lint
-
-For JavaScript and TypeScript codebases, run the bundled oxlint style check after human-code edits when `oxlint` is available. Skip it for non-JS/TS codebases such as Go, Rust, and C#.
-
-```sh
-files=()
-while IFS= read -r -d '' file; do [[ "$file" =~ \.(c|m)?(j|t)sx?$ ]] && files+=("$file"); done < <(git diff --name-only -z --diff-filter=ACMR)
-(( ${#files[@]} )) && oxlint -c "$HOME/.codex/skills/human-code/assets/oxlint.config.json" --no-error-on-unmatched-pattern "${files[@]}"
-```
-
-This is additive to project linting, formatting, typechecking, and tests. Do not install `oxlint` or use autofix flags unless asked. When cleaning current edits only, act only on diagnostics that overlap changed hunks.
