@@ -21,10 +21,11 @@ model_reasoning_effort = "high"
 
 # Full filesystem access for local tool calls, while keeping command approval
 # and rules active. Do not use --yolo / dangerously-bypass-approvals-and-sandbox.
-default_permissions = ":danger-full-access"
+sandbox_mode = "danger-full-access"
 approval_policy = "on-failure"
 
 notify = ["/Users/segersniels/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+service_tier = "fast"
 
 [shell_environment_policy]
 inherit = "all"
@@ -36,6 +37,9 @@ ignore_default_excludes = true
 
 [tui]
 notifications = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 1
 
 ################################################################################
 # Features
@@ -111,6 +115,12 @@ trust_level = "trusted"
 [projects."/Users/segersniels/personal/fracture"]
 trust_level = "trusted"
 
+[projects."/Users/segersniels/personal/cmt"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/.codex"]
+trust_level = "trusted"
+
 ################################################################################
 # Plugins
 ################################################################################
@@ -154,6 +164,9 @@ enabled = true
 [plugins."gmail@openai-curated"]
 enabled = true
 
+[plugins."build-macos-apps@openai-curated"]
+enabled = true
+
 [plugins."browser@openai-bundled"]
 enabled = true
 
@@ -189,24 +202,24 @@ command = "/Applications/Codex.app/Contents/Resources/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
-BROWSER_USE_AVAILABLE_BACKENDS = "iab"
-BROWSER_USE_MARKETPLACE_NAME = "openai-bundled"
-CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
-CODEX_HOME = "/Users/segersniels/.codex"
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
 NODE_REPL_NODE_MODULE_DIRS = ""
 NODE_REPL_NODE_PATH = "/Applications/Codex.app/Contents/Resources/node"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "167fdf579477181fba1773c1efb067b00c5a64fe85dafb50a2001bde198dc739"
 NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
-NODE_REPL_UNTRUSTED_ENV_ALLOWLIST = "BROWSER_USE_MARKETPLACE_NAME"
+CODEX_HOME = "/Users/segersniels/.codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "0b0d41e7a14a4903d2f95b0b3f427ed796b12c8edca2fa392a03df43997075ae"
+BROWSER_USE_AVAILABLE_BACKENDS = "iab"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-05-26T15:10:49Z"
+last_updated = "2026-06-02T08:00:42Z"
 source_type = "local"
 source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-05-22T08:02:58Z"
+last_updated = "2026-06-01T20:05:53Z"
 source_type = "local"
 source = "/Users/segersniels/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -234,7 +247,7 @@ reviewDelivery = "inline"
 preventSleepWhileRunning = true
 keepRemoteControlAwakeWhilePluggedIn = true
 git-branch-prefix = "feat/"
-git-create-pull-request-as-draft = false
+git-create-pull-request-as-draft = true
 git-show-sidebar-pr-icons = false
 git-commit-instructions = """
 Create commits only. Do not edit code, format files, or change generated output.
@@ -323,20 +336,8 @@ Prefer title-only commits by default. Add a commit body only when it adds import
 - Bundling dependency changes into `feat(...)` or `fix(...)`.
 - Grouping setup, refactor, and behavior changes into one commit.
 - Using package names as scopes when a clearer domain scope exists.
-- Treating "same feature" as "same commit" even when the work has separable steps.
-"""
+- Treating "same feature" as "same commit" even when the work has separable steps."""
 git-pr-instructions = """
-## Process
-
-1. Run `git fetch --all --prune` to ensure the latest changes are fetched
-2. Check git status and current branch
-3. Get commit history from [origin] to HEAD
-4. Analyze `git diff [origin]...HEAD` to understand changes
-5. Prompt the user for the [origin] (don't make assumptions)
-5. Confirm with the user whether it needs to be a draft PR or not
-7. Create a pull request with a descriptive title and body based on actual code changes (`gh`)
-8. Assign the current git user to the created PR
-
 ## Analysis
 
 - Examine modified files and functionality changes
@@ -360,8 +361,7 @@ git-pr-instructions = """
 - Assuming the base branch instead of asking the user
 - Writing the PR body from commit messages instead of the actual diff
 - Forgetting to confirm whether the PR should be draft or ready
-- Including checklists or test-plan boilerplate that the repo does not want
-"""
+- Including checklists or test-plan boilerplate that the repo does not want"""
 selected-avatar-id = "bsod"
 default-service-tier = "priority"
 

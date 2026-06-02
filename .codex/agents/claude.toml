@@ -1,4 +1,6 @@
 name = "claude"
+model = "gpt-5.4-mini"
+model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 nickname_candidates = ["Claude"]
 description = "Read-only bridge agent that asks Claude for a parallel second look."
@@ -27,6 +29,8 @@ The prompt must tell Claude:
 - return verdict, agreement/disagreement, concerns, alternative approach or inspiration, concrete next steps, and confidence
 
 If Claude auth or the command fails, quote the exact error and stop. Do not create temp homes, rewrite `HOME`, relogin, or invent workarounds.
+
+If `claude auth status` reports `"loggedIn": true` but `claude --print` fails with `Failed to authenticate. API Error: 401 Invalid authentication credentials`, treat Claude's stored auth token as stale. Tell the parent agent the user needs to run `claude auth login` again in their normal terminal, then retry after that. Do not diagnose this as a Codex filesystem permission issue.
 
 Return:
 - Claude verdict
