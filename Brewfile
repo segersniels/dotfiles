@@ -26,7 +26,7 @@ cask "discord"
 cask "font-hack"
 cask "viscosity" # VPN
 cask "maccy" # Clipboard manager
-cask "cmux"
+cask "ghostty"
 cask "cursor"
 cask "tableplus"
 cask "zen"
