@@ -13,6 +13,11 @@ backup-ghostty:
 	@rm -rf .ghostty
 	@rsync -av ~/.config/ghostty/ .ghostty/
 
+backup-cmux: backup-ghostty
+	@rm -rf .cmux
+	@mkdir -p .cmux
+	@scripts/export-cmux-config > .cmux/cmux.json
+
 backup-codex:
 	@rm -rf .codex
 	@rsync -av ~/.codex/config.toml .codex/
@@ -45,6 +50,10 @@ restore-nvim:
 
 restore-ghostty:
 	@rsync -av .ghostty/ ~/.config/ghostty/
+
+restore-cmux: restore-ghostty
+	@mkdir -p ~/.config/cmux
+	@rsync -av .cmux/cmux.json ~/.config/cmux/
 
 restore-codex:
 	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/

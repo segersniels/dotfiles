@@ -1,0 +1,95 @@
+#!/usr/bin/env node
+
+const { spawnSync } = require("child_process");
+
+const DOMAIN = "com.cmuxterm.app";
+
+function readDefault(key) {
+  const result = spawnSync("defaults", ["read", DOMAIN, key], {
+    encoding: "utf8",
+  });
+
+  if (result.status !== 0) {
+    return null;
+  }
+
+  return result.stdout.trim();
+}
+
+function readBoolean(key) {
+  const value = readDefault(key);
+
+  if (value === null) {
+    return null;
+  }
+
+  return ["1", "true", "TRUE", "yes", "YES"].includes(value);
+}
+
+function readNumber(key) {
+  const value = readDefault(key);
+
+  if (value === null) {
+    return null;
+  }
+
+  return Number(value);
+}
+
+function compact(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return value;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([key, child]) => [key, compact(child)])
+      .filter(([, child]) => child !== null && !(typeof child === "object" && Object.keys(child).length === 0)),
+  );
+}
+
+const workspacePresentationMode = readDefault("workspacePresentationMode");
+const sidebarBranchVerticalLayout = readBoolean("sidebarBranchVerticalLayout");
+
+const config = compact({
+  $schema: "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
+  schemaVersion: 1,
+  app: {
+    appearance: readDefault("appearanceMode"),
+    appIcon: readDefault("appIconMode"),
+    minimalMode: workspacePresentationMode === null ? null : workspacePresentationMode === "minimal",
+    focusPaneOnFirstClick: readBoolean("paneFirstClickFocus.enabled"),
+    preferredEditor: readDefault("preferredEditorCommand"),
+    openMarkdownInCmuxViewer: readBoolean("openMarkdownInCmuxViewer"),
+  },
+  automation: {
+    claudeCodeIntegration: readBoolean("claudeCodeHooksEnabled"),
+    cursorIntegration: readBoolean("cursorHooksEnabled"),
+    geminiIntegration: readBoolean("geminiHooksEnabled"),
+  },
+  browser: {
+    theme: readDefault("browserThemeMode"),
+  },
+  notifications: {
+    showInMenuBar: readBoolean("showMenuBarExtra"),
+  },
+  sidebar: {
+    hideAllDetails: readBoolean("sidebarHideAllDetails"),
+    showWorkspaceDescription: readBoolean("sidebarShowWorkspaceDescription"),
+    branchLayout:
+      sidebarBranchVerticalLayout === null ? null : sidebarBranchVerticalLayout ? "vertical" : "inline",
+    showBranchDirectory: readBoolean("sidebarShowBranchDirectory"),
+    showPullRequests: readBoolean("sidebarShowPullRequest"),
+    makePullRequestsClickable: readBoolean("sidebarMakePullRequestClickable"),
+  },
+  sidebarAppearance: {
+    matchTerminalBackground: readBoolean("sidebarMatchTerminalBackground"),
+    tintColor: readDefault("sidebarTintHex"),
+    tintOpacity: readNumber("sidebarTintOpacity"),
+  },
+  workspaceColors: {
+    indicatorStyle: readDefault("sidebarActiveTabIndicatorStyle"),
+  },
+});
+
+process.stdout.write(`${JSON.stringify(config, null, 2)}\n`);
