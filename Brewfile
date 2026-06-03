@@ -17,8 +17,10 @@ brew "mas" # App store
 brew "neovim"
 brew "fnm" # Node version manager
 brew "btop" # System monitor
+brew "gh"
 
 # Cask
+cask "1password"
 cask "docker-desktop"
 cask "spotify"
 cask "slack"
@@ -30,4 +32,3 @@ cask "cmux"
 cask "cursor"
 cask "tableplus"
 cask "zen"
-cask "gh"
