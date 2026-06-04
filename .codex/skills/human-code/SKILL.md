@@ -1,6 +1,6 @@
 ---
 name: human-code
-description: "Use for readability and reviewability improvements to existing logic: code flow, naming, comments, spacing, guard clauses, and making code read naturally. Use when the user asks for human code, readable code, proper code, reviewable code, or making code flow nicely. Keep the existing behavior intact."
+description: "Use for readability and reviewability improvements to existing logic: code flow, naming, comments, guard clauses, and making code read naturally. Use when the user asks for human code, readable code, proper code, reviewable code, or making code flow nicely. Keep the existing behavior intact."
 ---
 
 # Human Code
@@ -35,20 +35,10 @@ Make code read like a careful human wrote it. Focus on how the logic is expresse
 - Use temporary names when they make existing logic easier to read; avoid adding names that obscure the flow.
 - Prefer names that make the rule readable at scan speed.
 
-## Code style
+## Comments
 
-### Spacing
-
-- Add an empty line before early exits and control-transfer statements when preceded by other logic in the same block: `return`, `throw`, `break`, `continue`.
-- Do not separate a control-transfer statement from its own opening control statement.
-- Add an empty line after logical block statements when more code follows: `if`, `else`, `for`, `while`, `do`, `switch`, `try`, `catch`, `finally`.
-- Add an empty line between `switch` cases, including before `default`.
-- Keep one-line setup attached to the following control flow.
-- Add a blank line between any multi-line statement and the next logical block.
-
-### Comments
-
-- Comments should help a reviewer follow the higher-level flow and intent of the code.
+- Comments should help a reviewer scan the code and understand the product-level flow without fully diving into the implementation.
+- Prefer high-level product intent over low-level mechanics.
 - Comment why a guard exits or why a branch exists.
 - Do not comment obvious happy-path returns.
 - Use `//` for single-line comments.

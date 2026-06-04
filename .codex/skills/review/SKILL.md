@@ -67,22 +67,21 @@ Common sub agent mistakes to watch for:
 
 ## Step 4: Build TODO List
 
-After verification, create tasks for EACH finding (verified and debunked).
-Then immediately call mark all debunked tasks as `completed`.
+After verification, create tasks only for surviving verified findings.
+Keep debunked claims internal; do not create tasks for them and do not report them to the user.
 
 Before creating tasks, cross-check each surviving finding against the already-flagged list from Step 1.8. Same file + same line (±2) + same topic = already flagged. Drop these from the task list and interactive walkthrough; mention only the skipped count in the summary.
 
-Order: blockers first, then concerns, then nits, then debunked.
+Order: blockers first, then concerns, then nits.
 
 ## Step 5: Summary
 
 After all tasks are created, present a concise report:
 
 1. **Architecture assessment**: 2-4 sentences on whether the overall approach is sound, separation of concerns, and any fundamental design trade-offs
-2. **Stats**: X agents ran, Y claims investigated, Z verified, W debunked, N already flagged on PR (skipped)
-3. **Debunked**: One-liner per debunked claim with reason (e.g. `~~sessionUuid reuse~~ — sessionUuid IS submission.uuid`)
-4. **Findings**: One-liner per verified finding with severity tag (e.g. `[concern] form-data.ts:165 — batch retention loop does sequential Tinybird FINAL calls`)
-5. **Ask**: "Ready to go through the TODO list?"
+2. **Stats**: X agents ran, Y claims investigated, Z verified, N already flagged on PR (skipped)
+3. **Findings**: One-liner per verified finding with severity tag (e.g. `[concern] form-data.ts:165 — batch retention loop does sequential Tinybird FINAL calls`)
+4. **Ask**: "Ready to go through the TODO list?"
 
 ## Step 6: Interactive Review
 

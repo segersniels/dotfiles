@@ -66,12 +66,6 @@ config_file = "agents/test-writer.toml"
 [agents.reuse-finder]
 config_file = "agents/reuse-finder.toml"
 
-[agents.claude]
-config_file = "agents/claude.toml"
-
-[agents.cursor]
-config_file = "agents/cursor.toml"
-
 ################################################################################
 # Projects (trust levels)
 ################################################################################
@@ -121,6 +115,9 @@ trust_level = "trusted"
 [projects."/Users/segersniels/.codex"]
 trust_level = "trusted"
 
+[projects."/Users/segersniels/projects/tally/attio-tallyforms"]
+trust_level = "trusted"
+
 ################################################################################
 # Plugins
 ################################################################################
@@ -167,6 +164,9 @@ enabled = true
 [plugins."build-macos-apps@openai-curated"]
 enabled = true
 
+[plugins."codex-security@openai-curated"]
+enabled = true
+
 [plugins."browser@openai-bundled"]
 enabled = true
 
@@ -207,14 +207,14 @@ NODE_REPL_NODE_MODULE_DIRS = ""
 NODE_REPL_NODE_PATH = "/Applications/Codex.app/Contents/Resources/node"
 NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
 CODEX_HOME = "/Users/segersniels/.codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "0b0d41e7a14a4903d2f95b0b3f427ed796b12c8edca2fa392a03df43997075ae"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "4b6bfaf4ed2ce9b5cd68e60a61642eb4927a36306ba8c8993f6058607b3530fb"
 BROWSER_USE_AVAILABLE_BACKENDS = "iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
 CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-06-02T08:00:42Z"
+last_updated = "2026-06-03T12:20:28Z"
 source_type = "local"
 source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
@@ -363,8 +363,8 @@ git-pr-instructions = """
 - Forgetting to confirm whether the PR should be draft or ready
 - Including checklists or test-plan boilerplate that the repo does not want"""
 selected-avatar-id = "bsod"
-default-service-tier = "priority"
 show-context-window-usage = true
+default-service-tier = "priority"
 
 [desktop.appearanceLightChromeTheme]
 accent = "#d7827e"
