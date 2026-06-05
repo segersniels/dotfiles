@@ -71,7 +71,7 @@ output=$("${oxlint_cmd[@]}" -c "$config_path" --no-error-on-unmatched-pattern "$
 status=$?
 set -e
 
-[[ -n "${output//[[:space:]]/}" ]] || exit 0
+[[ -n "$output" ]] || exit 0
 
 jq -n \
   --arg message "$message" \
