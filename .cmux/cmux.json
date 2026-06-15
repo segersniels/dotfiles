@@ -6,7 +6,7 @@
     "appIcon": "automatic",
     "minimalMode": true,
     "focusPaneOnFirstClick": true,
-    "preferredEditor": "code",
+    "preferredEditor": "",
     "openMarkdownInCmuxViewer": true
   },
   "automation": {
