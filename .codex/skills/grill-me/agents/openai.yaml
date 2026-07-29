@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grill Me"
+  short_description: "Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree."
+  default_prompt: "Use $grill-me to interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree."
