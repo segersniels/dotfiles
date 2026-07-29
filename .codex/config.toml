@@ -1,231 +1,34 @@
-#:schema https://developers.openai.com/codex/config-schema.json
-
-################################################################################
-# UI, and Misc
-################################################################################
-
+approval_policy = "on-failure"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+notify = [
+    "/Users/segersniels/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient",
+    "turn-ended",
+]
+personality = "friendly"
+sandbox_mode = "danger-full-access"
+service_tier = "priority"
 suppress_unstable_features_warning = true
 web_search = "live"
-personality = "friendly"
-
-################################################################################
-# Core Model Selection
-################################################################################
-
-model = "gpt-5.5"
-model_reasoning_effort = "high"
-
-################################################################################
-# Approval & Sandbox
-################################################################################
-
-# Full filesystem access for local tool calls, while keeping command approval
-# and rules active. Do not use --yolo / dangerously-bypass-approvals-and-sandbox.
-sandbox_mode = "danger-full-access"
-approval_policy = "on-failure"
-
-notify = ["/Users/segersniels/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
-service_tier = "fast"
-
-[shell_environment_policy]
-inherit = "all"
-ignore_default_excludes = true
-
-################################################################################
-# Notifications
-################################################################################
-
-[tui]
-notifications = true
-
-[tui.model_availability_nux]
-"gpt-5.5" = 1
-
-################################################################################
-# Features
-################################################################################
-
-[features]
-memories = true
-js_repl = false
-
-################################################################################
-# Agents
-################################################################################
 
 [agents]
-max_threads = 6
 max_depth = 1
+max_threads = 6
+
+[agents.cursor-composer]
+config_file = "agents/cursor-composer.toml"
 
 [agents.explorer]
 config_file = "agents/explorer.toml"
 
-[agents.test-writer]
-config_file = "agents/test-writer.toml"
+[agents.grug]
+config_file = "agents/grug.toml"
+
+[agents.ponytail]
+config_file = "agents/ponytail.toml"
 
 [agents.reuse-finder]
 config_file = "agents/reuse-finder.toml"
-
-################################################################################
-# Projects (trust levels)
-################################################################################
-
-[projects."/Users/segersniels/projects"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/.fracture"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/projects/tally/tally"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/labeler"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/workd"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/kip"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/crusader"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/pawn"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/everything-must-go"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/Black_Crusade_agent"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/dotfiles"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/fracture"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/personal/cmt"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/.codex"]
-trust_level = "trusted"
-
-[projects."/Users/segersniels/projects/tally/attio-tallyforms"]
-trust_level = "trusted"
-
-################################################################################
-# Plugins
-################################################################################
-
-[plugins."github@openai-curated"]
-enabled = true
-
-[plugins."slack@openai-curated"]
-enabled = true
-
-[plugins."figma@openai-curated"]
-enabled = true
-
-[plugins."sentry@openai-curated"]
-enabled = true
-
-[plugins."vercel@openai-curated"]
-enabled = true
-
-[plugins."build-web-apps@openai-curated"]
-enabled = true
-
-[plugins."notion@openai-curated"]
-enabled = true
-
-[plugins."documents@openai-primary-runtime"]
-enabled = true
-
-[plugins."spreadsheets@openai-primary-runtime"]
-enabled = true
-
-[plugins."presentations@openai-primary-runtime"]
-enabled = true
-
-[plugins."chatgpt-apps@openai-curated"]
-enabled = true
-
-[plugins."linear@openai-curated"]
-enabled = true
-
-[plugins."gmail@openai-curated"]
-enabled = true
-
-[plugins."build-macos-apps@openai-curated"]
-enabled = true
-
-[plugins."codex-security@openai-curated"]
-enabled = true
-
-[plugins."browser@openai-bundled"]
-enabled = true
-
-[mcp_servers.tally]
-enabled = true
-url = "https://api.tally.so/mcp"
-
-[mcp_servers.notion_tally]
-enabled = true
-url = "https://mcp.notion.com/mcp"
-
-[mcp_servers.notion_personal]
-enabled = true
-url = "https://mcp.notion.com/mcp"
-
-[mcp_servers.notion_shared_leen]
-enabled = true
-url = "https://mcp.notion.com/mcp"
-
-[mcp_servers.notion_personal.tools.notion-update-page]
-approval_mode = "approve"
-
-[mcp_servers.sentry_tally]
-enabled = true
-url = "https://mcp.sentry.dev/mcp"
-
-[mcp_servers.sentry_tally.tools.analyze_issue_with_seer]
-approval_mode = "approve"
-
-[mcp_servers.node_repl]
-args = []
-command = "/Applications/Codex.app/Contents/Resources/node_repl"
-startup_timeout_sec = 120
-
-[mcp_servers.node_repl.env]
-NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = ""
-NODE_REPL_NODE_PATH = "/Applications/Codex.app/Contents/Resources/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
-CODEX_HOME = "/Users/segersniels/.codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "a0dc4b6aaefe6a6a82d9a34fb524e77df6e0bf71387f0d4760157a46f52e6a93"
-BROWSER_USE_AVAILABLE_BACKENDS = "iab"
-NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
-BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.602.30954"
-CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
-
-[marketplaces.openai-bundled]
-last_updated = "2026-06-05T07:41:05Z"
-source_type = "local"
-source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
-
-[marketplaces.openai-primary-runtime]
-last_updated = "2026-06-01T20:05:53Z"
-source_type = "local"
-source = "/Users/segersniels/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
-
-[apps.asdk_app_69c18c28f1188191bf5b8445c4ab0a2e.tools.notion_notion-update-page]
-approval_mode = "approve"
 
 [apps.asdk_app_69a089a326dc8191b32a3f2553f5be2c.tools.linear_research]
 approval_mode = "approve"
@@ -233,153 +36,91 @@ approval_mode = "approve"
 [apps.asdk_app_69a089a326dc8191b32a3f2553f5be2c.tools.linear_save_issue]
 approval_mode = "approve"
 
+[apps.asdk_app_69c18c28f1188191bf5b8445c4ab0a2e.tools.notion_notion-update-page]
+approval_mode = "approve"
+
 [apps.connector_690a90ec05c881918afb6a55dc9bbaa1.tools.vercel_search_vercel_documentation]
+approval_mode = "approve"
+
+[apps.connector_690a90ec05c881918afb6a55dc9bbaa1.tools."vercel.search_vercel_documentation"]
 approval_mode = "approve"
 
 [apps.connector_76869538009648d5b282a4bb21c3d157.tools.github_update_pull_request]
 approval_mode = "approve"
 
+[apps.connector_76869538009648d5b282a4bb21c3d157.tools."github.update_ref"]
+approval_mode = "approve"
+
+[apps.connector_68df038e0ba48191908c8434991bbac2.tools."figma.use_figma"]
+approval_mode = "approve"
+
 [desktop]
-appearanceTheme = "dark"
-appearanceLightCodeThemeId = "rose-pine"
 appearanceDarkCodeThemeId = "codex"
-followUpQueueMode = "steer"
-reviewDelivery = "inline"
-preventSleepWhileRunning = true
-keepRemoteControlAwakeWhilePluggedIn = true
-git-branch-prefix = "feat/"
-git-create-pull-request-as-draft = true
-git-show-sidebar-pr-icons = false
-git-commit-instructions = """
-Create commits only. Do not edit code, format files, or change generated output.
-
-## Workflow
-
-1. Inspect before staging
-- Run `git status --short`, `git diff --stat`, `git diff --cached --stat`, and targeted diffs as needed.
-- Identify unrelated user changes and leave them untouched.
-- Do not start with `git add .`.
-
-2. Plan commit buckets
-- Define the smallest valid commit set before staging anything.
-- Make each commit one reason to revert.
-- Prefer extra small commits over one broad commit when either would work.
-- If the diff mixes independent concerns, split them.
-
-3. Split by change type
-- Put added, removed, or updated runtime dependencies in `chore(deps): ...`.
-- Put added, removed, or updated dev, test, or build dependencies in `chore(deps-dev): ...`.
-- Keep manifest and lockfile changes with the dependency commit, not with `feat(...)` or `fix(...)`.
-- Put pure tooling, config, or setup changes in `chore(scope): ...`.
-- Put refactors with no behavior change in `refactor(scope): ...`.
-- Put docs-only changes in `docs(scope): ...`.
-- Keep tests with the behavior change they prove unless the test harness or test-only plumbing changed; then split `test(scope): ...`.
-
-4. Stage one bucket at a time
-- Use explicit paths or `git add -p`.
-- Re-check the staged diff before each commit with `git diff --cached`.
-- If one file contains multiple concerns, split hunks instead of bundling the whole file.
-
-5. Commit
-- Use `type(scope): description`.
-- Prefer feature or domain scopes; fall back to package names only when no clearer scope exists.
-- Use `deps` or `deps-dev` scopes for dependency updates.
-- Keep the title under 100 characters and describe the outcome, not the implementation.
-
-## Atomic Commit Heuristics
-
-Split commits when any of these are true:
-
-- A dependency or lockfile change appears beside app code.
-- Two files support different user-visible changes.
-- A mechanical rename or move sits beside logic changes.
-- Config or CI changes only enable later feature work.
-- Part of the diff could be reverted safely without the rest.
-
-Keep changes together only when separating them would leave the repo broken or misleading.
-
-## Examples
-
-Use examples to reason about commit boundaries, not to justify bundling.
-
-Example: mixed feature and dependency diff
-- If `package.json` and lockfiles add a new package for password reset and app code adds the flow, split it:
-- `chore(deps): add nodemailer`
-- `feat(auth): add password reset flow`
-
-Example: pure dependency update
-- If the change is only upgrading a runtime package and its lockfile, use:
-- `chore(deps): update react-native to 0.72.0`
-
-Example: fix plus unrelated setup
-- If Android NFC timeout logic changes and CI or Gradle config also changes, split it:
-- `chore(ci): update Android build configuration`
-- `fix(scanner): resolve NFC timeout on Android`
-
-Example: behavior-preserving cleanup
-- If the change only consolidates duplicate API error handling with no user-visible behavior change, use:
-- `refactor(api): simplify error handling`
-
-Prefer title-only commits by default. Add a commit body only when it adds important context such as why the change was necessary, a migration note, or a non-obvious constraint.
-
-## Guardrails
-
-- Never use `git add .` unless the whole worktree is already verified as one atomic change.
-- Never commit unrelated staged changes just because they are present.
-- Never rewrite code to make commits cleaner.
-- Avoid `--no-verify`; reserve it for docs-only commits when hooks are clearly irrelevant.
-- Never use heredoc or `cat` for commit messages.
-- Avoid ANSI codes in commit messages.
-- If the split is ambiguous, choose the smaller commits and state the assumption.
-
-## Common Failure Modes
-
-- Bundling dependency changes into `feat(...)` or `fix(...)`.
-- Grouping setup, refactor, and behavior changes into one commit.
-- Using package names as scopes when a clearer domain scope exists.
-- Treating "same feature" as "same commit" even when the work has separable steps."""
-git-pr-instructions = """
-## Analysis
-
-- Examine modified files and functionality changes
-- Understand technical implementation and business impact
-- Focus on what changed, not just commit messages
-
-## Rules
-
-- **PR title MUST use Conventional Commits format**: `type(scope): description`
-  - Lowercase, imperative mood (same as commit messages)
-  - Optional Notion ticket ID in brackets at end: `[TL-1234]`
-- Write meaningful descriptions based on diff analysis
-- Never include checkboxes, test plans, checklists or testing sections
-- Avoid ANSI codes in descriptions
-- Pass markdown directly to gh, never use heredoc
-- Use markdown and differentiate between sections using ###
-- When writing PR titles or bodies, wrap every code identifier (variable names, params, functions, keys, enum values) in backticks.
-
-## Common Failure Modes
-
-- Assuming the base branch instead of asking the user
-- Writing the PR body from commit messages instead of the actual diff
-- Forgetting to confirm whether the PR should be draft or ready
-- Including checklists or test-plan boilerplate that the repo does not want"""
-selected-avatar-id = "bsod"
-show-context-window-usage = true
+appearanceLightCodeThemeId = "rose-pine"
+appearanceTheme = "dark"
 default-service-tier = "priority"
+dock-icon-preference = "codex-system"
+followUpQueueMode = "steer"
+git-branch-prefix = "feat/"
+git-commit-instructions = """
+Create commit(s) from the current changes. Do not edit or format files.
 
-[desktop.appearanceLightChromeTheme]
-accent = "#d7827e"
-contrast = 45
-ink = "#575279"
-opaqueWindows = false
-surface = "#faf4ed"
+## Commit boundaries
 
-[desktop.appearanceLightChromeTheme.fonts]
+- Base commit boundaries on the actual diff.
+- Each commit should represent one reason to revert.
+- Split independent behavior, refactors, configuration, tooling, and dependency changes.
+- Keep changes together when separating them would leave the repository broken or make either commit misleading.
+- Never include unrelated changes.
+- If a file contains multiple concerns, stage only the relevant hunks.
 
-[desktop.appearanceLightChromeTheme.semanticColors]
-diffAdded = "#56949f"
-diffRemoved = "#797593"
-skill = "#907aa9"
+## Commit types
+
+- Runtime dependencies: `chore(deps): ...`
+- Development, test, or build dependencies: `chore(deps-dev): ...`
+- Tooling, configuration, or setup: `chore(scope): ...`
+- Behavior-preserving changes: `refactor(scope): ...`
+- Documentation only: `docs(scope): ...`
+- Test-only infrastructure or plumbing: `test(scope): ...`
+- Keep behavior tests with the change they prove.
+
+## Commit messages
+
+- Use `type(scope): description`.
+- Prefer a feature or domain scope over a package name.
+- Keep titles lowercase, imperative, and under 100 characters.
+- Describe the outcome, not the implementation.
+- Prefer title-only commits.
+- Add a body only for important motivation, migration details, or non-obvious constraints."""
+git-create-pull-request-as-draft = true
+git-pr-instructions = """
+Create a pull request for the current branch using the base branch and draft state supplied by the action.
+
+## Title
+
+- Use Conventional Commits format: `type(scope): description`.
+- Keep it lowercase and imperative.
+- Describe the overall outcome of the PR.
+- Append a relevant Notion ticket as `[TL-1234]` only when one is present in the branch context.
+- Keep code identifiers out of the title unless essential; wrap them in backticks when used.
+
+## Description
+
+- Derive the description from the actual diff, not only the commit messages.
+- Explain the user or business outcome and the meaningful implementation changes.
+- Use concise `###` sections appropriate to the change.
+- Wrap code identifiers such as functions, variables, parameters, keys, and enum values in backticks.
+- Do not include checkboxes, checklists, test plans, testing sections, or boilerplate.
+- Do not mention changes that are not present in the diff."""
+git-show-sidebar-pr-icons = false
+keepRemoteControlAwakeWhilePluggedIn = true
+preventSleepWhileRunning = true
+reviewDelivery = "inline"
+selected-avatar-id = "codex"
+show-context-window-usage = true
+avatar-overlay-mascot-width-px = 80
+conversationDetailMode = "STEPS_COMMANDS"
+notifications-turn-mode = "always"
 
 [desktop.appearanceDarkChromeTheme]
 accent = "#0169cc"
@@ -397,7 +138,247 @@ diffAdded = "#00a240"
 diffRemoved = "#e02e2a"
 skill = "#b06dff"
 
-[hooks.state]
+[desktop.appearanceLightChromeTheme]
+accent = "#d7827e"
+contrast = 45
+ink = "#575279"
+opaqueWindows = false
+surface = "#faf4ed"
+
+[desktop.appearanceLightChromeTheme.fonts]
+
+[desktop.appearanceLightChromeTheme.semanticColors]
+diffAdded = "#56949f"
+diffRemoved = "#797593"
+skill = "#907aa9"
+
+[features]
+js_repl = false
+memories = true
+multi_agent = true
 
 [hooks.state."/Users/segersniels/.codex/hooks.json:post_tool_use:0:0"]
 trusted_hash = "sha256:9e24dccb8fb60bc0d0d362459446ecd34262a29980ceebab6fc466f725200501"
+
+[marketplaces.openai-bundled]
+last_updated = "2026-07-29T07:48:30Z"
+source_type = "local"
+source = "/Users/segersniels/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-07-28T00:21:31Z"
+source_type = "local"
+source = "/Users/segersniels/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[mcp_servers.computer-use]
+command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
+args = ["mcp"]
+cwd = "."
+enabled = false
+
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
+CODEX_HOME = "/Users/segersniels/.codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "14e425736668bf21b5b39f2cc022ee8684728617fb5c49f35533c2e349f47193,6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.721.81911"
+SKY_CUA_SERVICE_PATH = "/Users/segersniels/.codex/computer-use/Codex Computer Use.app"
+CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
+
+[mcp_servers.notion_personal]
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.notion_personal.tools]
+
+[mcp_servers.notion_personal.tools.notion-update-page]
+approval_mode = "approve"
+
+[mcp_servers.notion_shared_leen]
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.notion_tally]
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+
+[mcp_servers.railway]
+command = "railway"
+args = ["mcp"]
+
+[mcp_servers.railway.tools]
+
+[mcp_servers.railway.tools.docs_fetch]
+approval_mode = "approve"
+
+[mcp_servers.railway.tools.docs_search]
+approval_mode = "approve"
+
+[mcp_servers.railway.tools.get_logs]
+approval_mode = "approve"
+
+[mcp_servers.railway.tools.list_deployments]
+approval_mode = "approve"
+
+[mcp_servers.railway.tools.list_projects]
+approval_mode = "approve"
+
+[mcp_servers.railway.tools.list_services]
+approval_mode = "approve"
+
+[mcp_servers.sentry_tally]
+url = "https://mcp.sentry.dev/mcp"
+
+[mcp_servers.sentry_tally.tools]
+
+[mcp_servers.sentry_tally.tools.analyze_issue_with_seer]
+approval_mode = "approve"
+
+[mcp_servers.tally]
+url = "https://api.tally.so/mcp"
+
+[plugins."chatgpt-apps@openai-curated"]
+enabled = true
+
+[plugins."codex-security@openai-curated"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."figma@openai-curated"]
+enabled = true
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[plugins."gmail@openai-curated"]
+enabled = true
+
+[plugins."notion@openai-curated"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."sentry@openai-curated"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."vercel@openai-curated"]
+enabled = true
+
+[plugins."sites@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[projects."/Users/segersniels/.codex"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/.fracture"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/agent"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/cmt"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/compresjon"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/fracture"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/kip"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/labeler"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/polish"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/workd"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/projects"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/projects/tally/attio-integration"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/projects/tally/mel"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/projects/tally/tally"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/mejl"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/Documents/Codex/2026-07-23/how"]
+trust_level = "trusted"
+
+[projects."/Users/segersniels/personal/niels.foo"]
+trust_level = "trusted"
+
+[shell_environment_policy]
+ignore_default_excludes = true
+inherit = "all"
+
+[shell_environment_policy.set]
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "14e425736668bf21b5b39f2cc022ee8684728617fb5c49f35533c2e349f47193,6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/segersniels/.codex"
+
+[[skills.config]]
+enabled = false
+name = "chatgpt-apps:build-chatgpt-app"
+
+[[skills.config]]
+enabled = false
+name = "chatgpt-apps:chatgpt-app-submission"
+
+[tui]
+notifications = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 1
