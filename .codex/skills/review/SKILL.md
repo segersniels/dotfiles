@@ -1,101 +1,87 @@
 ---
 name: review
-description: "Review code changes with repo-aware context, architecture scrutiny, claim verification, and actionable findings. Use for uncommitted changes, commits, branches, or PRs when you want a thorough but low-noise review."
+description: "Review code changes with repo-aware context, architecture scrutiny, claim verification, and actionable findings. For PRs, create a new thread in a Codex-managed worktree and continue the review there. Use for uncommitted changes, commits, branches, or PRs when you want a thorough but low-noise review."
 metadata:
   short-description: Repo-aware code review
 ---
 
-You are a critical but fair technical lead reviewing a PR. Question everything. Be thorough. Approve when changes clearly improve overall code health; don't block only because it differs from your preferred style.
+You are a critical but fair technical lead. Hunt for real regressions, not style preferences. Prefer fewer verified findings over noisy speculation, but do not stop at the obvious diff hunk.
 
-## Step 1: Context
+This workflow expects subagents. If subagent tools are available and the user request allows delegation, spawn them. If subagents are unavailable or not authorized, say so before doing a single-agent fallback.
 
-1. Read @AGENTS.md, then read every file it references (e.g. `.agents/docs/*.md`) to understand project conventions
-2. Read @REVIEW.md to understand what to focus on, prioritize, and skip during the review
-3. Read @VOICE.md (if it exists) to match the reviewer's tone in suggested comments
-4. Run `gh pr view --json number,title,body,headRefName,baseRefName` to get PR details
-5. If the current local checkout is not already on `headRefName`, use the `create-worktree` skill to create an isolated local checkout of the PR head branch with `fracture --no-spawn`. Review changed files from that local worktree rather than reading file contents via `gh api`.
-6. Only fall back to GitHub-hosted file contents when a local checkout is impossible (for example: no local repo, `fracture` unavailable, or the branch cannot be fetched locally). If you do fall back, say why.
-7. Run `gh pr diff` to get the full diff
-8. Read existing PR comments (including inline): `gh api repos/{owner}/{repo}/pulls/{number}/comments` and `gh api repos/{owner}/{repo}/issues/{number}/comments`. Build a structured list of already-flagged findings (file, line, topic, author/bot, and whether the author replied or it appears resolved). Pass this list to explorer agents explicitly so they skip duplicate feedback. The parent agent still owns final dedupe before reporting.
+## 1. Context
 
-## Step 2: Review
+1. Read `AGENTS.md`, referenced docs, `REVIEW.md`, and `VOICE.md` when present.
+2. Identify the review target:
+   - PR: read `gh pr view --json number,title,body,headRefName,baseRefName`, `gh pr diff`, and existing inline/issue comments.
+   - Local diff/commit/branch: read the relevant `git diff`, `git show`, or comparison against base.
+3. For a PR review, if this thread is not already running in a Codex-managed worktree:
+   - If `<repository-root>/.codex/environments/environment.toml` exists, include its absolute path
+     in the new thread prompt.
+   - Create a new thread in a Codex-managed worktree and ask it to continue with `$review`.
+   - If worktree creation did not select a local environment, have the worker read the supplied
+     config and run its `[setup].script` once in the worktree before reviewing. Stop if setup fails.
+   - Once the new thread starts successfully, archive this originating thread. If it cannot start,
+     stay here and report the blocker.
+4. Build an `already-flagged` list before fanout: file, line, topic, author, and whether it looks resolved.
+5. Extract the intended behavior from PR body, linked issue, tests, and changed UI/API copy.
 
-Dispatch multiple explorer agents in parallel to review the PR:
+For PR-wide reviews, risky diffs, rewrites, broad refactors, or subtle-regression hunts, read `references/deep-review-checks.md` before dispatching subagents.
 
-Before dispatching, pass each explorer the already-flagged findings from Step 1.8 and instruct them to avoid re-raising those topics unless the current diff adds a new, distinct issue.
+## 2. Subagent Fanout
 
-### Agent 1: High-Level Architecture Review
-- Is the overall approach sound? Is there a simpler architectural alternative?
-- Does the PR do one thing? Flag scope creep
-- **Behavioral semantics**: does the PR claim to be a refactor but actually change behavior? Look for: new filters that exclude data, changed conditions (e.g. `||` added/removed), removed UI elements, different API call patterns, changed data-fetching semantics (e.g. `isLoading` vs `isValidating`)
-- Are there missing edge cases or unhandled scenarios?
-- Any security concerns?
+Dispatch multiple subagents in parallel to review the target. Give each subagent the target, intended behavior, relevant diff, and `already-flagged` list. Tell them to avoid duplicate findings unless the current diff adds a distinct issue.
 
-### Agent 2+: File-by-File Deep Review
-- Split the changed files across sub agents (group related files together)
-- Review changed tests before implementation files when present, so intended behavior is clear before judging the code
-- Prefer reading files from the local PR-head worktree. Do not default to `gh api repos/.../contents/...` for changed-file reads when a local checkout is available.
-- Trace all code paths through each change
-- **For moved/rewritten files**: read BOTH the old file (on base branch) and the new file. Compare every code path, every conditional branch, every state variable. Flag anything present in old but absent in new — this is where subtle regressions hide.
-- Check for bugs, race conditions, N+1 queries, stale closures, ...
-- Verify consistency with existing patterns in the codebase
-- Flag dead code, misleading names, unnecessary complexity
-- Check if tests cover the new/changed behavior
+Use these subagent roles:
 
-Each sub agent should return a list of findings with:
-- File path and line number
-- What's wrong
-- Why it's wrong
-- Severity (blocker / concern / nit)
+- Architecture: scope, behavior semantics, data flow, boundaries, security, simpler approach.
+- Reuse: duplicated logic, reimplemented helpers, missed local patterns.
+- File groups: changed files grouped by feature area. Read changed tests before implementation files.
 
-## Step 3: Verify Claims
+Every changed file must be assigned to a subagent or explicitly marked skipped with a reason.
 
-Do NOT blindly trust sub agent findings. For each claim from the sub agents:
+Each subagent must return:
 
-1. **Read the actual code** — open the file, read the lines, trace the logic yourself
-2. **Follow the data** — if a claim says "X calls Y with Z", verify it by reading the call chain
-3. **Check assumptions** — if a claim assumes a value or behavior, grep/read the codebase to confirm
-4. **Cross-reference** — if multiple agents flag the same thing differently, reconcile them
-5. **Test the logic** — mentally trace edge cases against the actual code, not the agent's summary
+- Files reviewed
+- Base/head behavior compared
+- Callers/consumers traced
+- Tests/config/docs read
+- Regression passes checked
+- Findings with file, line, severity (`blocker` / `concern` / `nit`), and impact
+- Blind spots
 
-Common sub agent mistakes to watch for:
-- Assuming two things with similar names are different (e.g., sessionUuid vs submission.uuid)
-- Missing that a function is called elsewhere with different behavior
-- Claiming a filter is missing when the engine handles it (e.g., ENGINE_IS_DELETED + FINAL)
-- Flagging "no error handling" when there's a try/catch at a higher level
-- Overstating severity on things that are technically true but have zero functional impact
+## 3. Review Passes
 
-## Step 4: Build TODO List
+Subagents must trace beyond edited lines:
 
-After verification, create tasks only for surviving verified findings.
-Keep debunked claims internal; do not create tasks for them and do not report them to the user.
+- Compare changed behavior against base for conditions, defaults, removed branches, side effects, loading/error states, and data shape.
+- Trace direct callers, consumers, hooks, jobs, API handlers, UI entrypoints, and tests.
+- For moved/rewritten files, read old and new versions and compare every branch/state path.
+- Check bugs, races, stale closures, N+1s, permission leaks, data loss, cache invalidation, i18n/a11y regressions, and deployment/runtime assumptions.
+- Check whether tests cover the changed behavior; do not add tests during review.
 
-Before creating tasks, cross-check each surviving finding against the already-flagged list from Step 1.8. Same file + same line (±2) + same topic = already flagged. Drop these from the task list and interactive walkthrough; mention only the skipped count in the summary.
+## 4. Parent Verification
 
-Order: blockers first, then concerns, then nits.
+Do not trust subagent findings directly. For each claim:
 
-## Step 5: Summary
+1. Read the exact code and line.
+2. Follow the call/data path until the claim is confirmed or disproven.
+3. Grep/read assumptions against the repo.
+4. Dedupe against existing PR comments and other subagents.
+5. Drop style-only feedback and zero-impact technicalities.
 
-After all tasks are created, present a concise report:
+Common false positives: similar IDs that are actually equivalent, filters handled by lower layers, error handling in callers, and severity inflated beyond impact.
 
-1. **Architecture assessment**: 2-4 sentences on whether the overall approach is sound, separation of concerns, and any fundamental design trade-offs
-2. **Stats**: X agents ran, Y claims investigated, Z verified, N already flagged on PR (skipped)
-3. **Findings**: One-liner per verified finding with severity tag (e.g. `[concern] form-data.ts:165 — batch retention loop does sequential Tinybird FINAL calls`)
-4. **Ask**: "Ready to go through the TODO list?"
+## 5. Output
 
-## Step 6: Interactive Review
+Create tasks only for verified, new findings. Keep debunked claims internal.
 
-Go through each pending task one at a time.
+Report:
 
-For each pending task:
+1. Summary: what the change is trying to do.
+2. Coverage: files reviewed, files skipped, callers/tests/config checked, blind spots.
+3. Stats: subagents run, claims investigated, verified findings, already-flagged skipped.
+4. Findings: one line each, ordered blocker -> concern -> nit.
+5. Ask: `Ready to go through the TODO list?`
 
-1. Mark current task as `in_progress`
-2. Present the finding:
-   - **What's wrong**: Clear explanation
-   - **Why it matters**: What can go wrong
-   - **How to fix**: Concrete code suggestion or approach
-   - **Suggested PR comment**: To the point, no essay, include exact file and line
-3. Wait for the user's response before advancing
-4. When moving to next item: mark current task as `completed`, then present next
-
-If the user disagrees or wants to skip, mark it `completed` and move on.
+During interactive review, present one finding at a time with what's wrong, why it matters, how to fix, and a concise suggested PR comment. Wait for the user before advancing.
