@@ -1,12 +1,23 @@
+prefix_rule(pattern=["apply_patch"], decision="allow")
+prefix_rule(pattern=["rm"], decision="prompt")
+prefix_rule(pattern=["gh"], decision="allow")
+prefix_rule(pattern=["git"], decision="allow")
 prefix_rule(
-  pattern = ["apply_patch"],
-  decision = "allow",
+    pattern=["git", "push", ["--force", "-f"]],
+    decision="prompt",
+    justification="Force-pushing can overwrite remote history",
+    match=[
+        "git push --force origin main",
+        "git push -f origin main",
+    ],
+    not_match=[
+        "git push origin main",
+        "git push --force-with-lease origin main",
+    ],
 )
-prefix_rule(pattern=["python3"], decision="allow")
 prefix_rule(pattern=["tmux"], decision="allow")
 prefix_rule(pattern=["cat"], decision="allow")
 prefix_rule(pattern=["go"], decision = "allow")
 prefix_rule(pattern=["fracture"], decision="allow")
 prefix_rule(pattern=["vercel"], decision="allow")
 prefix_rule(pattern=["codex"], decision="allow")
-prefix_rule(pattern=["/bin/zsh", "-lc", "PYTHONPATH=/tmp/codex-skill-creator-pyyaml python3 '/Users/segersniels/.codex/skills/.system/skill-creator/scripts/init_skill.py' create-compound-component --path '/Users/segersniels/.codex/skills' --interface 'display_name=Create Compound Component' --interface 'short_description=Build React compound components with repo aligned patterns' --interface 'default_prompt=Create or refactor a React compound component to match repo patterns.'"], decision="allow")
