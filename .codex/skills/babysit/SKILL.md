@@ -28,7 +28,7 @@ Accept any of the following:
 An explicit `$babysit` invocation from a normal local checkout authorizes creating one dedicated
 Codex task for that PR. The launcher must not run the watcher or edit the foreground checkout.
 
-1. Resolve the PR URL, base repository, number, head repository, head branch, and current head SHA.
+1. Resolve the PR URL, title, body, base repository, number, head repository, head branch, and current head SHA.
 2. Build the canonical marker `Babysit <owner>/<repo>#<number>`.
 3. Use the Codex task-listing tool to look for an existing active task with that exact marker. Reuse
    or report the existing task instead of launching a duplicate.
@@ -48,8 +48,9 @@ Codex task for that PR. The launcher must not run the watcher or edit the foregr
    - `startingState.branchName: origin/codex-babysit-pr-<number>`
    - `model: gpt-5.6-sol`
    - `thinking: medium`
-   - a prompt containing `BABYSIT_PR_WORKER <owner>/<repo>#<number>`, the full PR URL, head
-     repository, head branch, head SHA, and the local environment config path when one exists
+   - a prompt containing `BABYSIT_PR_WORKER <owner>/<repo>#<number>`, the full PR URL, PR title and
+     body, head repository, head branch, head SHA, and the local environment config path when one
+     exists
 7. The worker prompt must say that it is already isolated, must not create another task/worktree,
    must use the explicit PR URL for every watcher command, and must follow this skill in worker mode.
 8. Set the task title to the canonical marker, wait for startup/progress, report the created task,
@@ -78,7 +79,28 @@ task is running in its Codex-managed worktree.
 - If worktree creation did not select a local environment and the prompt supplies an environment
   config path, read its `[setup].script` and run it once in this worktree before the first code edit
   or validation. Stop and report the blocker if setup fails.
+- Establish the Intent Boundary below before changing code.
 - Run the Core Workflow below and keep this task alive until a strict stop condition is reached.
+
+## Intent Boundary (Worker)
+
+Before the first code change:
+
+1. Fetch the current PR title and full body from GitHub instead of relying only on the launcher
+   prompt.
+2. Read every ticket or specification directly linked from the PR title or body, including linked
+   Notion pages, using an available authorized connector. Do not infer inaccessible private content.
+3. Derive a concise working scope: intended outcome, acceptance criteria, and any explicit non-goals.
+   If no ticket is linked, derive it from the PR title/body, tests, and changed behavior.
+4. Stop for user help before editing when required source material is inaccessible, sources conflict,
+   or the intended behavior remains materially ambiguous.
+
+Use this scope for every CI or review-driven code change. Automatically fix feedback only when it is
+within the intended outcome or necessary to make that outcome correct and safe. Do not automatically
+broaden supported scenarios, add new product behavior, change acceptance criteria, or make unrelated
+product/design/architecture decisions merely because feedback is technically valid or PR-introduced.
+Surface such feedback to the user as scope-expanding and wait for direction. Explicit user direction
+takes precedence over the ticket and PR description.
 
 ## Core Workflow (Worker)
 
@@ -86,10 +108,10 @@ task is running in its Codex-managed worktree.
 2. Run the watcher script to snapshot PR/review/CI state (or consume each streamed snapshot from `--watch`). Review items remain pending and repeat in snapshots until explicitly acknowledged.
 3. Inspect the `actions` list in the JSON response.
 4. If `diagnose_ci_failure` is present, inspect failed run logs and classify the failure.
-5. If the failure is likely caused by the current branch, patch code locally, validate it, use the Atomic Commit Gate below, and push. Do not patch random flaky tests, CI infrastructure, dependency outages, runner issues, or other failures that are unrelated to the branch.
+5. If the failure is likely caused by the current branch and its fix fits the Intent Boundary, patch code locally, validate it, use the Atomic Commit Gate below, and push. Escalate a required scope-expanding fix instead of changing product intent to make CI pass. Do not patch random flaky tests, CI infrastructure, dependency outages, runner issues, or other failures that are unrelated to the branch.
 6. If `process_review_comment` is present, inspect every surfaced published review item. Before deciding whether to address it, compare the reported behavior at the PR merge base and head, then assess whether it is reachable and materially relevant in real usage.
-7. Treat an issue as branch-related only when the PR introduced it or materially worsened its reachability, frequency, or impact. Process independently actionable branch-related issues one at a time. For each issue: patch and validate the smallest fix, create one atomic commit, push it, then reply with the concrete change, rationale, and commit SHA only when the originating item is an inline review comment with an actual GitHub review thread.
-8. If threaded feedback is incorrect, non-actionable, already addressed, theoretical with negligible practical impact, pre-existing and unchanged by the PR, or conflicts with explicit user direction, make no code change and reply in that actual review thread with a concise technical rationale. A touched nearby file does not make a pre-existing issue part of the PR. Surface material pre-existing security, privacy, data-loss, or corruption risks to the user for separate handling instead of silently expanding the PR. Never create top-level PR comments as a substitute for thread replies. Do not reply to status-only bot messages, summaries without requested changes, approvals, or duplicate/self-authored follow-ups.
+7. Treat an issue as branch-related only when the PR introduced it or materially worsened its reachability, frequency, or impact. A branch-related issue is not automatically in product scope: also apply the Intent Boundary before editing. Process independently actionable in-scope issues one at a time. For each issue: patch and validate the smallest fix, create one atomic commit, push it, then reply with the concrete change, rationale, and commit SHA only when the originating item is an inline review comment with an actual GitHub review thread.
+8. If threaded feedback is incorrect, non-actionable, already addressed, theoretical with negligible practical impact, pre-existing and unchanged by the PR, or conflicts with explicit user direction, make no code change and reply in that actual review thread with a concise ELIJ-style rationale. A touched nearby file does not make a pre-existing issue part of the PR. Surface material pre-existing security, privacy, data-loss, or corruption risks to the user for separate handling instead of silently expanding the PR. Never create top-level PR comments as a substitute for thread replies. Do not reply to status-only bot messages, summaries without requested changes, approvals, or duplicate/self-authored follow-ups.
 9. Acknowledge each review item only after its disposition is complete: the fix is pushed and its inline reply is verified; the no-change inline reply is verified; or status-only/duplicate/non-actionable feedback has been deliberately classified. Never acknowledge merely because an item was fetched or inspected.
 10. If the failure is likely flaky/unrelated and `retry_failed_checks` is present, rerun failed jobs with `--retry-failed-now`.
 11. If both actionable review feedback and `retry_failed_checks` are present, prioritize review feedback first; a new commit will retrigger CI, so avoid rerunning flaky checks on the old SHA unless you intentionally defer the review change.
@@ -160,13 +182,15 @@ Read `references/heuristics.md` relative to this `SKILL.md` for a concise checkl
 
 ## Edit Quality Gate
 
-Before making any code change for CI or review feedback:
+Apply this gate separately to every actionable CI or review issue before editing:
 
 1. Read and apply `${CODEX_HOME:-$HOME/.codex}/skills/kiss/SKILL.md`.
-2. Read and apply `${CODEX_HOME:-$HOME/.codex}/skills/human-code/SKILL.md`.
-3. Make the smallest root-cause fix that fully addresses the feedback. Reuse existing patterns and avoid speculative abstractions, unrelated cleanup, or broad refactors.
-4. Keep the implementation readable and reviewable: clear names, obvious control flow, and local structure that reads naturally.
-5. Follow the repository's `AGENTS.md`, style, test, lint, and typecheck requirements. Preserve existing behavior outside the requested fix.
+2. State internally, in one sentence, the exact defect and the smallest direct fix that fully addresses it.
+3. Confirm the fix fits the Intent Boundary. Start at the existing ownership seam and prefer a local change over a new helper, abstraction, type, interface, or generalized solution.
+4. Introduce an abstraction only when the direct fix would be incorrect, duplicate substantial logic, or make the code clearly harder to read. Possible future reuse is not sufficient.
+5. Read and apply `${CODEX_HOME:-$HOME/.codex}/skills/human-code/SKILL.md` within that minimal shape. Keep names clear, control flow obvious, and local structure natural without expanding the change.
+6. Inspect the completed diff through KISS again. If a smaller solution fully fixes the issue, simplify the implementation before validation.
+7. Follow the repository's `AGENTS.md`, style, test, lint, and typecheck requirements. Preserve existing behavior outside the requested fix.
 
 ## Atomic Commit Gate
 
@@ -180,6 +204,29 @@ After an issue's code change is complete and validated, but before staging:
 6. Keep tests with the behavior change they prove. Split dependencies, tooling, mechanical changes, or other independently revertible concerns as required by the create-commit skill.
 
 Multiple comments may share one commit only when they describe the same root cause and splitting them would leave the repository broken or misleading. Reply in each originating inline review thread with that commit.
+
+## Inline Reply Style (ELIJ)
+
+Write every automated inline reply so an outside reader can understand it without the babysitter's
+investigation context. Apply the "Explain it like I'm a junior" style:
+
+- Write all reply prose with ASD-STE100 Simplified Technical English principles. Use short,
+  complete, active-voice sentences, one idea per sentence, consistent terms, explicit nouns, and no
+  contractions. Preserve exact code identifiers, API names, commit SHAs, paths, and quoted evidence
+  as technical terms.
+- Start with the outcome in one or two sentences: what changed, or why no change was needed.
+- Explain the practical reason before implementation details or edge cases.
+- Use plain language before jargon. Briefly explain unavoidable terms instead of assuming the reader
+  knows internal labels such as "merge base," "reachability," or "intent boundary."
+- Include a small concrete example when it makes the behavior easier to understand.
+- Keep the reply compact. Include the evidence that supports the decision, but omit the investigation
+  diary, internal classification, and unrelated technical detail.
+- Be direct and respectful, never patronizing.
+
+For example, prefer `I checked the code from before this PR, and it already behaves this way. This PR
+does not make the behavior more likely or more harmful, so changing it here would expand the scope.`
+over an unexplained statement that the issue is "pre-existing at the merge base and not materially
+more reachable."
 
 ## Review Comment Handling
 The watcher surfaces review items from:
@@ -203,14 +250,14 @@ When you agree with a comment and it is actionable:
 2. Validate the focused change.
 3. Use the Atomic Commit Gate to create a small, issue-specific conventional commit.
 4. Push to the PR head branch.
-5. If the originating item is an inline `review_comment`, reply in its actual GitHub review thread with `Addressed in <commit-sha>.` followed by a concise explanation of what changed and why this implementation was chosen.
+5. If the originating item is an inline `review_comment`, reply in its actual GitHub review thread with `Addressed in <commit-sha>.` followed by an ELIJ-style explanation of what changed and why it matters.
 6. Leave the review thread open so the reviewer can follow up or re-review.
 7. Acknowledge the originating watcher item only after the push and verified thread reply.
 8. Resume watching on the new SHA immediately (do not stop after reporting the push).
 9. If monitoring was running in `--watch` mode, restart `--watch` immediately after the push in the same turn; do not wait for the user to ask again.
 
-When threaded feedback does not warrant a code change, reply in the actual inline review thread with `No change made.` followed by the concrete technical reason. Be respectful and factual. Ask the user before replying only when the response requires an unresolved product decision, private context, or cross-team coordination.
-For unchanged pre-existing behavior, use the substance of: `No change made. This behavior is already present at the PR merge base (<sha/path evidence>), and this PR does not change its reachability or impact, so it is outside this PR's scope.` Adapt the evidence to the actual report rather than posting a generic dismissal.
+When threaded feedback does not warrant a code change, reply in the actual inline review thread with `No change made.` followed by the concrete reason in the ELIJ style above. Be respectful and factual. Ask the user before replying only when the response requires an unresolved product decision, private context, or cross-team coordination.
+For unchanged pre-existing behavior, use the substance of: `No change made. I checked the code from before this PR (<sha/path evidence>), and it already behaves this way. This PR does not make the behavior more likely or more harmful, so changing it here would expand the scope.` Adapt the evidence to the actual report rather than posting a generic dismissal.
 After the reply is verified, acknowledge the originating watcher item. For status-only noise, approvals,
 duplicates, and self-authored follow-ups, acknowledge only after deliberately classifying them as ignorable.
 If the watcher later surfaces a reply containing the exact Codex signature below, treat it as an
@@ -243,8 +290,8 @@ successful comment creation. If no thread root exists or the reply endpoint fail
 limitation or blocker to the user. Do not resolve review threads automatically; leave them open for
 reviewer follow-up unless the user explicitly asks for resolution.
 
-Before making any changes, fetch the PR state yourself instead of relying on the PR watcher script's
-output.
+Before making any changes, fetch the PR state, title, and full body yourself instead of relying on the
+PR watcher script's output, and confirm that the Intent Boundary still supports the proposed change.
 
 Unless explicitly asked, do not:
 
@@ -293,12 +340,12 @@ Use this loop in a live Codex session:
 3. First check whether the PR is now merged or otherwise closed; if so, report that terminal state and stop polling immediately.
 4. Check CI summary, new review items, and mergeability/conflict status.
 5. Diagnose CI failures and classify branch-related vs flaky/unrelated. If the overall run is still pending but `failed_jobs` already includes a failed job, fetch that job's logs and diagnose immediately instead of waiting for the whole workflow run to finish. Patch only when the failure is branch-related.
-6. For each surfaced review issue from another author, handle it independently. Compare merge-base behavior with PR-head behavior and assess real-world reachability, likelihood, and impact. If the PR introduced or materially worsened a practical issue, patch and validate it, create an atomic conventional commit with the create-commit skill, push, and reply in every originating inline review thread with the commit and rationale. If feedback is incorrect, non-actionable, already addressed, theoretical with negligible impact, or pre-existing and unchanged by the PR, reply in that thread with a concise evidence-backed no-change rationale. Never substitute top-level PR comments for thread replies. Leave threads unresolved for follow-up. Ignore status-only noise and do not respond to your own attributed replies.
+6. For each surfaced review issue from another author, handle it independently. Compare merge-base behavior with PR-head behavior, assess real-world reachability, likelihood, and impact, and apply the Intent Boundary. If the PR introduced or materially worsened a practical in-scope issue, patch and validate it, create an atomic conventional commit with the create-commit skill, push, and reply in every originating inline review thread with the commit and rationale. If technically valid feedback would expand product scope, stop and ask the user instead of editing or posting a disposition. If feedback is incorrect, non-actionable, already addressed, theoretical with negligible impact, or pre-existing and unchanged by the PR, reply in that thread with a concise evidence-backed rationale using the Inline Reply Style. Never substitute top-level PR comments for thread replies. Leave threads unresolved for follow-up. Ignore status-only noise and do not respond to your own attributed replies.
 7. Process actionable review comments before flaky reruns when both are present; if a review fix requires a commit, push it and skip rerunning failed checks on the old SHA.
 8. Retry failed checks only when `retry_failed_checks` is present and you are not about to replace the current SHA with a review/CI fix commit. Do not make code changes for unrelated flakes or infrastructure failures just to get CI green.
 9. If you pushed a commit, posted a feedback disposition, or triggered a rerun, report the action briefly and continue polling (do not stop). Stop for user input only when a reply requires a product decision, private context, or cross-team coordination.
 10. After a review-fix push, proactively restart continuous monitoring (`--watch`) in the same turn unless a strict stop condition has already been reached.
-11. If everything is passing, mergeable, not blocked on required review approval, and there are no unaddressed review items, report that the PR is currently ready to merge but keep the watcher running so new review comments are surfaced quickly while the PR remains open.
+11. When everything first becomes passing, mergeable, not blocked on required review approval, and free of unaddressed review items, report once that the PR is ready to merge. Keep the watcher running, but do not repeat the update while that state remains unchanged.
 12. If blocked on a user-help-required issue (infra outage, exhausted flaky retries, unclear reviewer request, permissions), report the blocker and stop.
 13. Otherwise sleep according to the polling cadence below and repeat.
 
@@ -310,7 +357,7 @@ If a `--watch` process is still running and no strict stop condition has been re
 ## Polling Cadence
 Keep review polling aggressive and continue monitoring even after CI turns green:
 
-- While CI is not green (pending/running/queued or failing): poll every 1 minute.
+- Poll every 30 seconds while the PR remains open, including while CI is pending, failing, or green.
 - After CI turns green: keep polling at the base cadence while the PR remains open so newly posted review comments are surfaced promptly instead of waiting on a long green-state backoff.
 - Reset the cadence immediately whenever anything changes (new commit/SHA, check status changes, new review comments, mergeability changes, review decision changes).
 - If CI stops being green again (new commit, rerun, or regression): stay on the base polling cadence.
@@ -335,11 +382,12 @@ Keep polling when:
 Provide concise progress updates while monitoring and a final summary that includes:
 
 - In launcher mode, report the dedicated task and stop. Do not emit worker progress from the launcher.
-- During long unchanged monitoring periods, avoid emitting a full update on every poll; summarize only status changes plus occasional heartbeat updates.
+- After the initial watcher snapshot, emit progress only for a meaningful state change, an action taken, a user-help blocker, or a terminal outcome. Do not emit heartbeat, liveness, "still watching," or unchanged-status updates. Silence means monitoring is healthy and unchanged.
 - Treat push confirmations, intermediate CI snapshots, ready-to-merge snapshots, and review-action updates as progress updates only; do not emit the final summary or end the babysitting session unless a strict stop condition is met.
 - A user request to "monitor" is not satisfied by a couple of sample polls; remain in the loop until a strict stop condition or an explicit user interruption.
 - A review-fix commit + push is not a completion event; immediately resume live monitoring (`--watch`) in the same turn and continue reporting progress updates.
 - When CI first transitions to all green for the current SHA, emit a one-time celebratory progress update (do not repeat it on every green poll). Preferred style: `🚀 CI is all green! 33/33 passed. Still on watch for review approval.`
+- The watcher deliberately suppresses identical snapshots. When a live watcher wait returns no new output, do not narrate the empty poll; continue waiting. Align nested terminal and orchestration yield timeouts so one wait interval does not cause multiple unnecessary model resumptions.
 - Do not send the final summary while a watcher terminal is still running unless the watcher has emitted/confirmed a strict stop condition; otherwise continue with progress updates.
 
 - Final PR SHA

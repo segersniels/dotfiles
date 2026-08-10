@@ -980,14 +980,17 @@ def run_watch(args):
     last_change_key = None
     while True:
         snapshot, state_path = collect_snapshot(args)
-        print_event(
-            "snapshot",
-            {
-                "snapshot": snapshot,
-                "state_file": str(state_path),
-                "next_poll_seconds": poll_seconds,
-            },
-        )
+        current_change_key = snapshot_change_key(snapshot)
+        changed = current_change_key != last_change_key
+        if changed:
+            print_event(
+                "snapshot",
+                {
+                    "snapshot": snapshot,
+                    "state_file": str(state_path),
+                    "next_poll_seconds": poll_seconds,
+                },
+            )
         actions = set(snapshot.get("actions") or [])
         if (
             "stop_pr_closed" in actions
@@ -996,8 +999,6 @@ def run_watch(args):
             print_event("stop", {"actions": snapshot.get("actions"), "pr": snapshot.get("pr")})
             return 0
 
-        current_change_key = snapshot_change_key(snapshot)
-        changed = current_change_key != last_change_key
         green = is_ci_green(snapshot)
         pr = snapshot.get("pr") or {}
         pr_open = not bool(pr.get("closed")) and not bool(pr.get("merged"))

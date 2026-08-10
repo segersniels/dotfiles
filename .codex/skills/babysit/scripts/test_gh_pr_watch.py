@@ -360,7 +360,7 @@ def test_run_watch_keeps_polling_open_ready_to_merge_pr(monkeypatch):
         gh_pr_watch.run_watch(argparse.Namespace(poll_seconds=30))
 
     assert sleeps == [30, 30]
-    assert [event for event, _ in events] == ["snapshot", "snapshot"]
+    assert [event for event, _ in events] == ["snapshot"]
 
 
 def test_failed_jobs_include_direct_logs_endpoint(monkeypatch):
