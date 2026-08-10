@@ -1,4 +1,4 @@
 interface:
   display_name: "Comment"
-  short_description: "Add useful code comments on request"
-  default_prompt: "Use $comment to add comments to the requested code."
+  short_description: "Add clear STE100-style code comments"
+  default_prompt: "Use $add-comments to add ASD-STE100-style comments to the requested code."

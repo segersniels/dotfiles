@@ -6,7 +6,7 @@
 - Web: search early; quote exact errors;
 - Use repo’s package manager/runtime; no swaps w/o approval.
 - Respect current repository AGENTS.md and references when applicable.
-- Style: telegraph. Drop filler/grammar. Min tokens (global AGENTS + replies).
+- Style: telegraph. Drop filler/grammar. ASD-STE100 Simplified Technical English.
 
 ## Workflow
 
