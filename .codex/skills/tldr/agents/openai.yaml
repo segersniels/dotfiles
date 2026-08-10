@@ -1,0 +1,4 @@
+interface:
+  display_name: "TLDR"
+  short_description: "Summarize anything briefly in plain language"
+  default_prompt: "Use $tldr to give me the essential meaning of this."
