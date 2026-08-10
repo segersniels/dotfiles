@@ -1,0 +1,4 @@
+interface:
+  display_name: "Triage"
+  short_description: "Validate AI-created backlog bug tickets"
+  default_prompt: "Use $triage to investigate this Notion backlog ticket, judge its validity, and find the KISS solution only if the issue is real."
