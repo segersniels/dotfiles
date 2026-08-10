@@ -20,7 +20,7 @@ backup-cmux: backup-ghostty
 
 backup-codex:
 	@rm -rf .codex
-	@rsync -av ~/.codex/config.toml .codex/
+	@mkdir -p .codex
 	@rsync -av ~/.codex/AGENTS.md .codex/
 	@rsync -av --exclude='.system/' ~/.codex/skills/ .codex/skills/
 	@rsync -av ~/.codex/rules/ .codex/rules/
