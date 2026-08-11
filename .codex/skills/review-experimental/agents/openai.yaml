@@ -1,7 +1,0 @@
-interface:
-  display_name: "Review Experimental"
-  short_description: "Adaptive evidence-driven code review"
-  default_prompt: "Use $review-experimental to run a focused standard review of these changes; use deep mode only when requested or clearly high-risk."
-
-policy:
-  allow_implicit_invocation: false

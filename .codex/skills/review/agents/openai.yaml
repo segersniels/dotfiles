@@ -1,7 +1,7 @@
 interface:
   display_name: "Review"
-  short_description: "Repo-aware code review"
-  default_prompt: "Use $review to review the changes. For a PR, create a new thread in a Codex-managed worktree, pass the project environment config path when present, run its `[setup].script` before reviewing if no local environment was selected, and continue the review there."
+  short_description: "Adaptive evidence-driven code review"
+  default_prompt: "Use $review to run a focused standard review of these changes; use deep mode only when requested or clearly high-risk."
 
 policy:
   allow_implicit_invocation: false
