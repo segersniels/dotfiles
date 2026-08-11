@@ -9,6 +9,7 @@ Explain the topic as if the user is a junior engineer.
 
 ## Style
 
+- Write with ASD-STE100 Simplified Technical English principles. Use short, complete, active-voice sentences, one idea per sentence, consistent terms, explicit nouns, and no contractions.
 - Be clear, patient, and direct
 - Use plain language before jargon
 - Define important terms briefly
