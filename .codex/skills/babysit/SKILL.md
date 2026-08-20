@@ -214,6 +214,9 @@ investigation context. Apply the "Explain it like I'm a junior" style:
   complete, active-voice sentences, one idea per sentence, consistent terms, explicit nouns, and no
   contractions. Preserve exact code identifiers, API names, commit SHAs, paths, and quoted evidence
   as technical terms.
+- Begin every automated inline reply with `@<author-login>`, using the exact `author` from the
+  originating watcher item. Mention human and automated reviewers alike so connected notification
+  channels can alert the original author.
 - Start with the outcome in one or two sentences: what changed, or why no change was needed.
 - Explain the practical reason before implementation details or edge cases.
 - Use plain language before jargon. Briefly explain unavoidable terms instead of assuming the reader
@@ -250,13 +253,13 @@ When you agree with a comment and it is actionable:
 2. Validate the focused change.
 3. Use the Atomic Commit Gate to create a small, issue-specific conventional commit.
 4. Push to the PR head branch.
-5. If the originating item is an inline `review_comment`, reply in its actual GitHub review thread with `Addressed in <commit-sha>.` followed by an ELIJ-style explanation of what changed and why it matters.
+5. If the originating item is an inline `review_comment`, reply in its actual GitHub review thread with `@<author-login> Addressed in <commit-sha>.` followed by an ELIJ-style explanation of what changed and why it matters.
 6. Leave the review thread open so the reviewer can follow up or re-review.
 7. Acknowledge the originating watcher item only after the push and verified thread reply.
 8. Resume watching on the new SHA immediately (do not stop after reporting the push).
 9. If monitoring was running in `--watch` mode, restart `--watch` immediately after the push in the same turn; do not wait for the user to ask again.
 
-When threaded feedback does not warrant a code change, reply in the actual inline review thread with `No change made.` followed by the concrete reason in the ELIJ style above. Be respectful and factual. Ask the user before replying only when the response requires an unresolved product decision, private context, or cross-team coordination.
+When threaded feedback does not warrant a code change, reply in the actual inline review thread with `@<author-login> No change made.` followed by the concrete reason in the ELIJ style above. Be respectful and factual. Ask the user before replying only when the response requires an unresolved product decision, private context, or cross-team coordination.
 For unchanged pre-existing behavior, use the substance of: `No change made. I checked the code from before this PR (<sha/path evidence>), and it already behaves this way. This PR does not make the behavior more likely or more harmful, so changing it here would expand the scope.` Adapt the evidence to the actual report rather than posting a generic dismissal.
 After the reply is verified, acknowledge the originating watcher item. For status-only noise, approvals,
 duplicates, and self-authored follow-ups, acknowledge only after deliberately classifying them as ignorable.

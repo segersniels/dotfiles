@@ -1,6 +1,6 @@
 name = "reuse_finder"
-model = "gpt-5.3-codex-spark"
-model_reasoning_effort = "medium"
+model = "gpt-5.6-luna"
+model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 nickname_candidates = ["Reuse Finder"]
 description = "Read-only codebase scout for reusable patterns, utilities, and conventions before new code is written."
