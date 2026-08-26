@@ -27,7 +27,7 @@ Used to discover failed workflow runs and rerunnable run IDs.
 - `gh api repos/{owner}/{repo}/actions/jobs/{job_id}/logs > /tmp/codex-gh-job-{job_id}-logs.zip`
 - `gh run view <run-id> --log-failed`
 
-Used by Codex to classify branch-related vs flaky/unrelated failures. Prefer the direct job log endpoint as soon as a job has failed because `gh run view --log-failed` may not produce failed-job logs until the overall workflow run completes.
+Used by the babysitter to classify branch-related vs flaky/unrelated failures. Prefer the direct job log endpoint as soon as a job has failed because `gh run view --log-failed` may not produce failed-job logs until the overall workflow run completes.
 
 ### Retry failed jobs only
 
@@ -56,11 +56,9 @@ Use the watcher's `thread_root_id` as `<comment_id>`. After posting, verify that
 `in_reply_to_id` equals `thread_root_id`; only then report that the reply was posted in the thread.
 
 After a pushed fix, include the commit SHA, what changed, and why. When no change is made, state the
-technical reason. End every automated inline reply with a blank line and the exact signature
-`*🤖 Addressed by [Codex](https://openai.com/codex/)*`; use it as the sole attribution. Do not reply
-to status-only bot messages, summaries without requested changes, approvals, or self-authored
-follow-ups. Leave review threads open for reviewer follow-up unless the user explicitly asks to
-resolve them.
+technical reason. Do not reply to status-only bot messages, summaries without requested changes,
+approvals, or self-authored follow-ups. Leave review threads open for reviewer follow-up unless the
+user explicitly asks to resolve them.
 
 GitHub PR issue comments, review summaries, check annotations, and sections embedded inside a bot
 summary do not have inline review-thread reply targets. Never use

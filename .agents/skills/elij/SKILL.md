@@ -1,6 +1,6 @@
 ---
-name: "Explain it like I'm a junior"
-description: "ELIJ: explain it like I'm a junior. Use when the user asks for ELIJ, says explain like I'm a junior, or wants a simpler junior-engineer-level explanation."
+name: "ELIJ"
+description: "Explain it like I'm a junior. Use when the user asks for ELIJ, says explain like I'm a junior, or wants a simpler junior-engineer-level explanation."
 ---
 
 # Explain it like I'm a junior

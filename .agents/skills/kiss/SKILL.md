@@ -1,6 +1,6 @@
 ---
-name: "Keep it simple, stupid"
-description: "KISS: keep the work simple and tightly scoped. Use when the user asks for a minimal fix, small diff, no feature creep, no extra refactors, or the simplest change that solves the task."
+name: "KISS"
+description: "Keep the work simple and tightly scoped. Use when the user asks for a minimal fix, small diff, no feature creep, no extra refactors, or the simplest change that solves the task."
 ---
 
 KISS: keep it simple. Stay on the task. Prefer the smallest change that fully solves the user's request.

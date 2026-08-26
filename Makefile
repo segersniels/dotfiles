@@ -18,10 +18,14 @@ backup-cmux: backup-ghostty
 	@mkdir -p .cmux
 	@scripts/export-cmux-config > .cmux/cmux.json
 
-backup-codex:
+backup-agents:
+	@rm -rf .agents
+	@mkdir -p .agents
+	@rsync -av --exclude='target/' --exclude='.git/' ~/.agents/ .agents/
+
+backup-codex: backup-agents
 	@rm -rf .codex
 	@mkdir -p .codex
-	@rsync -av ~/.codex/AGENTS.md .codex/
 	@rsync -av --exclude='.system/' ~/.codex/skills/ .codex/skills/
 	@rsync -av ~/.codex/rules/ .codex/rules/
 	@rsync -av ~/.codex/agents/ .codex/agents/
@@ -55,8 +59,14 @@ restore-cmux: restore-ghostty
 	@mkdir -p ~/.config/cmux
 	@rsync -av .cmux/cmux.json ~/.config/cmux/
 
-restore-codex:
+restore-agents:
+	@mkdir -p ~/.agents ~/.config/opencode
+	@rsync -av .agents/ ~/.agents/
+
+restore-codex: restore-agents
+	@mkdir -p ~/.codex
 	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/
+	@ln -sfn ~/.agents/AGENTS.md ~/.codex/AGENTS.md
 
 restore-cursor:
 	@mkdir -p ~/Library/Application\ Support/Cursor/User/snippets

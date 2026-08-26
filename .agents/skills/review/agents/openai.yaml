@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review"
+  short_description: "Adaptive evidence-driven review"
+  default_prompt: "Use $review to review these changes directly with adaptive, evidence-driven coverage; do not delegate review work to subagents. Run pull request reviews in a dedicated isolated worktree using the mechanism supported by the current harness."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Watch GitHub PR CI and review activity for Codex PR babysitting workflows."""
+"""Watch GitHub PR CI and review activity for PR babysitting workflows."""
 
 import argparse
 import json
@@ -48,7 +48,7 @@ class GhCommandError(RuntimeError):
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
-            "Normalize PR/CI/review state for Codex PR babysitting and optionally "
+            "Normalize PR/CI/review state for PR babysitting and optionally "
             "trigger flaky reruns."
         )
     )

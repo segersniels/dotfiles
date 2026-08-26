@@ -1,5 +1,5 @@
 ---
-name: add-comments
+name: comment
 description: "Add, remove, or move code comments in requested code. Write new or revised comments with ASD-STE100 Simplified Technical English principles. Use when the user asks for comments, better comments, comment placement, why-comments, JSDoc, or comments that make code easier to review."
 ---
 

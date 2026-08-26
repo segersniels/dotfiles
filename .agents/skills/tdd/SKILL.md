@@ -1,5 +1,5 @@
 ---
-name: "Test-driven development"
+name: "TDD"
 description: "Use when the user wants to build features or fix bugs test-first, mentions 'red-green-refactor', or wants integration tests."
 ---
 

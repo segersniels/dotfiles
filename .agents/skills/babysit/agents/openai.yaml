@@ -1,0 +1,7 @@
+interface:
+  display_name: "Babysit"
+  short_description: "Babysit a PR in the current session"
+  default_prompt: "Use $babysit to make this session the dedicated babysitter for the current PR. Do not create another task, agent, branch, session, or worktree. Use this conversation as first-class implementation context, reconcile it with the live PR and linked sources, then continuously monitor CI, reviews, and mergeability until the PR is merged, closed, or requires user help. Diagnose branch-related failures, retry likely flakes within policy, make and push small validated fixes that fit the established intent, and reply only in originating inline review threads."
+
+policy:
+  allow_implicit_invocation: false

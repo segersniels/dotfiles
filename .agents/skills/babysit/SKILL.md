@@ -1,6 +1,6 @@
 ---
 name: babysit
-description: Launch an isolated Codex-managed worktree task to babysit a GitHub pull request after creation, then continuously poll review comments, CI checks/workflow runs, and mergeability state until the PR is merged/closed or user help is required. Diagnose failures, retry likely flaky failures up to 3 times, auto-fix/push branch-related issues in small atomic commits, follow up in originating inline review threads, and keep watching open PRs so fresh feedback is surfaced promptly. Use when the user explicitly asks Codex to monitor a PR, watch CI, handle review comments, or keep an eye on failures and feedback on an open PR.
+description: Babysit a GitHub pull request directly in the current session until it is merged, closed, or needs user help. Continuously monitor review comments, CI checks, workflow runs, and mergeability; diagnose failures, retry likely flakes, fix and push branch-related issues in atomic commits, and reply in originating inline review threads. Use when the user explicitly asks to monitor a PR, watch CI, handle review comments, or babysit an open PR.
 ---
 
 # Babysit
@@ -10,7 +10,7 @@ Babysit a PR persistently until one of these terminal outcomes occurs:
 
 - The PR is merged or closed.
 - A situation requires user help (for example CI infrastructure issues, repeated flaky failures after retry budget is exhausted, permission problems, or ambiguity that cannot be resolved safely).
-- Optional handoff milestone: the PR is currently green + mergeable + review-clean. Treat this as a progress state, not a watcher stop, so late-arriving review comments are still surfaced promptly while the PR remains open.
+- Optional readiness milestone: the PR is currently green + mergeable + review-clean. Treat this as a progress state, not a watcher stop, so late-arriving review comments are still surfaced promptly while the PR remains open.
 
 Do not stop merely because a single snapshot returns `idle` while checks are still pending.
 
@@ -21,88 +21,55 @@ Accept any of the following:
 - PR number
 - PR URL
 
-## Execution Modes
+## Session Ownership
 
-### Launcher mode
+An explicit `$babysit` invocation makes the current session the dedicated babysitter. Start the
+watcher here and keep this session active until a strict stop condition occurs.
 
-An explicit `$babysit` invocation from a normal local checkout authorizes creating one dedicated
-Codex task for that PR. The launcher must not run the watcher or edit the foreground checkout.
-
-1. Resolve the PR URL, title, body, base repository, number, head repository, head branch, and current head SHA.
-2. Build the canonical marker `Babysit <owner>/<repo>#<number>`.
-3. Use the Codex task-listing tool to look for an existing active task with that exact marker. Reuse
-   or report the existing task instead of launching a duplicate.
-4. Fetch the PR head without checking it out in the foreground repository:
-
-   ```bash
-   git fetch origin pull/<number>/head:refs/remotes/origin/codex-babysit-pr-<number>
-   ```
-
-5. Use the Codex project-listing tool to find the saved Git project whose path equals the current
-   repository root. If `<repository-root>/.codex/environments/environment.toml` exists, record its
-   absolute path.
-6. Use the Codex task-creation tool to create a task with:
-   - the matching saved project
-   - `environment.type: worktree`
-   - `startingState.type: branch`
-   - `startingState.branchName: origin/codex-babysit-pr-<number>`
-   - `model: gpt-5.6-sol`
-   - `thinking: medium`
-   - a prompt containing `BABYSIT_PR_WORKER <owner>/<repo>#<number>`, the full PR URL, PR title and
-     body, head repository, head branch, head SHA, and the local environment config path when one
-     exists
-7. The worker prompt must say that it is already isolated, must not create another task/worktree,
-   must use the explicit PR URL for every watcher command, and must follow this skill in worker mode.
-8. Set the task title to the canonical marker, wait for startup/progress, report the created task,
-   and end the launcher task.
-
-Do not create a local worktree manually with Fracture or `git worktree add` in launcher mode. The
-Codex task must own its managed worktree and lifecycle.
-
-The task-creation tool currently supports explicit model and reasoning overrides but no per-task
-service-tier override. Set Sol/medium as required, inherit the current Fast/Standard tier, and do not
-claim that a particular tier was selected.
-
-If Codex task/project tools are unavailable, or no matching saved Git project exists, stop and tell
-the user that isolated app-task launch is unavailable. Do not fall back to babysitting in the
-foreground checkout.
-
-### Worker mode
-
-Worker mode is active only when the prompt contains the canonical `BABYSIT_PR_WORKER` marker and the
-task is running in its Codex-managed worktree.
-
-- Never create another task or worktree.
-- Confirm the checkout is detached and clean.
-- Confirm `HEAD` equals the PR head SHA supplied by GitHub before starting.
-- Always pass the explicit PR URL to watcher commands; detached HEAD cannot reliably infer `--pr auto`.
-- If worktree creation did not select a local environment and the prompt supplies an environment
-  config path, read its `[setup].script` and run it once in this worktree before the first code edit
-  or validation. Stop and report the blocker if setup fails.
+- Do not create another task, agent, session, branch, or worktree.
+- The user chooses whether this session runs in the originating checkout, a new thread, or an
+  isolated worktree. Do not attempt to enforce or replace that choice.
+- Use the current conversation as the primary source of implementation context. If the user starts
+  babysitting in a new thread, use the context they provide and do not invent missing decisions.
+- Resolve the PR URL, title, full body, base repository, number, head repository, head branch, and
+  current head SHA before monitoring.
+- Prefer an explicit PR URL for every watcher command. Use `--pr auto` only when the current branch
+  unambiguously identifies the intended PR.
+- Confirm the current checkout is safe before any edit or push. Follow the Git Safety Rules below.
 - Establish the Intent Boundary below before changing code.
-- Run the Core Workflow below and keep this task alive until a strict stop condition is reached.
+- Run the Core Workflow below and keep this session active until a strict stop condition is reached.
 
-## Intent Boundary (Worker)
+## Intent Boundary
 
 Before the first code change:
 
-1. Fetch the current PR title and full body from GitHub instead of relying only on the launcher
-   prompt.
-2. Read every ticket or specification directly linked from the PR title or body, including linked
+1. Read the current conversation. Treat its user decisions, solution rationale, rejected
+   alternatives, evidence, and non-goals as first-class decision context. Do not assume factual
+   state from earlier messages is still current.
+2. Fetch the current PR title and full body from GitHub instead of relying only on conversation
+   context.
+3. Read every ticket or specification directly linked from the PR title or body, including linked
    Notion pages, using an available authorized connector. Do not infer inaccessible private content.
-3. Derive a concise working scope: intended outcome, acceptance criteria, and any explicit non-goals.
-   If no ticket is linked, derive it from the PR title/body, tests, and changed behavior.
-4. Stop for user help before editing when required source material is inaccessible, sources conflict,
-   or the intended behavior remains materially ambiguous.
+4. Reconcile the conversation with the live PR, linked sources, tests, and changed behavior. Verify
+   drift-prone facts, but do not discard implementation reasoning merely because it is absent from
+   the PR body. If no ticket is linked, use the conversation, PR title/body, tests, and changed
+   behavior.
+5. Derive a concise working scope: intended outcome, acceptance criteria, explicit non-goals, and
+   deliberate trade-offs that affect review decisions.
+6. Stop for user help before editing when required source material is inaccessible, sources conflict,
+   the conversation is missing material context, or the intended behavior remains materially ambiguous.
 
 Use this scope for every CI or review-driven code change. Automatically fix feedback only when it is
 within the intended outcome or necessary to make that outcome correct and safe. Do not automatically
 broaden supported scenarios, add new product behavior, change acceptance criteria, or make unrelated
 product/design/architecture decisions merely because feedback is technically valid or PR-introduced.
 Surface such feedback to the user as scope-expanding and wait for direction. Explicit user direction
-takes precedence over the ticket and PR description.
+takes precedence over the ticket and PR description. When review feedback revisits a deliberately
+rejected alternative, trade-off, or non-goal from the implementation, assess whether the reviewer
+provides new evidence. Do not silently reverse or dismiss the prior decision; ask the user when the
+new evidence could materially change it.
 
-## Core Workflow (Worker)
+## Core Workflow
 
 1. Start with the watcher's continuous mode (`--watch`) and the explicit PR URL unless you are intentionally doing a one-shot diagnostic snapshot.
 2. Run the watcher script to snapshot PR/review/CI state (or consume each streamed snapshot from `--watch`). Review items remain pending and repeat in snapshots until explicitly acknowledged.
@@ -125,20 +92,22 @@ takes precedence over the ticket and PR description.
 
 ### One-shot snapshot
 
+Use the base directory containing this `SKILL.md` in place of `<babysit-skill-directory>`:
+
 ```bash
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/babysit/scripts/gh_pr_watch.py" --pr <pr-url> --once
+python3 "<babysit-skill-directory>/scripts/gh_pr_watch.py" --pr <pr-url> --once
 ```
 
 ### Continuous watch (JSONL)
 
 ```bash
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/babysit/scripts/gh_pr_watch.py" --pr <pr-url> --watch
+python3 "<babysit-skill-directory>/scripts/gh_pr_watch.py" --pr <pr-url> --watch
 ```
 
 ### Trigger flaky retry cycle (only when watcher indicates)
 
 ```bash
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/babysit/scripts/gh_pr_watch.py" --pr <pr-url> --retry-failed-now
+python3 "<babysit-skill-directory>/scripts/gh_pr_watch.py" --pr <pr-url> --retry-failed-now
 ```
 
 ### Acknowledge handled review feedback
@@ -146,7 +115,7 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/babysit/scripts/gh_pr_watch.py" --pr
 Stop the current watcher, acknowledge one or more completed dispositions, then restart `--watch`:
 
 ```bash
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/babysit/scripts/gh_pr_watch.py" \
+python3 "<babysit-skill-directory>/scripts/gh_pr_watch.py" \
   --pr <pr-url> \
   --ack-review-item <issue_comment|review_comment|review>:<id>
 ```
@@ -157,7 +126,7 @@ or migrated as handled. Both flags are repeatable.
 ### Explicit PR target
 
 ```bash
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/babysit/scripts/gh_pr_watch.py" --pr <number-or-url> --once
+python3 "<babysit-skill-directory>/scripts/gh_pr_watch.py" --pr <number-or-url> --once
 ```
 
 ## CI Failure Classification
@@ -184,11 +153,11 @@ Read `references/heuristics.md` relative to this `SKILL.md` for a concise checkl
 
 Apply this gate separately to every actionable CI or review issue before editing:
 
-1. Read and apply `${CODEX_HOME:-$HOME/.codex}/skills/kiss/SKILL.md`.
+1. Load and apply the `Keep it simple, stupid` skill.
 2. State internally, in one sentence, the exact defect and the smallest direct fix that fully addresses it.
 3. Confirm the fix fits the Intent Boundary. Start at the existing ownership seam and prefer a local change over a new helper, abstraction, type, interface, or generalized solution.
 4. Introduce an abstraction only when the direct fix would be incorrect, duplicate substantial logic, or make the code clearly harder to read. Possible future reuse is not sufficient.
-5. Read and apply `${CODEX_HOME:-$HOME/.codex}/skills/human-code/SKILL.md` within that minimal shape. Keep names clear, control flow obvious, and local structure natural without expanding the change.
+5. Load and apply the `human-code` skill within that minimal shape. Keep names clear, control flow obvious, and local structure natural without expanding the change.
 6. Inspect the completed diff through KISS again. If a smaller solution fully fixes the issue, simplify the implementation before validation.
 7. Follow the repository's `AGENTS.md`, style, test, lint, and typecheck requirements. Preserve existing behavior outside the requested fix.
 
@@ -196,7 +165,7 @@ Apply this gate separately to every actionable CI or review issue before editing
 
 After an issue's code change is complete and validated, but before staging:
 
-1. Read and apply `${CODEX_HOME:-$HOME/.codex}/skills/create-commit/SKILL.md`.
+1. Load and apply the `create-commit` skill.
 2. Inspect the unstaged and staged state. Leave unrelated user changes untouched and never start with `git add .`.
 3. Stage only the paths or hunks for that one issue and review the staged diff before committing.
 4. Make the commit one reason to revert. Do not accumulate independent review issues into one commit.
@@ -215,8 +184,11 @@ investigation context. Apply the "Explain it like I'm a junior" style:
   contractions. Preserve exact code identifiers, API names, commit SHAs, paths, and quoted evidence
   as technical terms.
 - Begin every automated inline reply with `@<author-login>`, using the exact `author` from the
-  originating watcher item. Mention human and automated reviewers alike so connected notification
-  channels can alert the original author.
+  originating watcher item, except when the author is Codex or a Codex bot/service account. Codex
+  mentions can launch an unwanted Codex Cloud task. For Codex-authored feedback, omit the author
+  mention entirely and start with the outcome. Mention all other human and automated reviewers so
+  connected notification channels can alert the original author. Never include `@codex` or another
+  GitHub mention of a Codex account in a reply to Codex-authored feedback.
 - Start with the outcome in one or two sentences: what changed, or why no change was needed.
 - Explain the practical reason before implementation details or edge cases.
 - Use plain language before jargon. Briefly explain unavoidable terms instead of assuming the reader
@@ -253,26 +225,17 @@ When you agree with a comment and it is actionable:
 2. Validate the focused change.
 3. Use the Atomic Commit Gate to create a small, issue-specific conventional commit.
 4. Push to the PR head branch.
-5. If the originating item is an inline `review_comment`, reply in its actual GitHub review thread with `@<author-login> Addressed in <commit-sha>.` followed by an ELIJ-style explanation of what changed and why it matters.
+5. If the originating item is an inline `review_comment`, reply in its actual GitHub review thread with `@<author-login> Addressed in <commit-sha>.` followed by an ELIJ-style explanation of what changed and why it matters. If the author is Codex or a Codex bot/service account, omit `@<author-login>` and begin with `Addressed in <commit-sha>.`.
 6. Leave the review thread open so the reviewer can follow up or re-review.
 7. Acknowledge the originating watcher item only after the push and verified thread reply.
 8. Resume watching on the new SHA immediately (do not stop after reporting the push).
 9. If monitoring was running in `--watch` mode, restart `--watch` immediately after the push in the same turn; do not wait for the user to ask again.
 
-When threaded feedback does not warrant a code change, reply in the actual inline review thread with `@<author-login> No change made.` followed by the concrete reason in the ELIJ style above. Be respectful and factual. Ask the user before replying only when the response requires an unresolved product decision, private context, or cross-team coordination.
+When threaded feedback does not warrant a code change, reply in the actual inline review thread with `@<author-login> No change made.` followed by the concrete reason in the ELIJ style above. If the author is Codex or a Codex bot/service account, omit `@<author-login>` and begin with `No change made.`. Be respectful and factual. Ask the user before replying only when the response requires an unresolved product decision, private context, or cross-team coordination.
 For unchanged pre-existing behavior, use the substance of: `No change made. I checked the code from before this PR (<sha/path evidence>), and it already behaves this way. This PR does not make the behavior more likely or more harmful, so changing it here would expand the scope.` Adapt the evidence to the actual report rather than posting a generic dismissal.
 After the reply is verified, acknowledge the originating watcher item. For status-only noise, approvals,
 duplicates, and self-authored follow-ups, acknowledge only after deliberately classifying them as ignorable.
-If the watcher later surfaces a reply containing the exact Codex signature below, treat it as an
-already-handled babysitter reply and do not reply again.
 If a code review comment/thread is already marked as resolved in GitHub, treat it as non-actionable and safely ignore it unless new unresolved follow-up feedback appears.
-
-End every automated inline review reply—both addressed and no-change dispositions—with a blank line
-followed by this exact signature:
-
-```markdown
-*🤖 Addressed by [Codex](https://openai.com/codex/)*
-```
 
 PR issue comments, review summaries, check annotations, and sections embedded inside a bot's summary comment are not inline review threads. They have no thread-reply target. Do not synthesize separate PR comments for them. If substantive feedback has no inline thread, report that limitation to the user instead of posting on GitHub.
 
@@ -283,8 +246,8 @@ You can read any PR state you need for monitoring. Writes must comply with this 
 You can push PRs to update the code under review or to force CI re-runs as described above.
 
 The user authorizes automatic replies to inline review threads from human and automated reviewers.
-Use the exact Codex signature defined above as the sole attribution. Reply only to communicate the
-disposition of that threaded feedback: the pushed fix and commit, or the reason no change was made.
+Reply only to communicate the disposition of that threaded feedback: the pushed fix and commit, or
+the reason no change was made.
 
 Use only the inline review-comment reply endpoint with the watcher's `thread_root_id`. Verify the
 created comment has `in_reply_to_id` equal to that thread root before reporting success. Never use
@@ -307,21 +270,23 @@ Never impersonate the user. Keep automated follow-ups scoped, factual, and visib
 
 ## Git Safety Rules
 
-- Work only in the dedicated Codex-managed worktree created for this PR.
-- Remain on detached HEAD; do not create or check out the PR branch locally.
+- Work only in the checkout selected by the user for this babysitting session. Do not create or
+  switch branches or worktrees solely because the skill was invoked.
+- The checkout may use the PR branch or detached HEAD. Do not require one form over the other.
 - Avoid destructive git commands.
-- Before each edit, fetch the PR and confirm the worktree is clean and `HEAD` matches the latest PR
-  head SHA. If GitHub advanced, switch the clean worktree to the new commit with detached HEAD before
-  editing.
-- Before editing, check for unrelated uncommitted changes. If present, stop and ask the user.
+- Before each edit, fetch the PR and confirm `HEAD` matches the latest PR head SHA. If GitHub
+  advanced, update the clean checkout safely without force or destructive commands. Stop for user
+  help if the checkout cannot be aligned safely.
+- Before editing, check for unrelated uncommitted changes. Leave them untouched. Stop and ask the
+  user if they overlap the intended fix or make an atomic commit unsafe.
 - Record the PR head SHA used as the base for each fix. Immediately before pushing, fetch again and
   verify the remote PR head still equals that base. If it advanced, integrate safely and revalidate;
   never overwrite it.
-- For a same-repository PR, push a detached commit explicitly with
-  `git push origin HEAD:<head-branch>`. For a fork PR, identify or add a remote for the writable head
+- For a same-repository PR, push the current commit explicitly with `git push origin
+  HEAD:<head-branch>`. For a fork PR, identify or add a remote for the writable head
   repository and push `HEAD:<head-branch>` there.
 - Never force-push from the babysitter.
-- After each successful issue-specific fix, use the create-commit skill, commit, push the detached
+- After each successful issue-specific fix, use the create-commit skill, commit, push the current
   HEAD explicitly to the PR head branch, reply in each originating inline review thread when one
   exists, then re-run the watcher.
 - If you interrupted a live `--watch` session to make the fix, restart `--watch` immediately after the push in the same turn.
@@ -333,10 +298,10 @@ Commit titles must be concrete conventional commits, for example:
 - `fix(search): fail resync when cache is unavailable`
 - `fix(auth): preserve session during token refresh`
 
-Never use `codex: address PR review feedback` or another catch-all title.
+Never use `chore: address PR review feedback` or another catch-all title.
 
 ## Monitoring Loop Pattern
-Use this loop in a live Codex session:
+Use this loop in the current session:
 
 1. Run `--once`.
 2. Read `actions`.
@@ -370,7 +335,7 @@ Keep review polling aggressive and continue monitoring even after CI turns green
 Stop only when one of the following is true:
 
 - PR merged or closed (stop as soon as a poll/snapshot confirms this).
-- User intervention is required and Codex cannot safely proceed alone.
+- User intervention is required and the babysitter cannot safely proceed alone.
 
 Keep polling when:
 
@@ -384,7 +349,6 @@ Keep polling when:
 ## Output Expectations
 Provide concise progress updates while monitoring and a final summary that includes:
 
-- In launcher mode, report the dedicated task and stop. Do not emit worker progress from the launcher.
 - After the initial watcher snapshot, emit progress only for a meaningful state change, an action taken, a user-help blocker, or a terminal outcome. Do not emit heartbeat, liveness, "still watching," or unchanged-status updates. Silence means monitoring is healthy and unchanged.
 - Treat push confirmations, intermediate CI snapshots, ready-to-merge snapshots, and review-action updates as progress updates only; do not emit the final summary or end the babysitting session unless a strict stop condition is met.
 - A user request to "monitor" is not satisfied by a couple of sample polls; remain in the loop until a strict stop condition or an explicit user interruption.

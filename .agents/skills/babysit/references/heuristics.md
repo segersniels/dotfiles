@@ -77,14 +77,14 @@ Do not auto-fix when:
 - The proposed change expands beyond the PR description or linked ticket's intended outcome, even if the issue is technically valid or PR-introduced.
 - A linked ticket/specification is inaccessible or materially conflicts with the PR description or feedback.
 - The codebase is in a dirty/unrelated state that makes safe editing uncertain.
-- The inline review comment only needs a written answer or disagreement response; post a concise, factual `No change made.` reply in that thread, ending with the required Codex signature, unless it requires an unresolved product decision, private context, or cross-team coordination.
+- The inline review comment only needs a written answer or disagreement response; post a concise, factual `No change made.` reply in that thread unless it requires an unresolved product decision, private context, or cross-team coordination.
 - The feedback is a PR issue comment, review summary, check annotation, or embedded bot-summary section with no inline thread; report it to the user and do not create a top-level fallback comment.
 
 ## Stop-and-ask conditions
 
 Stop and ask the user instead of continuing automatically when:
 
-- The local worktree has unrelated uncommitted changes.
+- Uncommitted changes overlap the intended fix or make an atomic commit unsafe.
 - `gh` auth/permissions fail.
 - The PR branch cannot be pushed.
 - CI failures persist after the flaky retry budget.

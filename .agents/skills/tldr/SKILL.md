@@ -1,5 +1,5 @@
 ---
-name: tldr
+name: "TLDR"
 description: Give a short, junior-friendly summary of any topic or context. Use when the user asks for a TLDR or wants the essential meaning in plain language.
 ---
 
