@@ -21,7 +21,7 @@ backup-cmux: backup-ghostty
 backup-agents:
 	@rm -rf .agents
 	@mkdir -p .agents
-	@rsync -av --exclude='target/' --exclude='.git/' ~/.agents/ .agents/
+	@rsync -av --exclude='target/' --exclude='.git/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.pytest_cache/' --exclude='.ruff_cache/' ~/.agents/ .agents/
 
 backup-codex: backup-agents
 	@rm -rf .codex
@@ -30,7 +30,7 @@ backup-codex: backup-agents
 	@rsync -av ~/.codex/rules/ .codex/rules/
 	@rsync -av ~/.codex/agents/ .codex/agents/
 	@rsync -av ~/.codex/hooks/ .codex/hooks/
-	@rsync -av --exclude='target/' --exclude='.git/' ~/.codex/clis/ .codex/clis/
+	@rsync -av --exclude='target/' --exclude='.git/' --exclude='__pycache__/' --exclude='*.pyc' ~/.codex/clis/ .codex/clis/
 
 backup-cursor:
 	@rm -rf .cursor
