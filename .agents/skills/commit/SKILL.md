@@ -1,5 +1,5 @@
 ---
-name: create-commit
+name: commit
 description: "Create focused git commits without changing code. Use when Codex needs to review staged or unstaged changes, split work into small atomic commits, separate dependency updates from feature work, stage the right files, and write conventional commit titles in `type(scope): description` format."
 ---
 
