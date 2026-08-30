@@ -63,8 +63,7 @@ Accept a PR URL, a PR number resolvable from the current repository, or an unamb
 
 Default finding presentation policy:
 
-- Post verified **blockers** and **concerns** inline when a valid diff anchor exists.
-- Put **nits** in the review summary unless the user explicitly asks for inline nits.
+- Post verified **blockers**, **concerns**, and **nits** inline when a valid diff anchor exists.
 - Put **blind spots** only in the review summary. Never phrase a blind spot as a defect.
 - Keep relevant pre-existing problems and scope-expanding opportunities in a separate **Follow-up candidates** section. Include base-SHA evidence and state `No change requested in this PR.` Do not post them as inline findings.
 
