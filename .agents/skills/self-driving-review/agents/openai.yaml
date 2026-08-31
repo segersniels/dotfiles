@@ -1,7 +1,0 @@
-interface:
-  display_name: "Self-driving Review"
-  short_description: "Deep autonomous PR review and follow-up"
-  default_prompt: "Use $self-driving-review to publish an explicitly authorized review, monitor with only the exact model-independent bounded collector command once per tool call, never wrap or retime polling, never stop before a strict stop condition, never change PR code, and never approve the PR."
-
-policy:
-  allow_implicit_invocation: false
