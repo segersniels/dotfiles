@@ -32,6 +32,10 @@ backup-codex: backup-agents
 	@rsync -av ~/.codex/hooks/ .codex/hooks/
 	@rsync -av --exclude='target/' --exclude='.git/' --exclude='__pycache__/' --exclude='*.pyc' ~/.codex/clis/ .codex/clis/
 
+backup-claude: backup-agents
+	@mkdir -p .claude
+	@rsync -av ~/.claude/settings.json .claude/
+
 backup-cursor:
 	@rm -rf .cursor
 	@mkdir -p .cursor/user/snippets
@@ -41,7 +45,7 @@ backup-cursor:
 	@rsync -av ~/.cursor/settings.json .cursor/
 	@rsync -av ~/.cursor/cli-config.json .cursor/
 
-backup: backup-nvim backup-ghostty backup-codex backup-cursor
+backup: backup-nvim backup-ghostty backup-codex backup-claude backup-cursor
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -68,6 +72,12 @@ restore-codex: restore-agents
 	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/
 	@ln -sfn ~/.agents/AGENTS.md ~/.codex/AGENTS.md
 
+restore-claude: restore-agents
+	@mkdir -p ~/.claude
+	@rsync -av .claude/settings.json ~/.claude/
+	@ln -sfn ~/.agents/AGENTS.md ~/.claude/CLAUDE.md
+	@ln -sfn ~/.agents/skills ~/.claude/skills
+
 restore-cursor:
 	@mkdir -p ~/Library/Application\ Support/Cursor/User/snippets
 	@mkdir -p ~/.cursor
@@ -84,5 +94,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-cursor
+restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-claude restore-cursor
 	@$(foreach file, $(FILES), make restore-$(file);)

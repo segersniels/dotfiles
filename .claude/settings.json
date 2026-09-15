@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(bun *)",
+      "Bash(bunx *)",
+      "Bash(git *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(cat *)",
+      "Bash(sed *)",
+      "Bash(awk *)",
+      "Bash(wc *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(tr *)",
+      "Bash(gh pr:*)",
+      "Bash(gh api:*)",
+      "Bash(git diff:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(npx vitest:*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "claude-fable-5-1[1m]",
+  "enabledPlugins": {
+    "slack@claude-plugins-official": false,
+    "notion@claude-plugins-official": true,
+    "expo@claude-plugins-official": true,
+    "sentry@claude-plugins-official": true,
+    "figma@claude-plugins-official": true
+  },
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "low"
+    }
+  },
+  "tui": "fullscreen",
+  "theme": "dark",
+  "agentPushNotifEnabled": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}
