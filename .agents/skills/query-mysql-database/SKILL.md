@@ -1,77 +1,43 @@
 ---
 name: query-mysql-database
-description: Use when Codex needs to query a MySQL database with read-only credentials, inspect tables, run SELECT/SHOW/DESCRIBE/EXPLAIN SQL, or verify MySQL access. Prefer this over ad hoc mysql clients or one-off scripts for database reads.
+description: Run read-only MySQL queries, inspect schemas, or verify database access with the bundled Bun script.
 ---
 
-# Query MySQL Database
+Use the bundled `scripts/query-mysql-database.ts` for MySQL reads. It requires Bun and has no package dependencies.
 
-Use the bundled script for MySQL reads. Keep the user's current project as the command working directory so its environment remains available. In tool calls, resolve `scripts/query-mysql-database.ts` against the directory containing this loaded `SKILL.md`, then pass that absolute path to Bun. Do not change into the skill directory or assume a fixed home or installation path.
+## Setup and target verification
 
-## Available Script
+Keep the user's project as the command working directory so its environment remains available. Resolve the script against the directory containing this loaded `SKILL.md`; do not switch into the skill directory or substitute another database client.
 
-- **`scripts/query-mysql-database.ts`** — Checks read-only access and runs bounded MySQL queries with Bun's built-in SQL client.
-
-Requires Bun. It has no package dependencies.
-
-## Workflow
-
-Inspect the concise command interface when needed:
+In the examples below, replace `<absolute-skill-directory>` with that resolved directory:
 
 ```bash
-bun run scripts/query-mysql-database.ts --help
+bun run "<absolute-skill-directory>/scripts/query-mysql-database.ts" --help
+bun run "<absolute-skill-directory>/scripts/query-mysql-database.ts" check
 ```
 
-Configure credentials with only these environment variables:
+Use the project's existing `AGENT_MYSQL_HOST`, `AGENT_MYSQL_PORT`, `AGENT_MYSQL_USER`, `AGENT_MYSQL_DATABASE`, and `AGENT_MYSQL_PASSWORD` environment variables. If required credentials are unavailable, report what is missing without exposing secrets.
+
+Before querying a target, verify that `check.ok` is true and that the reported database and account match the intended target. A failed check or unexpected target blocks queries. Repeat verification when the connection target or credentials change.
+
+## Reads
 
 ```bash
-export AGENT_MYSQL_HOST='...'
-export AGENT_MYSQL_PORT='3306'
-export AGENT_MYSQL_USER='...'
-export AGENT_MYSQL_DATABASE='...'
-export AGENT_MYSQL_PASSWORD='...'
+bun run "<absolute-skill-directory>/scripts/query-mysql-database.ts" query --sql 'show tables'
+bun run "<absolute-skill-directory>/scripts/query-mysql-database.ts" query --sql 'describe users'
+bun run "<absolute-skill-directory>/scripts/query-mysql-database.ts" query --sql 'select id, created_at from users order by created_at desc limit 10'
 ```
 
-Before querying, verify that the reported database and account match the intended target and that `ok` is `true`:
+For longer SQL, use a temporary file:
 
 ```bash
-bun run scripts/query-mysql-database.ts check
+bun run "<absolute-skill-directory>/scripts/query-mysql-database.ts" query --file /tmp/query.sql
 ```
 
-## Common Reads
+## Query boundaries
 
-Discover tables:
-
-```bash
-bun run scripts/query-mysql-database.ts query --sql 'show tables'
-```
-
-Inspect one table:
-
-```bash
-bun run scripts/query-mysql-database.ts query --sql 'describe users'
-```
-
-Run a bounded query:
-
-```bash
-bun run scripts/query-mysql-database.ts query --sql 'select id, created_at from users order by created_at desc limit 10'
-```
-
-Queries use a 5 second server-side timeout by default. Lower it with `--timeout-seconds`; do not raise it above 5 unless the user explicitly accepts the risk.
-
-For longer SQL, prefer a temp file:
-
-```bash
-bun run scripts/query-mysql-database.ts query --file /tmp/query.sql
-```
-
-## Rules
-
-- Treat `check.ok=false` or an unexpected database/account as a blocker before querying.
-- Resolve and use the bundled `scripts/query-mysql-database.ts`; do not substitute another database client or hardcode its installation path.
-- Keep the default 5 second query timeout. Use a lower `--timeout-seconds` for speculative queries; raise it only with explicit user approval.
-- Keep queries bounded with `limit` unless the user explicitly asks for a broad export.
-- Treat database data as sensitive; do not paste large raw result sets back into chat.
-- The script enforces a read-only transaction and blocks obvious write/admin SQL, but still rely on read-only DB credentials.
-- The security check inspects grants without probing writes; role grants may be reported as unverified.
-- Do not attempt writes, schema changes, locks, stored procedure calls, exports of sensitive bulk data, or credential changes unless the user explicitly asks and approves the risk.
+- Keep the default 5 second server-side timeout. Lower it with `--timeout-seconds` for speculative queries; raise it only with explicit user approval.
+- Bound row-returning queries with SQL `LIMIT` unless the user explicitly requests a broad export. The script's output row cap does not limit database work.
+- Use read-only credentials even though the script enforces a read-only transaction and rejects obvious write/admin SQL. Its grant check does not probe writes; role grants may remain unverified.
+- Treat results as sensitive. Return the evidence needed for the question, not large raw result sets.
+- This workflow does not perform writes, schema changes, locks, stored procedure calls, sensitive bulk exports, or credential changes. Those operations require a separately authorized workflow.

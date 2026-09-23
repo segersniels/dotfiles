@@ -1,7 +1,7 @@
 interface:
   display_name: "Human Code"
   short_description: "Improve code readability and reviewability"
-  default_prompt: "Use $human-code to improve code readability without changing behavior."
+  default_prompt: "Use $human-code to assess or improve readability within the requested scope, preserving behavior outside any authorized fix or feature."
 
 policy:
   allow_implicit_invocation: false

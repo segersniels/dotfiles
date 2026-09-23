@@ -1,0 +1,4 @@
+interface:
+  display_name: "Worktree"
+  short_description: "Create space-saving worktrees with local env and dependencies"
+  default_prompt: "Use $worktree to create and prepare an isolated worktree for this task."

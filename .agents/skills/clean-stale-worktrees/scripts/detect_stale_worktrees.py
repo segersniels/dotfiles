@@ -12,9 +12,9 @@ import shutil
 import subprocess
 import sys
 import time
-from typing import Any, Iterable
+from typing import Any
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 3
 
 
 class InspectionError(RuntimeError):
@@ -98,6 +98,43 @@ def list_active_cwds() -> tuple[list[Path], str | None]:
     return paths, None
 
 
+def list_open_pull_requests(repo: Path) -> tuple[list[dict[str, Any]], str | None]:
+    if shutil.which("gh") is None:
+        return [], "gh is not installed"
+    environment = os.environ.copy()
+    environment["GH_PROMPT_DISABLED"] = "1"
+    result = subprocess.run(
+        [
+            "gh",
+            "pr",
+            "list",
+            "--state",
+            "open",
+            "--limit",
+            "1000",
+            "--json",
+            "number,isDraft,url,headRefName,headRefOid",
+        ],
+        cwd=repo,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=environment,
+        check=False,
+    )
+    if result.returncode != 0:
+        detail = decode(result.stderr).strip() or "no error detail"
+        return [], f"gh pr list failed with exit {result.returncode}: {detail}"
+    try:
+        pull_requests = json.loads(decode(result.stdout))
+    except json.JSONDecodeError as error:
+        return [], f"gh pr list returned invalid JSON: {error}"
+    if not isinstance(pull_requests, list) or not all(
+        isinstance(item, dict) for item in pull_requests
+    ):
+        return [], "gh pr list returned an invalid result"
+    return pull_requests, None
+
+
 def contains(root: Path, child: Path) -> bool:
     try:
         return os.path.commonpath((os.fspath(root), os.fspath(child))) == os.fspath(root)
@@ -105,34 +142,36 @@ def contains(root: Path, child: Path) -> bool:
         return False
 
 
-def newest_mtime(roots: Iterable[Path]) -> tuple[float | None, str | None]:
-    newest: float | None = None
-    errors: list[str] = []
+def git_timestamp(repo: Path, *args: str) -> tuple[float | None, str | None]:
+    result = git(repo, *args)
+    if result.returncode != 0:
+        detail = decode(result.stderr).strip() or "no error detail"
+        return None, f"git {' '.join(args)} failed: {detail}"
+    value = decode(result.stdout).strip()
+    if not value:
+        return None, None
+    try:
+        return float(value), None
+    except ValueError:
+        return None, f"git {' '.join(args)} returned an invalid timestamp: {value!r}"
 
-    def inspect(path: Path) -> None:
-        nonlocal newest
-        try:
-            modified = path.lstat().st_mtime
-            newest = modified if newest is None else max(newest, modified)
-        except OSError as error:
-            errors.append(f"{path}: {error.strerror or error}")
 
-    for root in roots:
-        inspect(root)
-        if not root.is_dir():
-            continue
-
-        def onerror(error: OSError) -> None:
-            errors.append(f"{error.filename or root}: {error.strerror or error}")
-
-        for directory, dirnames, filenames in os.walk(root, followlinks=False, onerror=onerror):
-            base = Path(directory)
-            for name in dirnames:
-                inspect(base / name)
-            for name in filenames:
-                inspect(base / name)
-
-    return newest, "; ".join(errors[:5]) if errors else None
+def head_reflog_timestamp(repo: Path) -> tuple[float | None, str | None]:
+    args = ("reflog", "show", "-1", "--date=unix", "--format=%gd", "HEAD")
+    result = git(repo, *args)
+    if result.returncode != 0:
+        detail = decode(result.stderr).strip() or "no error detail"
+        return None, f"git {' '.join(args)} failed: {detail}"
+    value = decode(result.stdout).strip()
+    if not value:
+        return None, None
+    _, separator, timestamp = value.rpartition("@{")
+    if not separator or not timestamp.endswith("}"):
+        return None, f"git {' '.join(args)} returned an invalid selector: {value!r}"
+    try:
+        return float(timestamp[:-1]), None
+    except ValueError:
+        return None, f"git {' '.join(args)} returned an invalid selector: {value!r}"
 
 
 def iso_time(timestamp: float | None) -> str | None:
@@ -147,6 +186,8 @@ def inspect_worktree(
     cutoff: float,
     active_cwds: list[Path],
     activity_error: str | None,
+    open_pull_requests: list[dict[str, Any]],
+    pull_request_error: str | None,
 ) -> dict[str, Any]:
     path = Path(raw["worktree"]).resolve(strict=False)
     result: dict[str, Any] = {
@@ -155,6 +196,7 @@ def inspect_worktree(
         "branch": raw.get("branch", "detached").removeprefix("refs/heads/"),
         "locked": bool(raw.get("locked")),
         "candidate": False,
+        "review_required": False,
         "reasons": [],
     }
     reasons: list[str] = result["reasons"]
@@ -178,28 +220,54 @@ def inspect_worktree(
         if active:
             reasons.append("active-process-cwd")
 
-    git_dir_result = git(path, "rev-parse", "--path-format=absolute", "--git-dir")
-    if git_dir_result.returncode != 0:
-        result["inspection_error"] = decode(git_dir_result.stderr).strip()
-        reasons.append("gitdir-check-failed")
-        return result
-    git_dir = Path(decode(git_dir_result.stdout).strip()).resolve(strict=False)
-    modified, scan_error = newest_mtime((path, git_dir))
-    result["last_modified"] = iso_time(modified)
-    result["age_days"] = round((time.time() - modified) / 86400, 2) if modified is not None else None
-    if scan_error:
-        result["inspection_error"] = scan_error
-        reasons.append("filesystem-scan-failed")
-    elif modified is None or modified >= cutoff:
-        reasons.append("recently-modified")
+    branch = result["branch"]
+    head = result["head"]
+    if pull_request_error:
+        result["pull_request_error"] = pull_request_error
+        reasons.append("pull-request-status-unknown")
+    else:
+        matching_pull_requests = [
+            pull_request
+            for pull_request in open_pull_requests
+            if (
+                branch != "detached" and pull_request.get("headRefName") == branch
+            )
+            or (head and pull_request.get("headRefOid") == head)
+        ]
+        result["open_pull_requests"] = matching_pull_requests
+        if matching_pull_requests:
+            reasons.append("open-pull-request")
+
+    commit_time, commit_error = git_timestamp(path, "show", "-s", "--format=%ct", "HEAD")
+    reflog_time, reflog_error = head_reflog_timestamp(path)
+    result["last_commit_at"] = iso_time(commit_time)
+    result["last_head_activity_at"] = iso_time(reflog_time)
+    activity_times = [value for value in (commit_time, reflog_time) if value is not None]
+    last_activity = max(activity_times) if activity_times else None
+    result["last_activity_at"] = iso_time(last_activity)
+    result["age_days"] = (
+        round((time.time() - last_activity) / 86400, 2)
+        if last_activity is not None
+        else None
+    )
+    activity_errors = [error for error in (commit_error, reflog_error) if error]
+    if activity_errors:
+        result["activity_inspection_error"] = "; ".join(activity_errors)
+        reasons.append("git-activity-check-failed")
+    elif last_activity is None:
+        reasons.append("git-activity-unknown")
+    elif last_activity >= cutoff:
+        reasons.append("recent-commit-or-head-activity")
 
     status = git(path, "status", "--porcelain", "--untracked-files=all")
     if status.returncode != 0:
         result["status_error"] = decode(status.stderr).strip()
         reasons.append("status-check-failed")
     else:
-        dirty_count = len(status.stdout.splitlines())
+        changes = [decode(line) for line in status.stdout.splitlines()]
+        dirty_count = len(changes)
         result["dirty_count"] = dirty_count
+        result["changes"] = changes
         if dirty_count:
             reasons.append("dirty")
 
@@ -228,6 +296,8 @@ def inspect_worktree(
     if not reasons:
         result["candidate"] = True
         reasons.append("safe-stale-candidate")
+    elif reasons == ["dirty"]:
+        result["review_required"] = True
     return result
 
 
@@ -236,9 +306,18 @@ def create_manifest(repo: Path, days: float) -> dict[str, Any]:
     raw_worktrees = parse_worktrees(root)
     main_path = Path(raw_worktrees[0]["worktree"]).resolve(strict=False)
     active_cwds, activity_error = list_active_cwds()
+    open_pull_requests, pull_request_error = list_open_pull_requests(root)
     cutoff = time.time() - days * 86400
     worktrees = [
-        inspect_worktree(raw, main_path, cutoff, active_cwds, activity_error)
+        inspect_worktree(
+            raw,
+            main_path,
+            cutoff,
+            active_cwds,
+            activity_error,
+            open_pull_requests,
+            pull_request_error,
+        )
         for raw in raw_worktrees
     ]
     return {
@@ -251,6 +330,7 @@ def create_manifest(repo: Path, days: float) -> dict[str, Any]:
         "summary": {
             "total": len(worktrees),
             "candidates": sum(bool(item["candidate"]) for item in worktrees),
+            "review_required": sum(bool(item["review_required"]) for item in worktrees),
         },
     }
 

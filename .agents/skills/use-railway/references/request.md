@@ -1,6 +1,6 @@
 # Request
 
-Official documentation and community endpoints. GraphQL operations for things the CLI doesn't expose.
+Official documentation and community endpoints. GraphQL operations without a dedicated CLI command or MCP tool.
 
 ## Official documentation
 
@@ -83,28 +83,36 @@ Thread URLs follow the format: `https://station.railway.com/{topic_slug}/{thread
 Community threads are anecdotal. Always pair with official docs when the answer informs an operational decision.
 
 
-## GraphQL helper
+## GraphQL with the CLI
 
-All GraphQL operations use the API helper script, which handles authentication automatically:
+Use `railway api` (CLI 5.28+) for API operations that dedicated commands and MCP tools cannot express. It uses the CLI's configured authentication and supports normal token refresh. Inspect the live schema before guessing fields or input shapes:
 
 ```bash
-scripts/railway-api.sh '<query>' '<variables-json>'
+railway api search projectUpdate --kind mutation
+railway api describe ProjectUpdateInput
+railway api describe Mutation.projectUpdate
+railway api schema --compact
+railway api '<query>' --variables '{"id":"<resource-id>"}'
+railway api --file query.graphql --variables @variables.json
+railway api --file query.graphql --raw-var id=<resource-id> --var enabled=true
 ```
 
-The script reads the API token from `~/.railway/config.json` and sends requests to `https://backboard.railway.com/graphql/v2`.
+`--var` parses JSON values when possible; `--raw-var` keeps strings. Queries can also come from stdin, with variables provided separately. Use `--operation-name` for documents containing multiple operations. Output is JSON by default; `--compact` changes formatting and there is no `--json` flag. HTTP errors and GraphQL `errors` fail the command; do not add `--allow-errors` when deciding whether a mutation succeeded. Query resource state before retrying an uncertain mutation.
+
+For an older CLI that cannot be upgraded, the bundled `scripts/railway-api.sh '<query>' '<variables-json>'` remains a compatibility fallback. The database analysis scripts (`dal.py`, `analyze-postgres.py`) still call this helper directly, so it must stay in the plugin even when agents use `railway api`. It reads `user.token` from `~/.railway/config.json`; it does not implement the CLI's environment-token selection or OAuth refresh. It expects query first and variables second, not a query on stdin, and callers must inspect its response for GraphQL errors. Keep the skill telemetry prefix on `railway api` calls just like other CLI calls.
 
 For the full API schema, see: https://docs.railway.com/api/llms-docs.md
 
 ## Project mutations
 
-The CLI doesn't expose project setting updates (rename, PR deploys, visibility). Use GraphQL:
+There is no dedicated project command for these setting updates (rename, PR deploys, visibility). Use GraphQL:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'mutation updateProject($id: String!, $input: ProjectUpdateInput!) {
     projectUpdate(id: $id, input: $input) { id name isPublic prDeploys botPrEnvironments }
   }' \
-  '{"id":"<project-id>","input":{"name":"new-name","prDeploys":true}}'
+  --variables '{"id":"<project-id>","input":{"name":"new-name","prDeploys":true}}'
 ```
 
 Common `ProjectUpdateInput` fields: `name`, `isPublic`, `prDeploys`, `botPrEnvironments`.
@@ -112,14 +120,14 @@ Common `ProjectUpdateInput` fields: `name`, `isPublic`, `prDeploys`, `botPrEnvir
 
 ## Service mutations
 
-The CLI can create services (`railway add`) but cannot rename them or change icons. Use GraphQL:
+Use `railway add` to create services and GraphQL to rename them or change icons:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'mutation updateService($id: String!, $input: ServiceUpdateInput!) {
     serviceUpdate(id: $id, input: $input) { id name icon }
   }' \
-  '{"id":"<service-id>","input":{"name":"new-name"}}'
+  --variables '{"id":"<service-id>","input":{"name":"new-name"}}'
 ```
 
 `ServiceUpdateInput` fields: `name`, `icon` (image URL, animated GIF, or devicons URL like `https://devicons.railway.app/postgres`).
@@ -132,11 +140,11 @@ Get the service ID from `railway service list --json`.
 Prefer `railway add` for most cases. Use GraphQL for programmatic or advanced use:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'mutation createService($input: ServiceCreateInput!) {
     serviceCreate(input: $input) { id name }
   }' \
-  '{"input":{"projectId":"<project-id>","name":"my-service","source":{"image":"nginx:latest"}}}'
+  --variables '{"input":{"projectId":"<project-id>","name":"my-service","source":{"image":"nginx:latest"}}}'
 ```
 
 `ServiceCreateInput` fields:
@@ -158,13 +166,13 @@ After creating a service via GraphQL, configure it with a JSON config patch incl
 Use `railway metrics` for routine metric checks. Use GraphQL only when you need custom measurements, grouping, sample rates, or averaging windows that the CLI doesn't expose.
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'query metrics($environmentId: String!, $serviceId: String, $startDate: DateTime!, $endDate: DateTime, $sampleRateSeconds: Int, $averagingWindowSeconds: Int, $groupBy: [MetricTag!], $measurements: [MetricMeasurement!]!) {
     metrics(environmentId: $environmentId, serviceId: $serviceId, startDate: $startDate, endDate: $endDate, sampleRateSeconds: $sampleRateSeconds, averagingWindowSeconds: $averagingWindowSeconds, groupBy: $groupBy, measurements: $measurements) {
       measurement tags { serviceId deploymentId region } values { ts value }
     }
   }' \
-  '{"environmentId":"<env-id>","serviceId":"<service-id>","startDate":"2026-02-19T00:00:00Z","measurements":["CPU_USAGE","MEMORY_USAGE_GB"]}'
+  --variables '{"environmentId":"<env-id>","serviceId":"<service-id>","startDate":"2026-02-19T00:00:00Z","measurements":["CPU_USAGE","MEMORY_USAGE_GB"]}'
 ```
 
 Available `MetricMeasurement` values: `CPU_USAGE`, `CPU_LIMIT`, `MEMORY_USAGE_GB`, `MEMORY_LIMIT_GB`, `NETWORK_RX_GB`, `NETWORK_TX_GB`, `DISK_USAGE_GB`, `EPHEMERAL_DISK_USAGE_GB`, `BACKUP_USAGE_GB`.
@@ -190,13 +198,13 @@ The CLI search command doesn't require authentication and supports pagination wi
 Use GraphQL only when the CLI output isn't enough for the workflow:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'query templates($query: String!, $verified: Boolean, $recommended: Boolean) {
     templates(query: $query, verified: $verified, recommended: $recommended) {
       edges { node { code name description category } }
     }
   }' \
-  '{"query":"redis","verified":true}'
+  --variables '{"query":"redis","verified":true}'
 ```
 
 | Parameter | Type | Description |
@@ -230,21 +238,21 @@ For deploying into a specific environment or tracking the workflow, use the two-
 **Step 1**: Fetch the template config:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'query template($code: String!) {
     template(code: $code) { id serializedConfig }
   }' \
-  '{"code":"postgres"}'
+  --variables '{"code":"postgres"}'
 ```
 
 **Step 2**: Deploy with `templateDeployV2`:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'mutation deploy($input: TemplateDeployV2Input!) {
     templateDeployV2(input: $input) { projectId workflowId }
   }' \
-  '{"input":{
+  --variables '{"input":{
     "templateId":"<id-from-step-1>",
     "serializedConfig":<config-object-from-step-1>,
     "projectId":"<project-id>",
@@ -253,10 +261,10 @@ scripts/railway-api.sh \
   }}'
 ```
 
-`serializedConfig` is the raw JSON object from the template query, not a string. Get `workspaceId` via `scripts/railway-api.sh 'query { project(id: "<project-id>") { workspaceId } }' '{}'`.
+`serializedConfig` is the raw JSON object from the template query, not a string. Get `workspaceId` via `railway api 'query { project(id: "<project-id>") { workspaceId } }'`.
 
 
 ## Validated against
 
 - Docs: [api docs](https://docs.railway.com/api/llms-docs.md), [agents.md](https://docs.railway.com/agents), [community.md](https://docs.railway.com/community), [cli/docs.md](https://docs.railway.com/cli/docs), [templates.md](https://docs.railway.com/cli/templates), [metrics.md](https://docs.railway.com/cli/metrics)
-- CLI source: [docs.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/docs.rs), [templates.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/templates.rs), [metrics.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/metrics.rs)
+- CLI source: [api.rs (v5.49.1)](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/api.rs), [client.rs (v5.49.1)](https://github.com/railwayapp/cli/blob/v5.49.1/src/client.rs), [docs.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/docs.rs), [templates.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/templates.rs), [metrics.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/metrics.rs)

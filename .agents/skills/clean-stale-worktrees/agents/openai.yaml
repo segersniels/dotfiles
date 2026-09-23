@@ -1,4 +1,4 @@
 interface:
   display_name: "Clean Stale Worktrees"
   short_description: "Find and safely remove stale Git worktrees"
-  default_prompt: "Use $clean-stale-worktrees to detect Git worktrees unused for more than 3 days. If I asked for cleanup, remove the safe candidates and their directories."
+  default_prompt: "Use $clean-stale-worktrees to detect Git worktrees with no commit or HEAD activity for more than 3 days. Keep worktrees with open or draft PRs. If I asked for cleanup, remove clean safe candidates and ask before discarding dirty changes."

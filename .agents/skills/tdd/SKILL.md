@@ -1,5 +1,5 @@
 ---
-name: "TDD"
+name: tdd
 description: "Use when the user wants to build features or fix bugs test-first, mentions 'red-green-refactor', or wants integration tests."
 ---
 
@@ -46,17 +46,9 @@ RIGHT (vertical):
 
 When exploring the codebase, read `CONTEXT.md` (if it exists) so that test names and interface vocabulary match the project's domain language, and respect ADRs in the area you're touching.
 
-Before writing any code:
+Before writing code, identify the intended interface and prioritize observable behaviors from the request, conversation, and repository. State the plan briefly, then proceed. Ask only about unresolved interface or behavior decisions that materially affect the result.
 
-- [ ] Confirm with user what interface changes are needed
-- [ ] Confirm with user which behaviors to test (prioritize)
-- [ ] Identify opportunities for deep modules (small interface, deep implementation)
-- [ ] List the behaviors to test (not implementation steps)
-- [ ] Get user approval on the plan
-
-Ask: "What should the public interface look like? Which behaviors are most important to test?"
-
-**You can't test everything.** Confirm with the user exactly which behaviors matter most. Focus testing effort on critical paths and complex logic, not every possible edge case.
+A request for TDD authorizes the focused tests needed for the requested behavior. Focus on critical paths and complex logic; do not expand into unrelated test infrastructure or exhaustive edge cases.
 
 ### 2. Tracer Bullet
 

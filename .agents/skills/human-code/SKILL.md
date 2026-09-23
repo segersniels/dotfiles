@@ -1,35 +1,23 @@
 ---
 name: human-code
-description: "Use for readability and reviewability improvements to existing logic: code flow, naming, guard clauses, local structure, and making code read naturally. Use when the user asks for human code, readable code, proper code, reviewable code, or making code flow nicely. Keep the existing behavior intact. Do not use for comment-only work; use the comment skill for requested code comments."
+description: Assess or improve code readability when the user asks for human-code, clearer naming, or easier-to-follow logic.
 ---
 
-# Human Code
+Make the intended behavior easy to understand from the code.
 
-Make code read like a careful human wrote it. Focus on how the logic is expressed, not what the logic does.
+## Scope
 
-## Default stance
+For a readability-only request, preserve behavior and report unrelated bugs separately. When the user also requests a fix or feature, apply these principles to that implementation and preserve behavior outside the requested change. For an assessment, report findings without editing.
 
-- Prefer edits that improve scan speed: naming, spacing, and local control-flow layout.
-- Keep the existing behavior intact.
-- Avoid broad rewrites and speculative cleanup.
-- If you notice a behavior issue, call it out separately instead of folding it into readability work.
-- Always lint and typecheck after each change.
-- Stop once the code flows clearly.
+This skill governs how code is expressed; it does not cancel other authorized work. Use the comment skill for comment-only requests.
 
-## Good edits
+## Readability
 
-- Rename variables, helpers, and local concepts for clarity.
-- Reorder local setup so the flow reads top-to-bottom without changing execution.
-- Extract one focused helper when it makes the existing flow easier to read.
-- Apply spacing rules that make control flow visually clear.
+- Use names that state the domain rule and make the flow easy to scan.
+- Keep the happy path clear. Prefer guard clauses and early returns when they reduce nesting.
+- Replace complicated nested ternaries with straightforward control flow.
+- Extract a focused helper only when it makes the flow easier to understand. Keep simple logic local.
+- Use spacing, temporary names, and optional chaining when they clarify the code without hiding execution order or changing semantics.
+- Follow existing conventions and avoid unrelated rewrites.
 
-## Implementation shape
-
-- Keep control flow visually separated from business logic.
-- Use one focused helper when inline logic is hard to read.
-- Prefer guard clauses and early returns for rejected cases.
-- Keep the happy path obvious.
-- Rewrite complicated nested ternaries as clear, flowing `if` statements.
-- Use optional chaining for simple nullable property access when it preserves behavior and removes boilerplate.
-- Use temporary names when they make existing logic easier to read; avoid adding names that obscure the flow.
-- Prefer names that make the rule readable at scan speed.
+After a coherent set of edits, run applicable project checks and verify the affected behavior. Complete the user's full request once the code reads clearly.

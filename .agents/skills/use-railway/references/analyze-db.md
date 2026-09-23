@@ -31,14 +31,14 @@ https://railway.com/project/<PROJECT_ID>/service/<SERVICE_ID>/database?environme
 Then query the API for the service name and database type in a **single call**:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'query getServiceAndConfig($serviceId: String!, $environmentId: String!) {
     service(id: $serviceId) { name }
     environment(id: $environmentId) {
       config(decryptVariables: false)
     }
   }' \
-  '{"serviceId": "<SERVICE_ID>", "environmentId": "<ENV_ID>"}'
+  --variables '{"serviceId": "<SERVICE_ID>", "environmentId": "<ENV_ID>"}'
 ```
 
 From the response, get:
@@ -57,9 +57,9 @@ Then match the image to the database type:
 **If `environmentId` is empty in the URL** (e.g., `?environmentId=` or no query param at all), skip the `environment.config` query — it requires a valid ID. Instead, list the project's environments:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'query getEnvs($id: String!) { project(id: $id) { environments { edges { node { id name } } } } }' \
-  '{"id": "<PROJECT_ID>"}'
+  --variables '{"id": "<PROJECT_ID>"}'
 ```
 
 Use the `production` environment by default. If multiple non-PR environments exist and the user hasn't specified one, ask which environment to analyze.
@@ -257,13 +257,13 @@ All three IDs come from the URL (see "Context: URL First" above). The service na
 If the URL has no `environmentId` and the user specifies an environment by name (e.g., "production"), resolve it:
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'query getProject($id: String!) {
     project(id: $id) {
       environments { edges { node { id name } } }
     }
   }' \
-  '{"id": "<PROJECT_ID>"}'
+  --variables '{"id": "<PROJECT_ID>"}'
 ```
 
 Match the environment name (case-insensitive) to get the `environmentId`.
@@ -342,3 +342,4 @@ Railway services auto-scale CPU, RAM, and disk based on actual usage. Users do N
 
 - Docs: [ssh.md](https://docs.railway.com/cli/ssh), [logs.md](https://docs.railway.com/cli/logs), [metrics.md](https://docs.railway.com/cli/metrics), [api docs](https://docs.railway.com/api/llms-docs.md)
 - Local scripts: [analyze-postgres.py](../scripts/analyze-postgres.py), [analyze-mysql.py](../scripts/analyze-mysql.py), [analyze-redis.py](../scripts/analyze-redis.py), [analyze-mongo.py](../scripts/analyze-mongo.py), [dal.py](../scripts/dal.py)
+- API command: [api.rs (v5.49.1)](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/api.rs)

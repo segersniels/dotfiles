@@ -10,11 +10,11 @@ Ship code, manage releases, and configure builds.
 railway up --detach -m "<release summary>"
 ```
 
-`--detach` (alias `--no-wait`) returns immediately instead of streaming build logs. Without it, the deploy blocks execution until the build finishes. Always include `-m` with a release summary for auditability.
+`--detach` (alias `--no-wait`) returns after upload without waiting for the deployment. An existing-project `up` also returns after upload when stdout is not a TTY and neither `--ci`, `--json`, nor CI environment mode is active. Do not assume omitting `--detach` makes an agent invocation wait. Include `-m` with a release summary for auditability.
 
 ### Verify before reporting — `--detach` only means QUEUED
 
-A detached `up` returns when the build is **queued**, not deployed. Never tell the user their app is deployed based on `--detach` output (or a streaming `up` that your shell timed out). Poll until the newest deployment reaches a terminal state:
+A detached `up` confirms upload, not a successful deployment. Capture the deployment ID from the upload (`--detach --json` includes `deploymentId` for an authenticated deployment). Poll for that deployment's terminal state; do not mistake a concurrent newer deployment for the one just submitted:
 
 ```bash
 railway deployment list --service <service> --environment <environment> --json    # newest first; check .status
@@ -29,7 +29,7 @@ Poll with the same project, environment, and service scope used for `railway up`
 - `FAILED` / `CRASHED` → do not report success. Pull scoped logs (`railway logs --service <service> --json --lines 100`) and triage per [operate.md](operate.md).
 - `SLEEPING` / `SKIPPED` / `REMOVED` / `REMOVING` / unknown → do not report success. Report the exact state and inspect status/logs to decide the next action.
 
-A non-detached `railway up` streams to completion and its exit code is authoritative: 0 = SUCCESS, 1 = FAILED/CRASHED. If it was killed or timed out before printing a terminal status, treat the outcome as unknown and poll as above.
+Observe `SUCCESS` for the submitted deployment before claiming success. Exit 0 can mean upload returned early or watch patterns skipped the build. A timeout, ended stream, or transport error without a deployment verdict leaves the outcome unknown; poll the existing deployment before deciding whether a retry is necessary.
 
 ### Watch the build
 
@@ -37,7 +37,7 @@ A non-detached `railway up` streams to completion and its exit code is authorita
 railway up --ci -m "<release summary>"
 ```
 
-`--ci` streams build logs and exits when the build completes. Use this when the user wants to see build output or when you need to triage build failures immediately.
+`--ci` streams build logs and waits for the deployment verdict; `--json` also enables CI behavior for authenticated deployments. On CLI 5.41+, failed build-log/status WebSocket connections fall back to HTTP status polling in CI mode. A log transport warning alone does not mean the deployment failed; let the verdict arrive or query its ID. Use a bounded process timeout because polling may outlive missing deployments or nonterminal states. `--ci` can exit 0 when no changed files match watch patterns, so report a skipped deployment accurately.
 
 ### Targeted deploy
 
@@ -222,4 +222,4 @@ railway environment edit --service-config <service> build.watchPatterns '["packa
 ## Validated against
 
 - Docs: [up.md](https://docs.railway.com/cli/up), [deploying.md](https://docs.railway.com/cli/deploying), [deployment.md](https://docs.railway.com/cli/deployment), [redeploy.md](https://docs.railway.com/cli/redeploy), [service.md](https://docs.railway.com/cli/service), [down.md](https://docs.railway.com/cli/down), [railpack.md](https://docs.railway.com/builds/railpack), [monorepo.md](https://docs.railway.com/deployments/monorepo)
-- CLI source: [up.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/up.rs), [deployment.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/deployment.rs), [down.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/down.rs), [redeploy.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/redeploy.rs), [restart.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/restart.rs), [service.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/service.rs)
+- CLI source: [up.rs](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/up.rs), [deployment.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/deployment.rs), [down.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/down.rs), [redeploy.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/redeploy.rs), [restart.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/restart.rs), [service.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/service.rs)

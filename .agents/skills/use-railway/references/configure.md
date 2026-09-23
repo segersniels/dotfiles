@@ -34,6 +34,21 @@ railway variable delete KEY --service <service> --environment <env>
 
 Variable changes trigger a redeployment by default. This is usually the desired behavior, since the service picks up the values on restart. Use `--skip-deploys` only when you plan to redeploy or restart separately.
 
+CLI 5.34.2+ accepts an empty assignment such as `railway variable set OPTIONAL_VALUE= --service <service>`. Empty is a value, not a deletion. Before an idempotent delete, list keys and delete only if present.
+
+### Bulk edit with a reviewed diff
+
+CLI 5.48+ opens an editor and presents the changes before applying:
+
+```bash
+railway variable edit --project <project-id> --environment <env> --service <service>
+railway variable edit --demo                 # offline fixture; no Railway mutation
+```
+
+This workflow requires a TTY or an explicitly configured `$EDITOR`/`$VISUAL`. Prefer `set`/`delete` for deterministic agent edits when no editor workflow was requested. Saving the editor is not approval: the CLI shows a redacted diff and asks before applying. Noninteractive apply requires `--yes`; deletions in agent or noninteractive sessions also require `--confirm-destructive`, within the user's approved scope.
+
+Removing a line deletes that variable. Keep `<sealed>` placeholders unchanged to preserve sealed values. Railway-provided variables are comments and cannot be edited. `--reveal` exposes plaintext in the diff; use only when intended. `--skip-deploys` commits changes without triggering deploys.
+
 ### Set sensitive values
 
 Use stdin for secrets or values that shouldn't appear in shell history:
@@ -128,7 +143,7 @@ These are set automatically at runtime. Availability depends on resource configu
 | `RAILWAY_VOLUME_MOUNT_PATH` | Filesystem path where the volume is mounted |
 | `RAILWAY_VOLUME_NAME` | Name of the attached volume |
 
-Sealed variables are write-only. Their values don't appear in CLI output.
+Sealed variables are write-only. CLI 5.47.2+ lists their names with `null` in JSON, `<sealed>` in the table, or a comment in KV output. **A null value means the sealed key already exists; do not recreate or clear it as though it were missing.** Ordinary variable output can contain plaintext secrets.
 
 ## Service config
 
@@ -356,4 +371,4 @@ While active, browser visitors must pass a check. Non-browser API clients and we
 ## Validated against
 
 - Docs: [environment.md](https://docs.railway.com/cli/environment), [variable.md](https://docs.railway.com/cli/variable), [domain.md](https://docs.railway.com/cli/domain), [tcp-proxy.md](https://docs.railway.com/cli/tcp-proxy), [private-network.md](https://docs.railway.com/cli/private-network), [outbound-network.md](https://docs.railway.com/cli/outbound-network), [cdn.md](https://docs.railway.com/cli/cdn), [waf.md](https://docs.railway.com/cli/waf)
-- CLI source: [environment/mod.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/environment/mod.rs), [environment/edit.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/environment/edit.rs), [variable.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/variable.rs), [domain.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/domain.rs), [tcp_proxy.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/tcp_proxy.rs), [private_network.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/private_network.rs), [outbound_networking.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/outbound_networking.rs), [cdn.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/cdn.rs), [waf.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/waf.rs)
+- CLI source: [environment/mod.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/environment/mod.rs), [environment/edit.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/environment/edit.rs), [variable.rs](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/variable.rs), [domain.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/domain.rs), [tcp_proxy.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/tcp_proxy.rs), [private_network.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/private_network.rs), [outbound_networking.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/outbound_networking.rs), [cdn.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/cdn.rs), [waf.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/waf.rs)

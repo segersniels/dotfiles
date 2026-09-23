@@ -8,7 +8,7 @@ A brand-new user with no Railway account is onboarded through the same unified O
 
 - **Deploy from the current directory** → `railway up` (interactive) or `railway up -y` (skips the confirm prompt). When unauthenticated it opens a browser to sign in / sign up, then creates a project + service and deploys. Run it yourself; do not ask the user to `railway login` first.
 - **New project from cwd when already signed in** → `railway up --new` (`--name <name>` to override the project name).
-- **Sign up with a deployable app in cwd → `railway up`** (signs up *and* deploys — bare `up` works for a detected agent, even if the user only said "sign me up"; add `-y` to skip prompts / force it non-interactively). Sign in, or sign up with nothing to deploy → `railway login` (creates new accounts on the fly).
+- **Sign up or sign in → `railway login`**. Use `railway up` only when deployment is also requested.
 
 `railway up` and `railway login` self-validate auth — don't run `railway whoami` before them.
 
@@ -59,14 +59,14 @@ railway init --name <project-name> --workspace <workspace-id-or-name>
 
 ### Update project settings
 
-Settings like project name, PR deploys, and visibility aren't exposed through the CLI. Use the GraphQL API helper (see [request.md](request.md)):
+Settings like project name, PR deploys, and visibility have no dedicated CLI command. Use `railway api` (see [request.md](request.md)):
 
 ```bash
-scripts/railway-api.sh \
+railway api \
   'mutation updateProject($id: String!, $input: ProjectUpdateInput!) {
     projectUpdate(id: $id, input: $input) { id name isPublic prDeploys }
   }' \
-  '{"id":"<project-id>","input":{"name":"new-name","prDeploys":true}}'
+  --variables '{"id":"<project-id>","input":{"name":"new-name","prDeploys":true}}'
 ```
 
 ## Services
@@ -140,7 +140,17 @@ railway connect <database-service> --ssh
 railway connect <database-service> --no-ssh
 ```
 
-The local database client must be installed. By default, `connect` uses a public TCP proxy when one exists and falls back to an SSH tunnel when no public proxy URL is available. Use `--ssh` to force the tunnel path, or `--no-ssh` to require a public TCP proxy.
+The local database client must be installed for a shell. By default, `connect` uses a public TCP proxy when one exists and falls back to an SSH tunnel when no public proxy URL is available. Use `--ssh` to force the tunnel path, or `--no-ssh` to require a public TCP proxy.
+
+For TablePlus, DBeaver, pgAdmin, or another GUI, CLI 5.27+ can hold a private tunnel open without starting or requiring a local database CLI:
+
+```bash
+railway connect <database-service> --tunnel-only --port 15432 --project <project-id> --environment production
+```
+
+`--tunnel-only` implies SSH and conflicts with `--no-ssh`. Omit `--port` to choose an available ephemeral port. Use the printed local connection details in the GUI; they include credentials, so do not echo them into a report. Keep the process running while the GUI is connected and stop it when finished. With `--project`, always supply `--environment`.
+
+For backups, PITR, HA conversion/scaling, or connection pooling, load [databases.md](databases.md).
 
 ### Delete a service
 
@@ -361,4 +371,5 @@ When creating projects, Railway uses the default workspace unless `--workspace` 
 ## Validated against
 
 - Docs: [cli.md](https://docs.railway.com/cli), [init.md](https://docs.railway.com/cli/init), [add.md](https://docs.railway.com/cli/add), [link.md](https://docs.railway.com/cli/link), [project.md](https://docs.railway.com/cli/project), [service.md](https://docs.railway.com/cli/service), [connect.md](https://docs.railway.com/cli/connect), [templates.md](https://docs.railway.com/cli/templates), [list.md](https://docs.railway.com/cli/list), [whoami.md](https://docs.railway.com/cli/whoami)
-- CLI source: [init.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/init.rs), [add.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/add.rs), [project.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/project.rs), [service.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/service.rs), [connect.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/connect.rs), [templates.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/templates.rs), [list.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/list.rs), [bucket.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/bucket.rs)
+- CLI source: [init.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/init.rs), [add.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/add.rs), [project.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/project.rs), [service.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/service.rs), [connect.rs](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/connect.rs), [templates.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/templates.rs), [list.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/list.rs), [bucket.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/bucket.rs)
+- API command: [api.rs (v5.49.1)](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/api.rs)

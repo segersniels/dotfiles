@@ -1,6 +1,6 @@
 # Risk-Triggered Review Checks
 
-Use only the sections justified by the review brief and changed contracts. Do not run every checklist mechanically.
+Use only sections justified by the changed behavior and material risks. Do not run every checklist mechanically.
 
 ## Root Cause and State Provenance
 
@@ -78,8 +78,8 @@ Mark each relevant cell checked, intentionally excluded, unreachable, or unteste
 - Cover adjacent negative, sibling, and entry-point cases only when they share the invariant.
 - For lifecycle logic, cover the relevant failure, partial success, retry, recovery, and cleanup states.
 - Assert that the original error, telemetry signal, duplicate side effect, or invalid persistence no longer occurs.
-- For central high-risk behavior, remove or invert one essential implementation step in an isolated disposable worktree and require the focused test to fail.
-- Mutate independent responsibilities separately when one test suite claims to protect each responsibility.
+- When practical and permitted for central high-risk behavior, remove or invert an essential implementation step in an isolated disposable worktree and require the focused test to fail. Restore the implementation afterward.
+- Check separate responsibilities only when the claimed coverage or a concrete concern justifies it. Report material uncertainty when a useful check cannot be performed.
 
 ## Review-Fix Deltas
 
@@ -88,15 +88,3 @@ Mark each relevant cell checked, intentionally excluded, unreachable, or unteste
 - Re-run the exact prior finding at the current HEAD.
 - Check whether the fix moved behavior across layers or changed ordering, identity, scope, or normalization.
 - Do not reuse a clean verdict from the prior SHA.
-
-## Evidence Standard
-
-A reportable finding needs:
-
-- Exact file and line in the reviewed HEAD.
-- Reachable trigger or realistic runtime scenario.
-- Concrete impact.
-- Evidence that the change introduced or materially worsened it.
-- Novelty relative to existing review threads.
-
-If any element is missing, investigate further or report a blind spot instead.

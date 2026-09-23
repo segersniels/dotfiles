@@ -79,7 +79,7 @@ HTTP filter fields include `@method`, `@path`, `@host`, `@requestId`, `@srcIp`, 
 
 ### Network flow logs
 
-Use network flow logs for private networking, TCP proxy, outbound allowlist, DNS, or dropped-packet investigations:
+Use network flow logs for private networking, TCP proxy, outbound allowlist, or dropped-packet investigations. Use DNS query logs below for resolution results:
 
 ```bash
 railway logs --service <service> --network --lines 100 --json
@@ -103,6 +103,20 @@ Useful filters:
 | `--port <port>` | Source or destination port |
 | `--src`, `--dst`, `--host` | IP filters |
 | `--drop-cause <cause>` | Drop reason |
+
+### DNS query logs
+
+CLI 5.29+ exposes DNS resolution results directly:
+
+```bash
+railway logs --service <service> --environment <env> --dns --lines 100 --json
+railway logs --service <service> --dns --status failed --since 1h --lines 100 --json
+railway logs --service <service> --dns --rcode NXDOMAIN --lines 100 --json
+railway logs --service <service> --dns --qname backend.railway.internal --zone internal --lines 50 --json
+railway logs --service <service> --dns --domain example.com --qtype AAAA --lines 100 --json
+```
+
+Use `--qname` for the full query name, `--domain` for domain filtering, `--qtype` for record type, `--rcode` for DNS response code, and `--zone internal|external` for lookup scope. `--status failed` finds failed resolutions. DNS logs are service-level and mutually exclusive with build, deployment, HTTP, and network modes; do not pass a deployment ID or `--latest`. Correlate failed lookups with runtime errors and network flows instead of treating a DNS failure as an application crash.
 
 ## Metrics
 
@@ -155,6 +169,8 @@ For database-level metrics and introspection, use the analysis scripts. `railway
 - HA cluster checks (Patroni, etcd, HAProxy)
 - Redis, MySQL, and MongoDB introspection
 - Combined analysis via `scripts/analyze-<type>.py` (postgres, mysql, redis, mongo)
+
+For native PITR/HA/PgBouncer status and operations, use [databases.md](databases.md). For billed usage and spending limits, use [usage.md](usage.md); infrastructure metrics are not a billing statement.
 
 ## Failure triage
 
@@ -259,6 +275,10 @@ Always verify after fixing. Don't assume the redeploy succeeded.
 
 ## Troubleshoot common blockers
 
+- **`OAUTH_INSUFFICIENT_GRANT` / resource access denied**: CLI 5.37.4+ distinguishes a live OAuth session without access from an expired login. Check the resource IDs, workspace membership, and integration grant scope; repeating the same login may retain the same insufficient grant. Reauthorize with the necessary access only when the user intends that scope.
+- **Expired or invalid credentials**: follow the CLI's login/token-specific error. Transient refresh failures are not proof that access was revoked. Newer CLI versions refresh long-lived clients too; upgrade an old CLI before repeatedly reinstalling MCP to address stale authentication.
+- **CI log stream failed**: on CLI 5.41+, the command falls back to status polling. Inspect the submitted deployment before retrying; a logging error alone is not a deployment failure.
+
 - **Unlinked context**: `railway link --project <id-or-name>`
 - **Missing service scope for logs**: pass `--service` and `--environment` explicitly
 - **Wrong project in status or deploy polling**: pass `--project`, `--environment`, and `--service`; URL IDs beat local linked context
@@ -270,4 +290,5 @@ Always verify after fixing. Don't assume the redeploy succeeded.
 ## Validated against
 
 - Docs: [status.md](https://docs.railway.com/cli/status), [service.md](https://docs.railway.com/cli/service), [logs.md](https://docs.railway.com/cli/logs), [metrics.md](https://docs.railway.com/cli/metrics), [ssh.md](https://docs.railway.com/cli/ssh), [cdn.md](https://docs.railway.com/cli/cdn), [waf.md](https://docs.railway.com/cli/waf), [observability/logs.md](https://docs.railway.com/observability/logs), [observability/metrics.md](https://docs.railway.com/observability/metrics)
-- CLI source: [status.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/status.rs), [service.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/service.rs), [logs.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/logs.rs), [metrics.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/metrics.rs), [ssh/mod.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/ssh/mod.rs), [deployment.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/deployment.rs), [redeploy.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/redeploy.rs), [cdn.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/cdn.rs), [waf.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/waf.rs)
+- CLI source: [status.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/status.rs), [service.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/service.rs), [logs.rs](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/logs.rs), [metrics.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/metrics.rs), [ssh/mod.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/ssh/mod.rs), [deployment.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/deployment.rs), [redeploy.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/redeploy.rs), [cdn.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/cdn.rs), [waf.rs](https://github.com/railwayapp/cli/blob/v5.23.3/src/commands/waf.rs)
+- Authentication and CI recovery (v5.49.1): [client.rs](https://github.com/railwayapp/cli/blob/v5.49.1/src/client.rs), [up.rs](https://github.com/railwayapp/cli/blob/v5.49.1/src/commands/up.rs)

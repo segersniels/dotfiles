@@ -1,140 +1,76 @@
 ---
 name: review
-description: "Review pull requests, branches, commits, or local diffs with adaptive, evidence-driven coverage, systematic candidate discovery, and strict low-noise finding verification. Run pull request reviews in a dedicated isolated worktree."
+description: Review pull requests, branches, commits, or local diffs and prepare useful PR comments about proven concerns.
 ---
 
-You are a critical but fair technical lead. Find real regressions and costly design mistakes, not style preferences. Prefer a few proven concerns over speculative noise. Omit nits unless the user asks for them.
+Find actionable problems supported by evidence. Omit style preferences and nits unless requested. Perform the review directly; do not delegate coverage or candidate generation to subagents.
 
-Use one adaptive workflow. Keep ordinary reviews focused, but add checks when the changed contracts justify them. Perform the review directly; do not delegate review coverage or candidate generation to subagents. Elapsed time never justifies a clean verdict, but it can end the review with explicit incomplete coverage. Do not let an ordinary review grow without a concrete risk reason.
+## Scope and target
 
-Reviews are read-only. Do not edit product code, commit, push, approve, post comments, or create external tasks unless the user separately asks. A temporary mutation check may modify only an isolated disposable worktree when repository and user instructions permit it.
+A review-only request is read-only. Its deliverables are findings and proposed review comments. Do not edit product code, add tests, commit, push, approve, post comments, or create external tasks without authorization for that action. Temporary mutation checks are limited to a permitted isolated disposable checkout.
 
-## 1. Establish Context
+Review TODOs are candidates for PR comments, not implementation assignments. Stay in the reviewer role during the walkthrough: a fix direction is advice for the PR author. Switch to implementation only when the user explicitly requests it; a review request or agreement to go through TODOs does not imply that request.
 
-1. Read `AGENTS.md`, directly referenced project docs, `REVIEW.md`, and `VOICE.md` when present.
-2. Identify the exact target:
-   - PR: read metadata, body, linked issue, recorded base and HEAD SHAs, diff, changed files, changed tests, commits, and existing review threads.
-   - Local diff, commit, or branch: compare it with the correct base.
-3. For a pull request, use a dedicated isolated worktree. Choose the mechanism supported by the current harness, such as a harness-managed worktree task or a standard Git worktree in a temporary location. Do not require a specific harness API.
-   - If this task is already running in a suitable isolated worktree, continue there. Otherwise, create the worktree through the available mechanism and continue the review from that checkout or from a new task rooted there.
-   - Carry forward the pull request URL and recorded base and HEAD SHAs. Start from the pull request head ref when available; otherwise detach at the recorded HEAD before reviewing.
-   - Use repository and harness setup configuration when available so the isolated checkout receives its configured environment.
-   - Once the isolated review context is ready, continue the complete review there and do not recursively create another review task.
-   - If one isolation mechanism is unavailable, try another supported mechanism. The absence of a harness-managed worktree API is not itself a blocker. If no safe isolated checkout can be created, stay in the current context and report the blocker.
-   For local diffs, commits, and branches, use the current task when its checkout is suitable.
-4. Build a compact `already-flagged` ledger: file, line, topic, and resolution status. Read existing threads far enough to dedupe. Reinvestigate an existing finding only when a new candidate overlaps it or its exact-HEAD status matters.
-5. Write a short brief: the original ticket problem and why it matters, intended behavior, one concrete user or system flow, acceptance checks, and the highest risks. Label missing or inferred acceptance checks. Never treat an inferred check as a verified acceptance mismatch.
-6. For each meaningful changed contract, record a compact map:
+Read applicable `AGENTS.md` and review instructions. Read linked project docs for the behavior under review, and voice guidance when preparing comments; do not load every referenced document by default.
 
-   `producer -> transformations or normalization -> final consumer`
+Establish the exact diff and its intended behavior:
 
-   State the invariant that must remain consistent across the flow. Group tightly related files and contracts.
+- For a PR, record the immutable base and current head SHAs, read its description and relevant linked issue, and inspect changed files, commits, tests, and existing review threads. Label inferred acceptance criteria.
+- For a branch, commit, or local diff, identify the correct base and include the requested staged and unstaged changes.
+- Use a dedicated isolated worktree for PR reviews. Reuse a suitable existing one, or create it with a supported harness or Git mechanism and configured environment setup. Carry the PR URL and recorded SHAs into that context, using the head ref or a detached recorded head. Do not recursively create review tasks. Try another safe mechanism if one is unavailable; if isolation cannot be established, report the coverage limitation.
+- Use the current checkout for local reviews when suitable. Preserve unrelated user changes.
 
-When the brief identifies security, data integrity, public-contract, lifecycle, resolver, normalization, high-volume, or complex product-interaction risk, read the applicable sections of `references/risk-triggered-checks.md`. Do not run every conditional check mechanically.
+## Coverage and verification
 
-## 2. Plan and Execute Coverage
+Account for every changed file and trace meaningful behavior changes through the relevant callers, transformations, and consumers. Keep ordinary reviews focused. Use a brief, flow map, or coverage ledger when complexity makes it useful, rather than producing each artifact for every review.
 
-Group tightly related files by changed contract and review each group directly. Order the groups by risk, and review changed tests before the corresponding implementation. Keep a compact coverage ledger with each group, its files, contract, invariant, applicable risks, and status. Account for every changed file.
+For a bug fix, reconstruct the reported failure and verify the proposed cause. Treat the ticket's explanation as a hypothesis. Compare base and head behavior, and check whether existing callers or lower layers prevent the suspected problem.
 
-For each group, trace the contract from producer through transformations to the final consumer. Inspect the minimum supporting files needed to prove the flow, but do not expand into unrelated pre-existing behavior. Generate plausible candidates, counterevidence, coverage results, and blind spots. Each candidate must include:
+Load only the applicable sections of [risk-triggered checks](references/risk-triggered-checks.md) when changes involve state provenance, normalization or resolution, reuse costs, interacting cases, recurring or high-volume work, product interactions, test quality, or review-fix deltas.
 
-- Exact file and line.
-- Base and HEAD behavior.
-- Producer, transformations, and final consumer.
-- Reachable trigger and concrete impact.
-- Why the change introduced or worsened the behavior.
-- Relevant test evidence or missing coverage.
-- Uncertainty and counterevidence.
+A reportable finding needs:
 
-After reviewing the contract groups, inspect cross-contract integration seams, changed-test adequacy, review-fix history, existing-thread status, target freshness, and reproduction setup as applicable. Record material unresolved coverage as blind spots.
+- An exact file and line in the reviewed version.
+- A reachable trigger and concrete correctness, maintenance, performance, or acceptance impact.
+- Evidence that the change introduced or materially worsened the issue.
+- Verified runtime, repository, or product assumptions.
+- A distinct concern not already covered by another finding or existing review thread.
 
-## 3. Generate Candidates
+Check counterevidence before retaining a candidate. Drop disproved, duplicate, unreachable, or negligible claims; they are not coverage gaps. Record plausible material concerns that cannot be verified as uncertainty, not proven findings.
 
-Apply the passes justified by each changed contract and risk brief.
+Read changed tests and run focused checks for central behavior or suspected regressions. Follow repository-required checks; do not run broad suites merely to accumulate verification. Do not repair an unavailable environment beyond configured setup during review.
 
-### Root Cause and Provenance
+For central stateful, multi-stage, resolver-heavy, or similarly high-risk changes, assess whether tests would catch a broken implementation. Use the conditional mutation guidance in the reference when practical and permitted. Restore temporary mutations and report material test-quality gaps.
 
-For a bug fix, reproduce or reconstruct the failure, state the violated invariant, and trace the bad state backward through reachable writers. Separate producer prevention, legacy repair, normalization, and consumer defense. Treat the ticket and PR's proposed cause as a hypothesis until the reported path proves it.
+## Completion
 
-### Reuse and Simplicity
+Finish when the requested diff has been covered, retained concerns are verified or explicitly uncertain, relevant existing findings are reconciled, and the target is still current:
 
-Search by behavior and domain concepts for existing helpers, components, hooks, reducers, middleware, extension points, sibling implementations, and platform primitives. Report a distinct implementation only when it creates a concrete correctness, maintenance, or performance cost.
+- PR: refresh the remote head and compare it with the reviewed SHA.
+- Committed local changes: confirm HEAD is unchanged.
+- Uncommitted changes: confirm the working-tree and index diffs still match what was reviewed.
 
-### Completeness and Ordering
+If the target changed, review the new delta before giving a current verdict. Do not reuse an earlier clean verdict for a later head. Elapsed time alone never justifies a clean verdict; report incomplete coverage when needed. Do not expand into unrelated pre-existing issues.
 
-Check the exact case and the few plausible siblings or entry points that share the changed invariant. Expand only when the contract uses lossy matching, normalization, multiple entry points, or state transitions.
+## Report
 
-When validation or resolution occurs before later changes to position, identity, scope, or shape, verify the decision against the final normalized state.
+Always deliver the complete initial review with these sections in this order:
 
-When matching uses names, prefixes, truncation, translation, coercion, or fallbacks, check zero matches, one match, multiple matches, exact-and-fallback intersections, and lossy collisions.
+1. **What the PR aims to fix:** Explain the original problem, why it matters, and the expected behavior in junior-friendly language. State when no linked ticket is available and label inferred intent. For a feature or local diff, explain its intended outcome instead of inventing a bug or PR.
+2. **How the PR addresses it:** Explain the main changes and the resulting flow in plain language. Connect the implementation to the intended outcome, define unfamiliar terms, and use a small example when helpful. Distinguish verified behavior from the PR's claims.
+3. **Findings and verification:** List verified findings by severity with file/line, evidence, practical impact, and fix direction. State coverage and material uncertainty; do not give a confident clean verdict when material coverage remains unresolved. Keep disproved hypotheses internal and mention relevant pre-existing issues separately.
+4. **TODO list:** Propose a numbered, prioritized list of concerns worth turning into PR review comments. Each item names the concern and the comment to prepare, rather than assigning a code or test change to Codex. Include practical, evidence-backed findings and demonstrated test gaps with a clear reason they matter to this PR. Keep general verification limitations in the findings section; missing coverage alone does not justify a comment. Include the TODO section even when empty; say `No comment-worthy TODOs identified` instead of inventing work.
 
-### Review-Fix Deltas
+End by asking: `Ready to go through the TODO list one by one?`
 
-If commits were added after a previously reviewed SHA, review that delta separately against the prior SHA. A review fix can introduce a new regression. Recheck existing findings against the exact current HEAD.
+## TODO walkthrough and PR comments
 
-### Runtime and Product Behavior
+When the user accepts, take the first TODO and present: **Problem**, **Evidence**, **Impact**, **Fix direction**, **Suggested PR comment**, **Severity**, and **Status**. Keep the explanation junior-friendly and provide the actual proposed comment text, with its target file and line or existing thread. Lead the comment with the issue and practical impact, then explain the proposed fix. It must make sense to the PR author without this conversation.
 
-For recurring or data-heavy work, estimate `frequency x candidates x work per candidate`. Check material risks such as unbounded growth, poor selectivity, fan-out, concurrency, retries, partial success, reset-on-success, and cleanup.
+End with `Post this comment on the PR?` and wait for the user's decision before advancing. The user can revise or skip the draft. A `yes` to the walkthrough means explain and draft the next comment; a `yes` to this posting question authorizes posting that comment. Do not respond to a review TODO by offering to implement the fix or add the test.
 
-When a runnable surface is already available, exercise the exact reported flow and an adjacent or adversarial case justified by the changed contract. Do not spend the review repairing an unavailable environment beyond configured setup; report the blind spot.
+When posting is authorized, recheck the current PR head and existing threads, verify the concern still applies, and post to the appropriate file/line or existing thread without duplicating feedback. Verify the posted comment and mark the TODO as posted before continuing. Otherwise keep it drafted or mark it skipped. Respect any explicit batch-posting authorization without asking again for each comment.
 
-### Tests and Mutation Checks
+For a local review without a PR, prepare the same actionable feedback without inventing a posting destination. Keep implementation requests separate from comment review and posting; carry out an explicit implementation request within its authorized scope.
 
-Check whether tests cover the reported reproduction and invariant instead of only the edited branch. Run focused tests that verify candidates and central changed behavior. Do not run full lint, typecheck, broad integration suites, or E2E by default unless repository instructions require them, the user asks, or a candidate depends on them. Do not add tests during review.
-
-For central stateful, multi-stage, resolver-heavy, or otherwise high-risk behavior, mutation-check the focused test when practical and permitted. In an isolated disposable worktree, remove or invert the central implementation and require the focused test to fail. Restore or discard the worktree afterward. If this is unsafe, prohibited, or impractical, report the test-quality blind spot.
-
-## 4. Verify Every Candidate
-
-Verify candidates after each contract group while its code and flow are still in context. Do not carry weak or disproved hypotheses forward.
-
-Before final reconciliation, cluster overlapping candidates by trigger, root cause, and impact. Compare clusters with the `already-flagged` ledger. Preserve materially different variants, reuse evidence already validated, and verify each unique claim only once.
-
-Triage clusters by plausible impact, reachability, and evidence. Drop disproved, implausible, duplicate, and zero-impact hypotheses; these are not blind spots. Retain plausible material clusters for verification. If a retained material cluster cannot be verified proportionately, record it as a blind spot. A material blind spot prevents a confident clean verdict but does not block an honest review handoff.
-
-The reviewer must verify every retained unique candidate cluster:
-
-1. Read the exact code and compare base with HEAD.
-2. Prove reachability and practical impact through the call or data path.
-3. Verify the necessary repository, runtime, or product assumption.
-4. Decide whether the change introduced or materially worsened the problem.
-5. Reproduce or run a focused test when useful.
-6. Confirm that the candidate is not already covered by existing comments or another cluster.
-7. Classify it as a verified regression, concrete architecture concern, product acceptance mismatch, pre-existing issue, or blind spot.
-
-Drop style-only feedback, preferences without an acceptance basis, implausible edge cases, and zero-impact technicalities. Common false positives include plausible but unproven producers, lower-layer filters, caller-owned handling, unreachable siblings, and theoretical scale problems without realistic volume.
-
-Never report a candidate without completing this verification.
-
-## 5. Stop Only With Coverage Evidence
-
-A confident clean verdict requires:
-
-- Every changed file has a coverage result.
-- Every meaningful changed contract has a traced flow and stated invariant.
-- Every triggered normalization, resolver, runtime, product, test-quality, and review-fix check is complete or reported as a blind spot.
-- Existing findings have been checked against the exact current HEAD.
-- All retained candidates are verified or recorded as blind spots; all others were explicitly dropped during triage.
-- For a PR, the remote head SHA still matches the reviewed HEAD.
-- For committed local changes, the HEAD SHA is unchanged since final verification.
-- For uncommitted local changes, the working-tree and index diff fingerprint is unchanged since final verification.
-
-If a required condition is missing, say that no new finding has been verified so far and list the incomplete coverage. Do not give a confident `nothing new` verdict.
-
-Do not expand the review into unrelated pre-existing issues.
-
-## 6. Report
-
-Keep disproved claims internal. Treat verified new findings as the findings list. Mention relevant pre-existing issues only in a separate context section.
-
-1. Start with a junior-friendly overview:
-   - **Original ticket:** Explain the reported problem, why it matters, and expected behavior. State when no linked ticket is available or part of the explanation is inferred.
-   - **How this PR solves it:** Explain the main change and intended flow in plain language. Define important terms briefly. Add a small example when useful.
-2. Summarize coverage and material blind spots.
-3. List findings by severity, one line each.
-4. List relevant pre-existing issues separately.
-5. Ask: `Ready to go through the TODO list?`
-
-The initial report contains the compact findings list above. After the user agrees to continue, present one finding at a time with the problem, evidence, impact, fix direction, and a concise suggested PR comment. Wait for the user before advancing.
-
-Write proposed or posted PR comments with ASD-STE100 Simplified Technical English principles. Use short, complete, active-voice sentences, one idea per sentence, consistent terms, explicit nouns, and no contractions. Preserve exact code identifiers, API names, commit SHAs, paths, and quoted evidence as technical terms.
+Write proposed or authorized PR comments with ASD-STE100 Simplified Technical English principles: short, complete, active-voice sentences, consistent terms, explicit nouns, and no contractions. Preserve technical identifiers and quoted evidence.

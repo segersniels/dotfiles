@@ -1,17 +1,14 @@
 ---
-name: "TLDR"
-description: Give a short, junior-friendly summary of any topic or context. Use when the user asks for a TLDR or wants the essential meaning in plain language.
+name: tldr
+description: Give a brief, plain-language summary when the user asks for a TLDR or the essential meaning.
 ---
 
-# TLDR
+State the core idea and why it matters in 2–4 sentences, or fewer when sufficient.
 
-Explain the core idea clearly, directly, and without assuming deep technical knowledge.
+- Lead with the answer; do not spend a sentence repeating the question.
+- Use plain language and briefly define unavoidable technical terms.
+- Include a caveat only when it materially changes the conclusion.
+- Omit background repetition, implementation tours, and exhaustive examples.
+- Use a `TL;DR:` prefix only when it helps the requested format.
 
-Use this format:
-
-**TL;DR:** In 2-4 sentences, state what the user is asking about, the essential meaning, and why it matters.
-
-- Use plain language before jargon; briefly define unavoidable terms.
-- Explain the why, not the implementation tour.
-- Include a caveat or gotcha only when it materially changes the summary.
-- Do not repeat background details, exhaustive examples, or edge cases.
+A summary requested during ongoing work is a status update; continue the authorized task unless the user asks to stop.

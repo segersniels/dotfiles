@@ -19,6 +19,7 @@ from detect_stale_worktrees import (
     git,
     inspect_worktree,
     list_active_cwds,
+    list_open_pull_requests,
     parse_worktrees,
     repository_root,
 )
@@ -64,11 +65,22 @@ def revalidate(repo: Path, candidate_path: Path, days: float) -> Optional[dict[s
     if raw is None:
         return None
     active_cwds, activity_error = list_active_cwds()
+    open_pull_requests, pull_request_error = list_open_pull_requests(repo)
     cutoff = time.time() - days * 86400
-    return inspect_worktree(raw, main_path, cutoff, active_cwds, activity_error)
+    return inspect_worktree(
+        raw,
+        main_path,
+        cutoff,
+        active_cwds,
+        activity_error,
+        open_pull_requests,
+        pull_request_error,
+    )
 
 
-def clean(manifest: dict[str, Any]) -> tuple[dict[str, Any], int]:
+def clean(
+    manifest: dict[str, Any], approved_dirty_paths: list[Path]
+) -> tuple[dict[str, Any], int]:
     repo = repository_root(Path(manifest["repository"]))
     recorded_repo = Path(manifest["repository"]).resolve(strict=False)
     if repo != recorded_repo:
@@ -82,10 +94,30 @@ def clean(manifest: dict[str, Any]) -> tuple[dict[str, Any], int]:
         for item in manifest["worktrees"]
         if isinstance(item, dict) and item.get("candidate") is True
     ]
+    recorded_reviews = [
+        item
+        for item in manifest["worktrees"]
+        if isinstance(item, dict) and item.get("review_required") is True
+    ]
+    reviews_by_path = {
+        os.fspath(Path(item["path"]).resolve(strict=False)): item
+        for item in recorded_reviews
+        if isinstance(item.get("path"), str)
+    }
+    approved = {os.fspath(path.resolve(strict=False)) for path in approved_dirty_paths}
+    unknown_approvals = sorted(approved - reviews_by_path.keys())
+    if unknown_approvals:
+        raise InspectionError(
+            "--approve-dirty paths must be review_required entries in the manifest: "
+            + ", ".join(unknown_approvals)
+        )
+
+    recorded_operations = [(item, False) for item in recorded_candidates]
+    recorded_operations.extend((reviews_by_path[path], True) for path in sorted(approved))
     results: list[dict[str, Any]] = []
     failed = False
 
-    for recorded in recorded_candidates:
+    for recorded, allow_dirty in recorded_operations:
         path_value = recorded.get("path")
         head = recorded.get("head")
         if not isinstance(path_value, str) or not isinstance(head, str):
@@ -108,7 +140,8 @@ def clean(manifest: dict[str, Any]) -> tuple[dict[str, Any], int]:
                 }
             )
             continue
-        if not current.get("candidate"):
+        expected_state = current.get("review_required") if allow_dirty else current.get("candidate")
+        if not expected_state:
             results.append(
                 {
                     "path": os.fspath(path),
@@ -119,7 +152,11 @@ def clean(manifest: dict[str, Any]) -> tuple[dict[str, Any], int]:
             )
             continue
 
-        removal = git(repo, "worktree", "remove", os.fspath(path))
+        removal_args = ["worktree", "remove"]
+        if allow_dirty:
+            removal_args.append("--force")
+        removal_args.append(os.fspath(path))
+        removal = git(repo, *removal_args)
         if removal.returncode != 0:
             failed = True
             results.append(
@@ -140,7 +177,14 @@ def clean(manifest: dict[str, Any]) -> tuple[dict[str, Any], int]:
                 }
             )
         else:
-            results.append({"path": os.fspath(path), "status": "removed", "directory_removed": True})
+            results.append(
+                {
+                    "path": os.fspath(path),
+                    "status": "removed",
+                    "directory_removed": True,
+                    "discarded_dirty_changes": allow_dirty,
+                }
+            )
 
     output = {
         "schema_version": SCHEMA_VERSION,
@@ -148,6 +192,8 @@ def clean(manifest: dict[str, Any]) -> tuple[dict[str, Any], int]:
         "repository": os.fspath(repo),
         "threshold_days": days,
         "manifest_candidates": len(recorded_candidates),
+        "manifest_review_required": len(recorded_reviews),
+        "unapproved_review_required": sorted(reviews_by_path.keys() - approved),
         "results": results,
         "summary": {
             "removed": sum(item["status"] == "removed" for item in results),
@@ -163,7 +209,8 @@ def build_parser() -> argparse.ArgumentParser:
         description="Revalidate and remove candidates from a stale-worktree JSON manifest.",
         epilog=(
             "The command removes each registered worktree directory with git worktree remove. "
-            "It does not delete branches or use --force.\n\n"
+            "It does not delete branches. It uses --force only for exact paths passed with "
+            "--approve-dirty.\n\n"
             "Exit codes: 0 success; 2 invalid input, missing prerequisite, or inspection error; "
             "3 one or more removals failed.\n\n"
             "Example:\n"
@@ -173,6 +220,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("manifest", type=Path, help="Manifest from detect_stale_worktrees.py")
     parser.add_argument("--confirm", metavar="REMOVE", required=True, help="Must be exactly REMOVE")
+    parser.add_argument(
+        "--approve-dirty",
+        action="append",
+        default=[],
+        type=Path,
+        metavar="PATH",
+        help=(
+            "Approve deletion of one exact review_required path and its uncommitted changes. "
+            "Repeat for more paths."
+        ),
+    )
     return parser
 
 
@@ -186,7 +244,7 @@ def main() -> int:
         return 2
     try:
         manifest = load_manifest(args.manifest)
-        output, exit_code = clean(manifest)
+        output, exit_code = clean(manifest, args.approve_dirty)
     except (InspectionError, OSError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 2
