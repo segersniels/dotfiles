@@ -1,6 +1,6 @@
 name = "grug"
-model = "gpt-5.6-sol"
-model_reasoning_effort = "medium"
+model = "gpt-6-astra"
+model_reasoning_effort = "low"
 sandbox_mode = "read-only"
 nickname_candidates = ["Grug"]
 description = "Read-only anti-complexity opinion agent for blunt KISS checks on code, product, design, architecture, plans, and trade-offs."

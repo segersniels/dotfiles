@@ -1,6 +1,6 @@
 name = "ponytail"
-model = "gpt-5.6-sol"
-model_reasoning_effort = "medium"
+model = "gpt-6-astra"
+model_reasoning_effort = "low"
 sandbox_mode = "read-only"
 nickname_candidates = ["Ponytail"]
 description = "Forces the laziest solution that actually works, simplest, shortest, most minimal."
