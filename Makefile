@@ -21,7 +21,7 @@ backup-cmux: backup-ghostty
 backup-agents:
 	@rm -rf .agents
 	@mkdir -p .agents
-	@rsync -av --exclude='target/' --exclude='.git/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.pytest_cache/' --exclude='.ruff_cache/' ~/.agents/ .agents/
+	@rsync -av --exclude='target/' --exclude='.git/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.pytest_cache/' --exclude='.ruff_cache/' --exclude='.trash/' ~/.agents/ .agents/
 
 backup-codex: backup-agents
 	@rm -rf .codex
