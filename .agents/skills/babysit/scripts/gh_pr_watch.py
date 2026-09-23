@@ -376,7 +376,23 @@ def get_jobs_for_run(repo, run_id):
     return jobs
 
 
-def failed_jobs_from_workflow_runs(repo, runs, head_sha):
+ACTIONS_RUN_ID_PATTERN = re.compile(r"/actions/runs/(\d+)")
+
+
+def run_ids_with_failed_checks(checks):
+    # Each check links to its Actions job. The run ID in that link lets the
+    # watcher fetch jobs only for runs that already have a failed job.
+    run_ids = set()
+    for check in checks:
+        if str(check.get("bucket") or "").lower() != "fail":
+            continue
+        match = ACTIONS_RUN_ID_PATTERN.search(str(check.get("link") or ""))
+        if match:
+            run_ids.add(int(match.group(1)))
+    return run_ids
+
+
+def failed_jobs_from_workflow_runs(repo, runs, head_sha, failed_check_run_ids=frozenset()):
     failed_jobs = []
     for run in runs:
         if not isinstance(run, dict):
@@ -388,7 +404,12 @@ def failed_jobs_from_workflow_runs(repo, runs, head_sha):
             continue
         run_status = str(run.get("status") or "")
         run_conclusion = str(run.get("conclusion") or "")
-        if run_status.lower() == "completed" and run_conclusion not in FAILED_RUN_CONCLUSIONS:
+        if run_status.lower() == "completed":
+            if run_conclusion not in FAILED_RUN_CONCLUSIONS:
+                continue
+        elif int(run_id) not in failed_check_run_ids:
+            # Skip the jobs API for running workflows without a failed job.
+            # One call per active run per poll exhausts the rate limit fast.
             continue
         jobs = get_jobs_for_run(repo, run_id)
         for job in jobs:
@@ -825,7 +846,12 @@ def collect_snapshot(args):
     checks_summary = summarize_checks(checks)
     workflow_runs = get_workflow_runs_for_sha(pr["repo"], pr["head_sha"])
     failed_runs = failed_runs_from_workflow_runs(workflow_runs, pr["head_sha"])
-    failed_jobs = failed_jobs_from_workflow_runs(pr["repo"], workflow_runs, pr["head_sha"])
+    failed_jobs = failed_jobs_from_workflow_runs(
+        pr["repo"],
+        workflow_runs,
+        pr["head_sha"],
+        failed_check_run_ids=run_ids_with_failed_checks(checks),
+    )
 
     retries_used = current_retry_count(state, pr["head_sha"])
     actions = recommend_actions(

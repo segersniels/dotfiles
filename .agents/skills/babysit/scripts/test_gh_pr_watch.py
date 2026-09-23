@@ -400,6 +400,7 @@ def test_failed_jobs_include_direct_logs_endpoint(monkeypatch):
             }
         ],
         "abc123",
+        failed_check_run_ids={99},
     )
 
     assert failed_jobs == [
@@ -416,3 +417,40 @@ def test_failed_jobs_include_direct_logs_endpoint(monkeypatch):
             "logs_endpoint": "repos/openai/codex/actions/jobs/555/logs",
         }
     ]
+
+
+def test_failed_jobs_skip_running_workflows_without_failed_checks(monkeypatch):
+    fetched_run_ids = []
+
+    def fake_get_jobs_for_run(repo, run_id):
+        fetched_run_ids.append(run_id)
+        return []
+
+    monkeypatch.setattr(gh_pr_watch, "get_jobs_for_run", fake_get_jobs_for_run)
+
+    gh_pr_watch.failed_jobs_from_workflow_runs(
+        "openai/codex",
+        [
+            {"id": 99, "status": "in_progress", "conclusion": "", "head_sha": "abc123"},
+            {"id": 100, "status": "queued", "conclusion": "", "head_sha": "abc123"},
+            {"id": 101, "status": "in_progress", "conclusion": "", "head_sha": "abc123"},
+            {"id": 102, "status": "completed", "conclusion": "success", "head_sha": "abc123"},
+            {"id": 103, "status": "completed", "conclusion": "failure", "head_sha": "abc123"},
+        ],
+        "abc123",
+        failed_check_run_ids={101},
+    )
+
+    assert fetched_run_ids == [101, 103]
+
+
+def test_run_ids_with_failed_checks_reads_actions_links():
+    checks = [
+        {"bucket": "fail", "link": "https://github.com/openai/codex/actions/runs/101/job/555"},
+        {"bucket": "pass", "link": "https://github.com/openai/codex/actions/runs/102/job/556"},
+        {"bucket": "pending", "link": "https://github.com/openai/codex/actions/runs/103/job/557"},
+        {"bucket": "fail", "link": "https://ci.example.com/build/7"},
+        {"bucket": "fail", "link": None},
+    ]
+
+    assert gh_pr_watch.run_ids_with_failed_checks(checks) == {101}
