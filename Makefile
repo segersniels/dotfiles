@@ -35,6 +35,7 @@ backup-codex: backup-agents
 backup-claude: backup-agents
 	@mkdir -p .claude
 	@rsync -av ~/.claude/settings.json .claude/
+	@rsync -av --delete ~/.claude/agents/ .claude/agents/
 
 backup-cursor:
 	@rm -rf .cursor
@@ -75,6 +76,7 @@ restore-codex: restore-agents
 restore-claude: restore-agents
 	@mkdir -p ~/.claude
 	@rsync -av .claude/settings.json ~/.claude/
+	@rsync -av .claude/agents/ ~/.claude/agents/
 	@ln -sfn ~/.agents/AGENTS.md ~/.claude/CLAUDE.md
 	@ln -sfn ~/.agents/skills ~/.claude/skills
 
