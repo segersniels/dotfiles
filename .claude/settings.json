@@ -41,6 +41,21 @@
       "effortLevel": "low"
     }
   },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/post_edit_lint.sh\"",
+            "timeout": 60,
+            "statusMessage": "Running post-edit linting hook"
+          }
+        ]
+      }
+    ]
+  },
   "tui": "fullscreen",
   "theme": "dark",
   "agentPushNotifEnabled": false,

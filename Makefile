@@ -36,6 +36,7 @@ backup-claude: backup-agents
 	@mkdir -p .claude
 	@rsync -av ~/.claude/settings.json .claude/
 	@rsync -av --delete ~/.claude/agents/ .claude/agents/
+	@rsync -av --delete ~/.claude/hooks/ .claude/hooks/
 
 backup-cursor:
 	@rm -rf .cursor
@@ -77,6 +78,7 @@ restore-claude: restore-agents
 	@mkdir -p ~/.claude
 	@rsync -av .claude/settings.json ~/.claude/
 	@rsync -av .claude/agents/ ~/.claude/agents/
+	@rsync -av .claude/hooks/ ~/.claude/hooks/
 	@ln -sfn ~/.agents/AGENTS.md ~/.claude/CLAUDE.md
 	@ln -sfn ~/.agents/skills ~/.claude/skills
 
