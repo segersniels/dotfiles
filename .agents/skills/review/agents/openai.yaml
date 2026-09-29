@@ -1,7 +1,6 @@
 interface:
   display_name: "Review"
-  short_description: "Adaptive evidence-driven review"
-  default_prompt: "Use $review at the exact target revision to explain what the PR aims to fix and how, then propose a TODO list of valuable PR comments to discuss and draft one by one."
+  short_description: "Multi-agent adversarial PR review"
 
 policy:
   allow_implicit_invocation: false
