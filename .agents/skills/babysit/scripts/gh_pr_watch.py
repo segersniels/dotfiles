@@ -151,6 +151,48 @@ def gh_json(args, repo=None):
         raise GhCommandError(f"Failed to parse JSON from gh output for {' '.join(args)}") from err
 
 
+# ETag and parsed body for each REST GET endpoint. GitHub does not count a
+# 304 Not Modified reply against the rate limit, so unchanged polls are free.
+_ETAG_CACHE = {}
+HTTP_HEADER_END_PATTERN = re.compile(r"\r?\n\r?\n")
+
+
+def gh_api_get(endpoint):
+    cached = _ETAG_CACHE.get(endpoint)
+    cmd = ["gh", "api", "-i"]
+    if cached:
+        cmd.extend(["-H", f"If-None-Match: {cached[0]}"])
+    cmd.append(endpoint)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+    except FileNotFoundError as err:
+        raise GhCommandError("`gh` command not found") from err
+
+    parts = HTTP_HEADER_END_PATTERN.split(proc.stdout, maxsplit=1)
+    head = parts[0]
+    body = parts[1] if len(parts) > 1 else ""
+    status_line = head.splitlines()[0] if head else ""
+    # `gh api` exits with an error for a 304 reply, so read the status line.
+    if cached and " 304" in status_line:
+        return cached[1]
+    if proc.returncode != 0:
+        raise GhCommandError(
+            _format_gh_error(cmd, subprocess.CalledProcessError(proc.returncode, cmd, proc.stdout, proc.stderr))
+        )
+
+    body = body.strip()
+    if not body:
+        return None
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError as err:
+        raise GhCommandError(f"Failed to parse JSON from gh api {endpoint}") from err
+    etag = re.search(r"(?im)^etag:\s*(.+?)\s*$", head)
+    if etag:
+        _ETAG_CACHE[endpoint] = (etag.group(1), data)
+    return data
+
+
 def parse_pr_spec(pr_spec):
     if pr_spec == "auto":
         return {"mode": "auto", "value": None}
@@ -162,79 +204,109 @@ def parse_pr_spec(pr_spec):
     raise ValueError("--pr must be 'auto', a PR number, or a PR URL")
 
 
-def pr_view_fields():
-    return (
-        "number,url,state,mergedAt,closedAt,headRefName,headRefOid,"
-        "headRepository,headRepositoryOwner,mergeable,mergeStateStatus,reviewDecision"
-    )
+_PR_TARGET_CACHE = {}
 
 
-def checks_fields():
-    return "name,state,bucket,link,workflow,event,startedAt,completedAt"
+def resolve_pr_target(pr_spec, repo_override=None):
+    # Return (OWNER/REPO, number). Only `auto` or a number without --repo needs
+    # `gh pr view`, which uses GraphQL, so ask once per process.
+    key = (pr_spec, repo_override)
+    if key in _PR_TARGET_CACHE:
+        return _PR_TARGET_CACHE[key]
+
+    parsed = parse_pr_spec(pr_spec)
+    if parsed["mode"] == "url":
+        pr_url = parsed["value"]
+    elif parsed["mode"] == "number" and repo_override:
+        pr_url = None
+        target = (repo_override, int(parsed["value"]))
+    else:
+        cmd = ["pr", "view"]
+        if parsed["value"] is not None:
+            cmd.append(parsed["value"])
+        cmd.extend(["--json", "url"])
+        data = gh_json(cmd, repo=repo_override)
+        if not isinstance(data, dict):
+            raise GhCommandError("Unexpected PR payload from `gh pr view`")
+        pr_url = str(data.get("url") or "")
+
+    if pr_url is not None:
+        repo = repo_override or extract_repo_from_pr_url(pr_url)
+        number = extract_number_from_pr_url(pr_url)
+        if not repo or number is None:
+            raise GhCommandError("Unable to determine OWNER/REPO and number for the PR")
+        target = (repo, number)
+
+    _PR_TARGET_CACHE[key] = target
+    return target
+
+
+def rest_mergeable(value):
+    # Map the REST boolean to the GraphQL enum that the snapshot exposes.
+    if value is True:
+        return "MERGEABLE"
+    if value is False:
+        return "CONFLICTING"
+    return "UNKNOWN"
+
+
+def review_decision_from_reviews(reviews):
+    # REST has no reviewDecision. Use the latest decisive review of each
+    # reviewer. A missing required review shows as BLOCKED in merge_state_status.
+    latest_by_reviewer = {}
+    for review in reviews:
+        if not isinstance(review, dict):
+            continue
+        state = str(review.get("state") or "").upper()
+        if state not in {"APPROVED", "CHANGES_REQUESTED", "DISMISSED"}:
+            continue
+        latest_by_reviewer[extract_login(review.get("user"))] = state
+    decisions = set(latest_by_reviewer.values())
+    if "CHANGES_REQUESTED" in decisions:
+        return "CHANGES_REQUESTED"
+    if "APPROVED" in decisions:
+        return "APPROVED"
+    return ""
 
 
 def resolve_pr(pr_spec, repo_override=None):
-    parsed = parse_pr_spec(pr_spec)
-    cmd = ["pr", "view"]
-    if parsed["value"] is not None:
-        cmd.append(parsed["value"])
-    cmd.extend(["--json", pr_view_fields()])
-    data = gh_json(cmd, repo=repo_override)
+    repo, number = resolve_pr_target(pr_spec, repo_override)
+    data = gh_api_get(f"repos/{repo}/pulls/{number}")
     if not isinstance(data, dict):
-        raise GhCommandError("Unexpected PR payload from `gh pr view`")
+        raise GhCommandError("Unexpected payload from pulls API")
+    reviews = gh_api_list_paginated(comment_endpoints(repo, number)["review"])
 
-    pr_url = str(data.get("url") or "")
-    repo = (
-        repo_override
-        or extract_repo_from_pr_url(pr_url)
-        or extract_repo_from_pr_view(data)
-    )
-    if not repo:
-        raise GhCommandError("Unable to determine OWNER/REPO for the PR")
-
-    state = str(data.get("state") or "")
-    merged = bool(data.get("mergedAt"))
-    closed = bool(data.get("closedAt")) or state.upper() == "CLOSED"
+    merged = bool(data.get("merged") or data.get("merged_at"))
+    closed = bool(data.get("closed_at")) or str(data.get("state") or "").lower() == "closed"
+    head = data.get("head") or {}
 
     return {
-        "number": int(data["number"]),
-        "url": pr_url,
+        "number": int(data.get("number") or number),
+        "url": str(data.get("html_url") or ""),
         "repo": repo,
-        "head_sha": str(data.get("headRefOid") or ""),
-        "head_branch": str(data.get("headRefName") or ""),
-        "state": state,
+        "head_sha": str(head.get("sha") or ""),
+        "head_branch": str(head.get("ref") or ""),
+        "state": "MERGED" if merged else str(data.get("state") or "").upper(),
         "merged": merged,
         "closed": closed,
-        "mergeable": str(data.get("mergeable") or ""),
-        "merge_state_status": str(data.get("mergeStateStatus") or ""),
-        "review_decision": str(data.get("reviewDecision") or ""),
+        "mergeable": rest_mergeable(data.get("mergeable")),
+        "merge_state_status": str(data.get("mergeable_state") or "").upper(),
+        "review_decision": review_decision_from_reviews(reviews),
     }
 
 
-def extract_repo_from_pr_view(data):
-    head_repo = data.get("headRepository")
-    head_owner = data.get("headRepositoryOwner")
-    owner = None
-    name = None
-    if isinstance(head_owner, dict):
-        owner = head_owner.get("login") or head_owner.get("name")
-    elif isinstance(head_owner, str):
-        owner = head_owner
-    if isinstance(head_repo, dict):
-        name = head_repo.get("name")
-        repo_owner = head_repo.get("owner")
-        if not owner and isinstance(repo_owner, dict):
-            owner = repo_owner.get("login") or repo_owner.get("name")
-    elif isinstance(head_repo, str):
-        name = head_repo
-    if owner and name:
-        return f"{owner}/{name}"
-    return None
 def extract_repo_from_pr_url(pr_url):
     parsed = urlparse(pr_url)
     parts = [p for p in parsed.path.split("/") if p]
     if len(parts) >= 4 and parts[2] == "pull":
         return f"{parts[0]}/{parts[1]}"
+    return None
+
+
+def extract_number_from_pr_url(pr_url):
+    parts = [p for p in urlparse(pr_url).path.split("/") if p]
+    if len(parts) >= 4 and parts[2] == "pull" and parts[3].isdigit():
+        return int(parts[3])
     return None
 
 
@@ -288,18 +360,58 @@ def default_state_file_for(pr):
     return Path(f"/tmp/codex-babysit-pr-{repo_slug}-pr{pr['number']}.json")
 
 
-def get_pr_checks(pr_spec, repo):
-    parsed = parse_pr_spec(pr_spec)
-    cmd = ["pr", "checks"]
-    if parsed["value"] is not None:
-        cmd.append(parsed["value"])
-    cmd.extend(["--json", checks_fields()])
-    data = gh_json(cmd, repo=repo)
-    if data is None:
-        return []
-    if not isinstance(data, list):
-        raise GhCommandError("Unexpected payload from `gh pr checks`")
-    return data
+def check_bucket(conclusion):
+    # Same buckets as `gh pr checks`.
+    if conclusion in {"SUCCESS", "NEUTRAL"}:
+        return "pass"
+    if conclusion == "SKIPPED":
+        return "skipping"
+    if conclusion == "CANCELLED":
+        return "cancel"
+    return "fail"
+
+
+def normalize_check_run(run):
+    status = str(run.get("status") or "").upper()
+    if status != "COMPLETED":
+        state, bucket = status, "pending"
+    else:
+        state = str(run.get("conclusion") or "").upper()
+        bucket = check_bucket(state)
+    return {
+        "name": str(run.get("name") or ""),
+        "state": state,
+        "bucket": bucket,
+        "link": str(run.get("details_url") or run.get("html_url") or ""),
+    }
+
+
+def normalize_commit_status(status):
+    state = str(status.get("state") or "").upper()
+    if state == "PENDING":
+        bucket = "pending"
+    elif state == "SUCCESS":
+        bucket = "pass"
+    else:
+        bucket = "fail"
+    return {
+        "name": str(status.get("context") or ""),
+        "state": state,
+        "bucket": bucket,
+        "link": str(status.get("target_url") or ""),
+    }
+
+
+def get_pr_checks(repo, head_sha):
+    # REST replacement for `gh pr checks`, which uses GraphQL. The check-runs
+    # endpoint returns only the latest run for each check name.
+    check_runs = gh_api_list_paginated(
+        f"repos/{repo}/commits/{head_sha}/check-runs", list_key="check_runs"
+    )
+    statuses = gh_api_list_paginated(f"repos/{repo}/commits/{head_sha}/status", list_key="statuses")
+    return [normalize_check_run(run) for run in check_runs if isinstance(run, dict)] + [
+        normalize_commit_status(status) for status in statuses if isinstance(status, dict)
+    ]
 
 
 def is_pending_check(check):
@@ -329,11 +441,7 @@ def summarize_checks(checks):
 
 
 def get_workflow_runs_for_sha(repo, head_sha):
-    endpoint = f"repos/{repo}/actions/runs"
-    data = gh_json(
-        ["api", endpoint, "-X", "GET", "-f", f"head_sha={head_sha}", "-f", "per_page=100"],
-        repo=repo,
-    )
+    data = gh_api_get(f"repos/{repo}/actions/runs?head_sha={head_sha}&per_page=100")
     if not isinstance(data, dict):
         raise GhCommandError("Unexpected payload from actions runs API")
     runs = data.get("workflow_runs") or []
@@ -366,8 +474,7 @@ def failed_runs_from_workflow_runs(runs, head_sha):
 
 
 def get_jobs_for_run(repo, run_id):
-    endpoint = f"repos/{repo}/actions/runs/{run_id}/jobs"
-    data = gh_json(["api", endpoint, "-X", "GET", "-f", "per_page=100"], repo=repo)
+    data = gh_api_get(f"repos/{repo}/actions/runs/{run_id}/jobs?per_page=100")
     if not isinstance(data, dict):
         raise GhCommandError("Unexpected payload from actions run jobs API")
     jobs = data.get("jobs") or []
@@ -454,15 +561,18 @@ def comment_endpoints(repo, pr_number):
     }
 
 
-def gh_api_list_paginated(endpoint, repo=None, per_page=100):
+def gh_api_list_paginated(endpoint, repo=None, per_page=100, list_key=None):
+    # `list_key` names the list inside an object payload, such as `check_runs`.
     items = []
     page = 1
     while True:
         sep = "&" if "?" in endpoint else "?"
         page_endpoint = f"{endpoint}{sep}per_page={per_page}&page={page}"
-        payload = gh_json(["api", page_endpoint], repo=repo)
+        payload = gh_api_get(page_endpoint)
         if payload is None:
             break
+        if list_key is not None and isinstance(payload, dict):
+            payload = payload.get(list_key) or []
         if not isinstance(payload, list):
             raise GhCommandError(f"Unexpected paginated payload from gh api {endpoint}")
         items.extend(payload)
@@ -840,9 +950,7 @@ def collect_snapshot(args):
     # Surface review feedback before drilling into CI and mergeability details.
     # That keeps the babysitter responsive to new comments even when other
     # actions are also available.
-    # `gh pr checks -R <repo>` requires an explicit PR/branch/url argument.
-    # After resolving `--pr auto`, reuse the concrete PR number.
-    checks = get_pr_checks(str(pr["number"]), repo=pr["repo"])
+    checks = get_pr_checks(pr["repo"], pr["head_sha"])
     checks_summary = summarize_checks(checks)
     workflow_runs = get_workflow_runs_for_sha(pr["repo"], pr["head_sha"])
     failed_runs = failed_runs_from_workflow_runs(workflow_runs, pr["head_sha"])

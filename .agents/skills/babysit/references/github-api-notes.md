@@ -2,21 +2,31 @@
 
 ## Primary commands used
 
+The watcher polls only REST endpoints. `gh pr view` and `gh pr checks` use GraphQL, which has a
+small shared hourly budget; do not poll them in a loop. The watcher sends `If-None-Match` with the
+last ETag of each endpoint. GitHub does not count a `304 Not Modified` reply against the rate limit.
+Only `--pr auto` or a bare number without `--repo` calls `gh pr view --json url` once per process.
+
+`gh api rate_limit` can report a wrong GraphQL budget. To see the real budget, read the
+`X-RateLimit-*` headers of `gh api -i graphql -f query='{viewer{login}}'`.
+
 ### PR metadata
 
-- `gh pr view --json number,url,state,mergedAt,closedAt,headRefName,headRefOid,headRepository,headRepositoryOwner`
+- `gh api repos/{owner}/{repo}/pulls/<pr_number>`
 
-Used to resolve PR number, URL, branch, head SHA, and closed/merged state.
+Used to resolve the URL, branch, head SHA, closed/merged state, `mergeable`, and `mergeable_state`.
+The review decision comes from the latest approval or change request of each reviewer.
 
 ### PR checks summary
 
-- `gh pr checks --json name,state,bucket,link,workflow,event,startedAt,completedAt`
+- `gh api repos/{owner}/{repo}/commits/<sha>/check-runs?per_page=100`
+- `gh api repos/{owner}/{repo}/commits/<sha>/status?per_page=100`
 
 Used to compute pending/failed/passed counts and whether the current CI round is terminal.
 
 ### Workflow runs for head SHA
 
-- `gh api repos/{owner}/{repo}/actions/runs -X GET -f head_sha=<sha> -f per_page=100`
+- `gh api 'repos/{owner}/{repo}/actions/runs?head_sha=<sha>&per_page=100'`
 
 Used to discover failed workflow runs and rerunnable run IDs.
 
@@ -68,23 +78,25 @@ the blocker instead of posting elsewhere.
 
 ## JSON fields consumed by the watcher
 
-### `gh pr view`
+### Pulls API
 
 - `number`
-- `url`
+- `html_url`
 - `state`
-- `mergedAt`
-- `closedAt`
-- `headRefName`
-- `headRefOid`
+- `merged`
+- `closed_at`
+- `head.ref`
+- `head.sha`
+- `mergeable`
+- `mergeable_state`
 
-### `gh pr checks`
+### Check runs API (`check_runs[]`) and combined status API (`statuses[]`)
 
-- `bucket` (`pass`, `fail`, `pending`, `skipping`)
-- `state`
-- `name`
-- `workflow`
-- `link`
+- `name` / `context`
+- `status` and `conclusion` / `state`
+- `details_url` / `target_url`
+
+The watcher maps these to `gh pr checks` buckets (`pass`, `fail`, `pending`, `skipping`, `cancel`).
 
 ### Actions runs API (`workflow_runs[]`)
 

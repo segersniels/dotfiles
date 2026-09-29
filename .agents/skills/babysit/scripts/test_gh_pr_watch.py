@@ -454,3 +454,90 @@ def test_run_ids_with_failed_checks_reads_actions_links():
     ]
 
     assert gh_pr_watch.run_ids_with_failed_checks(checks) == {101}
+
+
+def test_gh_api_get_reuses_cached_body_on_not_modified(monkeypatch):
+    calls = []
+    replies = [
+        (0, 'HTTP/2.0 200 OK\r\nEtag: W/"v1"\r\n\r\n{"number": 123}'),
+        (1, 'HTTP/2.0 304 Not Modified\r\nEtag: "v1"\r\n\r\n'),
+    ]
+
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+        returncode, stdout = replies[len(calls) - 1]
+        return gh_pr_watch.subprocess.CompletedProcess(cmd, returncode, stdout, "gh: HTTP 304")
+
+    monkeypatch.setattr(gh_pr_watch, "_ETAG_CACHE", {})
+    monkeypatch.setattr(gh_pr_watch.subprocess, "run", fake_run)
+
+    assert gh_pr_watch.gh_api_get("repos/openai/codex/pulls/123") == {"number": 123}
+    assert gh_pr_watch.gh_api_get("repos/openai/codex/pulls/123") == {"number": 123}
+    assert calls[1] == [
+        "gh", "api", "-i", "-H", 'If-None-Match: W/"v1"', "repos/openai/codex/pulls/123"
+    ]
+
+
+def test_resolve_pr_uses_rest_for_pr_url(monkeypatch):
+    def fake_get(endpoint):
+        assert endpoint == "repos/openai/codex/pulls/123"
+        return {
+            "number": 123,
+            "html_url": "https://github.com/openai/codex/pull/123",
+            "state": "open",
+            "merged": False,
+            "closed_at": None,
+            "head": {"sha": "abc123", "ref": "feature"},
+            "mergeable": True,
+            "mergeable_state": "clean",
+        }
+
+    reviews = [
+        {"user": {"login": "alice"}, "state": "CHANGES_REQUESTED"},
+        {"user": {"login": "bob"}, "state": "COMMENTED"},
+        {"user": {"login": "alice"}, "state": "APPROVED"},
+    ]
+
+    monkeypatch.setattr(gh_pr_watch, "_PR_TARGET_CACHE", {})
+    monkeypatch.setattr(gh_pr_watch, "gh_json", lambda *args, **kwargs: pytest.fail("GraphQL call"))
+    monkeypatch.setattr(gh_pr_watch, "gh_api_get", fake_get)
+    monkeypatch.setattr(gh_pr_watch, "gh_api_list_paginated", lambda endpoint, **kwargs: reviews)
+
+    assert gh_pr_watch.resolve_pr("https://github.com/openai/codex/pull/123") == {
+        **sample_pr(),
+        "review_decision": "APPROVED",
+    }
+
+
+def test_get_pr_checks_combines_check_runs_and_statuses(monkeypatch):
+    payloads = {
+        "check_runs": [
+            {
+                "name": "unit tests",
+                "status": "completed",
+                "conclusion": "failure",
+                "details_url": "https://github.com/openai/codex/actions/runs/99/job/555",
+            },
+            {"name": "lint", "status": "in_progress", "conclusion": None},
+            {"name": "docs", "status": "completed", "conclusion": "skipped"},
+        ],
+        "statuses": [{"context": "deploy", "state": "success", "target_url": "https://ci.example.com/7"}],
+    }
+    monkeypatch.setattr(
+        gh_pr_watch,
+        "gh_api_list_paginated",
+        lambda endpoint, list_key=None, **kwargs: payloads[list_key],
+    )
+
+    checks = gh_pr_watch.get_pr_checks("openai/codex", "abc123")
+
+    assert [(c["name"], c["state"], c["bucket"]) for c in checks] == [
+        ("unit tests", "FAILURE", "fail"),
+        ("lint", "IN_PROGRESS", "pending"),
+        ("docs", "SKIPPED", "skipping"),
+        ("deploy", "SUCCESS", "pass"),
+    ]
+    assert gh_pr_watch.summarize_checks(checks) == sample_checks(
+        pending_count=1, failed_count=1, passed_count=1, all_terminal=False
+    )
+    assert gh_pr_watch.run_ids_with_failed_checks(checks) == {99}
