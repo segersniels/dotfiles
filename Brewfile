@@ -2,6 +2,8 @@
 brew "git" # Should be installed by now
 brew "tig"
 brew "zsh"
+brew "zsh-autosuggestions"
+brew "starship" # Prompt
 brew "grep"
 brew "jq"
 brew "curl"

@@ -1,32 +1,37 @@
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+## Shell
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="avit"
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions)
-
-# OrbStack (before oh-my-zsh so completions load)
+# Completions (OrbStack and Homebrew add to fpath, so load them before compinit)
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+autoload -Uz compinit && compinit
 
-source $ZSH/oh-my-zsh.sh
+setopt auto_menu complete_in_word always_to_end
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' list-colors ''
 
-# User configuration
+# History
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt extended_history hist_expire_dups_first hist_ignore_dups hist_ignore_space hist_verify share_history
+
+# Navigation
+setopt auto_cd auto_pushd pushd_ignore_dups interactive_comments
+
+# Keys: emacs mode, up/down search history by typed prefix
+bindkey -e
+autoload -U up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[Z' reverse-menu-complete
+
+export CLICOLOR=1
 
 ## Alias
 
@@ -42,6 +47,11 @@ alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
 alias code="cursor"
 alias vi="nvim"
+alias -- -='cd -'
+alias ll='ls -lh'
+alias gpf='git push --force-with-lease --force-if-includes'
+alias history='fc -l 1'
+alias grep='grep --color=auto'
 
 ## Exports
 
@@ -120,3 +130,8 @@ export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_H
 # >>> railway initialize >>>
 [ -f "$HOME/.railway/env" ] && source "$HOME/.railway/env"
 # <<< railway initialize <<<
+
+## Prompt and plugins (keep last)
+
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+eval "$(starship init zsh)"

@@ -1,0 +1,36 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Mimic the oh-my-zsh avit theme: folder, branch, clean/dirty mark, arrow on the next line.
+format = """
+$directory$git_branch${custom.git_clean}${custom.git_dirty}
+$character"""
+
+[directory]
+style = "bold blue"
+format = "[$path]($style) "
+truncation_length = 3
+truncate_to_repo = false
+truncation_symbol = ""
+read_only = ""
+
+[git_branch]
+style = "green"
+format = " [$branch]($style)"
+
+[custom.git_clean]
+when = '[ -z "$(git status --porcelain 2>/dev/null)" ]'
+require_repo = true
+shell = ["sh"]
+style = "green"
+format = " [✔]($style)"
+
+[custom.git_dirty]
+when = '[ -n "$(git status --porcelain 2>/dev/null)" ]'
+require_repo = true
+shell = ["sh"]
+style = "red"
+format = " [✗]($style)"
+
+[character]
+success_symbol = "[▶](white)"
+error_symbol = "[▶](white)"

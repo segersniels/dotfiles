@@ -42,6 +42,9 @@ backup-mise:
 	@mkdir -p .mise-global
 	@rsync -av ~/.config/mise/config.toml .mise-global/
 
+backup-starship:
+	@rsync -av ~/.config/starship.toml .starship.toml
+
 backup-cursor:
 	@rm -rf .cursor
 	@mkdir -p .cursor/user/snippets
@@ -51,7 +54,7 @@ backup-cursor:
 	@rsync -av ~/.cursor/settings.json .cursor/
 	@rsync -av ~/.cursor/cli-config.json .cursor/
 
-backup: backup-nvim backup-cmux backup-codex backup-claude backup-cursor backup-mise
+backup: backup-nvim backup-cmux backup-codex backup-claude backup-cursor backup-mise backup-starship
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -90,6 +93,10 @@ restore-mise:
 	@mkdir -p ~/.config/mise
 	@rsync -av .mise-global/config.toml ~/.config/mise/
 
+restore-starship:
+	@mkdir -p ~/.config
+	@rsync -av .starship.toml ~/.config/starship.toml
+
 restore-cursor:
 	@mkdir -p ~/Library/Application\ Support/Cursor/User/snippets
 	@mkdir -p ~/.cursor
@@ -106,5 +113,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-cursor restore-mise
+restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-cursor restore-mise restore-starship
 	@$(foreach file, $(FILES), make restore-$(file);)
