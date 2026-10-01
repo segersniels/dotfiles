@@ -39,6 +39,7 @@ alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
 alias code="cursor"
 alias nvm="fnm"
+alias vi="nvim"
 
 ## Exports
 
@@ -76,6 +77,16 @@ function gfr() {
   git fetch origin +$1:$1
 }
 
+function gcpr() {
+  # Cherry pick a range of commits incl. the start commit
+  if [ $# -ne 2 ]; then
+    echo "Usage: gcpr FIRST_COMMIT LAST_COMMIT"
+    return 2
+  fi
+
+  git cherry-pick "$1^..$2"
+}
+
 ## Customization
 
 zstyle ':completion:*:make:*:targets' call-command true # outputs all possible results for make targets
@@ -96,11 +107,14 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # fnm
 eval "$(fnm env --use-on-cd --shell zsh)"
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/segersniels/Downloads/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/segersniels/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
-
 # opencode
 export PATH=/Users/segersniels/.opencode/bin:$PATH
+
+# android
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin
+
+# >>> railway initialize >>>
+[ -f "$HOME/.railway/env" ] && source "$HOME/.railway/env"
+# <<< railway initialize <<<
