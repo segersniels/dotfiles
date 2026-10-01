@@ -51,9 +51,6 @@ brew upgrade
 brew bundle
 brew cleanup
 
-# Install App store apps
-mas install 441258766 # Magnet
-
 # ZSH
 chsh -s "$(which zsh)"
 
