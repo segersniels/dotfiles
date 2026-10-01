@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-NODE_VERSION=22
 DOTFILES_REPO=https://github.com/segersniels/dotfiles
 ZSHRC_FILE=$HOME/.zshrc
 
@@ -71,9 +70,8 @@ popd
 rm -rf ./dotfiles
 
 # Node
-fnm install --lts
-npm install -g supdock
-npm install -g @segersniels/cmt
+mise install
+mise exec -- npm install -g supdock @segersniels/cmt
 
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

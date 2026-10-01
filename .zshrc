@@ -38,7 +38,6 @@ alias gcamp='git add -p && cmt commit'
 alias gp='git push'
 alias dotfiles='cd $HOME/personal/dotfiles'
 alias code="cursor"
-alias nvm="fnm"
 alias vi="nvim"
 
 ## Exports
@@ -104,8 +103,8 @@ export PATH="$HOME/.local/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# fnm
-eval "$(fnm env --use-on-cd --shell zsh)"
+# mise
+eval "$(mise activate zsh)"
 
 # opencode
 export PATH=/Users/segersniels/.opencode/bin:$PATH

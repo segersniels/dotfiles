@@ -15,7 +15,7 @@ brew "tldr"
 brew "cmake"
 brew "mas" # App store
 brew "neovim"
-brew "fnm" # Node version manager
+brew "mise" # Runtime version manager
 brew "btop" # System monitor
 brew "gh"
 brew "ripgrep"

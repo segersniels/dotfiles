@@ -38,6 +38,10 @@ backup-claude: backup-agents
 	@rsync -av --delete ~/.claude/agents/ .claude/agents/
 	@rsync -av --delete ~/.claude/hooks/ .claude/hooks/
 
+backup-mise:
+	@mkdir -p .mise-global
+	@rsync -av ~/.config/mise/config.toml .mise-global/
+
 backup-cursor:
 	@rm -rf .cursor
 	@mkdir -p .cursor/user/snippets
@@ -47,7 +51,7 @@ backup-cursor:
 	@rsync -av ~/.cursor/settings.json .cursor/
 	@rsync -av ~/.cursor/cli-config.json .cursor/
 
-backup: backup-nvim backup-cmux backup-codex backup-claude backup-cursor
+backup: backup-nvim backup-cmux backup-codex backup-claude backup-cursor backup-mise
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -82,6 +86,10 @@ restore-claude: restore-agents
 	@ln -sfn ~/.agents/AGENTS.md ~/.claude/CLAUDE.md
 	@ln -sfn ~/.agents/skills ~/.claude/skills
 
+restore-mise:
+	@mkdir -p ~/.config/mise
+	@rsync -av .mise-global/config.toml ~/.config/mise/
+
 restore-cursor:
 	@mkdir -p ~/Library/Application\ Support/Cursor/User/snippets
 	@mkdir -p ~/.cursor
@@ -98,5 +106,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-cursor
+restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-cursor restore-mise
 	@$(foreach file, $(FILES), make restore-$(file);)
