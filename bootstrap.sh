@@ -62,7 +62,10 @@ rm -rf ./dotfiles
 
 # Node
 mise install
-mise exec -- npm install -g supdock @segersniels/cmt
+
+# Own CLIs (install into ~/.local/bin)
+curl -fsSL https://raw.githubusercontent.com/segersniels/supdock/master/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/segersniels/cmt/master/scripts/install.sh | bash
 
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
