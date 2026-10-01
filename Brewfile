@@ -31,7 +31,7 @@ brew "railway"
 
 # Cask
 cask "1password"
-cask "docker-desktop"
+cask "orbstack" # Docker runtime
 cask "spotify"
 cask "slack"
 cask "discord"

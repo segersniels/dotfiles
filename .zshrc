@@ -21,6 +21,9 @@ ZSH_THEME="avit"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git zsh-autosuggestions)
 
+# OrbStack (before oh-my-zsh so completions load)
+source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
