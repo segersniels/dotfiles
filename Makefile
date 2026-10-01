@@ -47,7 +47,7 @@ backup-cursor:
 	@rsync -av ~/.cursor/settings.json .cursor/
 	@rsync -av ~/.cursor/cli-config.json .cursor/
 
-backup: backup-nvim backup-ghostty backup-codex backup-claude backup-cursor
+backup: backup-nvim backup-cmux backup-codex backup-claude backup-cursor
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -98,5 +98,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-ghostty restore-secrets restore-claude restore-cursor
+restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-cursor
 	@$(foreach file, $(FILES), make restore-$(file);)
