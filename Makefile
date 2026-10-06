@@ -21,7 +21,7 @@ backup-cmux: backup-ghostty
 backup-agents:
 	@rm -rf .agents
 	@mkdir -p .agents
-	@rsync -av --exclude='target/' --exclude='.git/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.pytest_cache/' --exclude='.ruff_cache/' --exclude='.trash/' ~/.agents/ .agents/
+	@rsync -av --exclude='skills/synced/' --exclude='target/' --exclude='.git/' --exclude='__pycache__/' --exclude='*.pyc' --exclude='.pytest_cache/' --exclude='.ruff_cache/' --exclude='.trash/' ~/.agents/ .agents/
 
 backup-codex: backup-agents
 	@rm -rf .codex
@@ -37,6 +37,7 @@ backup-claude: backup-agents
 	@rsync -av ~/.claude/settings.json .claude/
 	@rsync -av --delete ~/.claude/agents/ .claude/agents/
 	@rsync -av --delete ~/.claude/hooks/ .claude/hooks/
+	@rsync -av --delete ~/.claude/rules/ .claude/rules/
 
 backup-mise:
 	@mkdir -p .mise-global
@@ -86,6 +87,7 @@ restore-claude: restore-agents
 	@rsync -av .claude/settings.json ~/.claude/
 	@rsync -av .claude/agents/ ~/.claude/agents/
 	@rsync -av .claude/hooks/ ~/.claude/hooks/
+	@rsync -av .claude/rules/ ~/.claude/rules/
 	@ln -sfn ~/.agents/AGENTS.md ~/.claude/CLAUDE.md
 	@ln -sfn ~/.agents/skills ~/.claude/skills
 
