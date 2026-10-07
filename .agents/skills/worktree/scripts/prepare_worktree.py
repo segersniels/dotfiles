@@ -62,8 +62,11 @@ def main():
     parser.add_argument('--copy-deps', action='store_true', help='Clone node_modules when dependency inputs match')
     args = parser.parse_args()
     source, target = args.source.resolve(), args.target.resolve()
-    if inside(target, source) or inside(source, target):
-        raise RuntimeError('Use separate, non-nested source and target worktrees')
+    if inside(source, target):
+        raise RuntimeError('Source worktree must not be inside the target')
+    # Allow repositories that keep worktrees in an ignored folder of the main worktree.
+    if inside(target, source) and not ignored(source, f'{target.relative_to(source)}/'):
+        raise RuntimeError('A target inside the source must be in an ignored folder')
     for root in (source, target):
         if Path(git(root, 'rev-parse', '--show-toplevel')).resolve() != root:
             raise RuntimeError(f'Expected a worktree root: {root}')

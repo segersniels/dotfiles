@@ -9,7 +9,7 @@ Create a registered Git worktree with independent files that share disk blocks w
 
 ## Create
 
-1. Read the repository instructions. Resolve the requested base commit and destination. Use `git worktree list --porcelain` to find the main worktree for local environment files. Preserve the user's base and branch choices. Creating a worktree for an authorized task does not authorize switching the original checkout, committing, or pushing.
+1. Read the repository instructions. Resolve the requested base commit and destination. Use `git worktree list --porcelain` to find the main worktree for local environment files. Preserve the user's base and branch choices. A destination inside the main worktree must be in a Git-ignored folder, such as `.worktrees/`. Creating a worktree for an authorized task does not authorize switching the original checkout, committing, or pushing.
 2. Locate `git-cow-worktree` on PATH or at `~/.local/bin/git-cow-worktree`. If missing, install the reviewed revision using the existing Go toolchain:
 
    ```sh
