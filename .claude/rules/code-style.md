@@ -18,3 +18,4 @@ The user reads and reviews every diff by hand. Optimize for a small change that 
 - Keep the happy path at the lowest indent. Use guard clauses and early returns to reduce nesting.
 - Replace nested ternaries with plain control flow.
 - Keep simple logic inline. Extract a function only when it makes the caller easier to read.
+- Separate the logical steps of a function with one blank line, so a reader can scan the flow section by section. Keep the lines of a single step together.
