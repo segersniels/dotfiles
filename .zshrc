@@ -36,6 +36,7 @@ export CLICOLOR=1
 ## Alias
 
 alias personal='cd $HOME/personal'
+alias tally='cd $HOME/projects/tally/tally'
 alias reload='source $HOME/.zshrc'
 alias dcomp='docker compose'
 alias search='history |grep'
