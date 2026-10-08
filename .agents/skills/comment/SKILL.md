@@ -14,8 +14,7 @@ Add, remove, or move comments using the original Human Code comment guidance.
 - Comment why a guard exits or why a branch exists.
 - Put comments that explain an `if` branch directly above the `if`; for `if`/`else`, put branch-specific comments inside the relevant block.
 - Use `//` for single-line comments.
-- Use JSDoc for multi-line comments or function explanations.
-- Start a function's JSDoc with what the function does, as a verb phrase ("Checks whether…", "Builds…"). Do not start with "True for…" or "Returns true when…".
+- Use JSDoc for multi-line comments or function explanations. Start a function's JSDoc with a verb that states what the function does, such as "Checks whether…" or "Builds…". Do not describe only the return value, such as "True for…" or "Returns true when…".
 
 ## Simplified Technical English
 
