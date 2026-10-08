@@ -46,16 +46,7 @@ backup-mise:
 backup-starship:
 	@rsync -av ~/.config/starship.toml .starship.toml
 
-backup-cursor:
-	@rm -rf .cursor
-	@mkdir -p .cursor/user/snippets
-	@rsync -av ~/Library/Application\ Support/Cursor/User/settings.json .cursor/user/
-	@rsync -av ~/Library/Application\ Support/Cursor/User/keybindings.json .cursor/user/
-	@rsync -av ~/Library/Application\ Support/Cursor/User/snippets/ .cursor/user/snippets/
-	@rsync -av ~/.cursor/settings.json .cursor/
-	@rsync -av ~/.cursor/cli-config.json .cursor/
-
-backup: backup-nvim backup-cmux backup-codex backup-claude backup-cursor backup-mise backup-starship
+backup: backup-nvim backup-cmux backup-codex backup-claude backup-mise backup-starship
 	@$(foreach file, $(FILES), make backup-$(file);)
 
 restore-all: $(patsubst %, restore-%, $(FILES))
@@ -99,15 +90,6 @@ restore-starship:
 	@mkdir -p ~/.config
 	@rsync -av .starship.toml ~/.config/starship.toml
 
-restore-cursor:
-	@mkdir -p ~/Library/Application\ Support/Cursor/User/snippets
-	@mkdir -p ~/.cursor
-	@rsync -av .cursor/user/settings.json ~/Library/Application\ Support/Cursor/User/
-	@rsync -av .cursor/user/keybindings.json ~/Library/Application\ Support/Cursor/User/
-	@rsync -av .cursor/user/snippets/ ~/Library/Application\ Support/Cursor/User/snippets/
-	@rsync -av .cursor/settings.json ~/.cursor/
-	@rsync -av .cursor/cli-config.json ~/.cursor/
-
 restore-secrets:
 	@if [ ! -f ~/.secrets ]; then \
 		cp -v .secrets ~/.secrets; \
@@ -115,5 +97,5 @@ restore-secrets:
 		echo "~/.secrets already exists. Skipping."; \
 	fi
 
-restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-cursor restore-mise restore-starship
+restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-mise restore-starship
 	@$(foreach file, $(FILES), make restore-$(file);)
