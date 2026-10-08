@@ -26,7 +26,6 @@ backup-agents:
 backup-codex: backup-agents
 	@rm -rf .codex
 	@mkdir -p .codex
-	@rsync -av --exclude='.system/' ~/.codex/skills/ .codex/skills/
 	@rsync -av ~/.codex/rules/ .codex/rules/
 	@rsync -av ~/.codex/agents/ .codex/agents/
 	@rsync -av ~/.codex/hooks/ .codex/hooks/
@@ -70,7 +69,7 @@ restore-agents:
 
 restore-codex: restore-agents
 	@mkdir -p ~/.codex
-	@rsync -av --exclude='skills/.system/' .codex/ ~/.codex/
+	@rsync -av .codex/ ~/.codex/
 	@ln -sfn ~/.agents/AGENTS.md ~/.codex/AGENTS.md
 
 restore-claude: restore-agents
