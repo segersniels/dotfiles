@@ -41,6 +41,9 @@ fi
 
 if [[ "$diagnostic_count" =~ ^[0-9]+$ ]] && (( diagnostic_count > 0 )); then
   reason="$message"
+
+  # Send plain lines so the agent does not need to decode JSON nested in a string.
+  output=$(jq -r '.diagnostics[] | "\(.filename):\(.labels[0].span.line // "?"):\(.labels[0].span.column // "?") \(.code): \(.message)\(if .help then " (\(.help))" else "" end)"' <<<"$output")
 else
   reason="$failure_message"
 fi
@@ -53,6 +56,6 @@ jq -n \
     reason: $message,
     hookSpecificOutput: {
       hookEventName: "PostToolUse",
-      additionalContext: ($message + "\n\n" + $output)
+      additionalContext: $output
     }
   }'
