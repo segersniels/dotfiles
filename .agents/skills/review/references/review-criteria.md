@@ -123,7 +123,8 @@ A point another reviewer or bot already raised is **not** automatically out of s
 automatically correct. It means exactly one thing: **don't raise it again as if it were new.**
 
 - Never open a second thread where one already exists. If you have something to add, reply in that
-  thread, framed as a follow-up rather than a fresh discovery.
+  thread, framed as a follow-up rather than a fresh discovery. If you agree and have nothing to
+  add, a 👍 on the original comment is enough: a reply that only says "agreed" bloats the thread.
 - Keep it in the findings list, labelled with who flagged it, so the picture stays complete.
 - **Verify validity and resolution separately.** They're independent questions, and both are claims:
   a confidently-worded finding — especially from a bot — is not proof of a defect, and a resolved

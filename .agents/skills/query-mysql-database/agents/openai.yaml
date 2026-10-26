@@ -1,4 +1,0 @@
-interface:
-  display_name: "Query MySQL Database"
-  short_description: "Query MySQL databases safely from Codex."
-  default_prompt: "Use $query-mysql-database to verify the intended database and run bounded read-only MySQL queries."
