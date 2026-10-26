@@ -9,7 +9,7 @@ An explicit `$babysit` request starts the full workflow: monitor a PR, retry lik
 
 Keep the current session as the babysitter. Use the checkout selected by the user; do not create another task, agent, session, branch, or worktree. A PR branch or detached HEAD is acceptable.
 
-Continue until the PR is merged or closed, the user explicitly stops or replaces the monitoring request, or a blocker requires user help and independent authorized work cannot continue. Answer status questions and incorporate steering without abandoning monitoring. Green CI, approval, merge readiness, quiet polls, and a successful push are progress states while the PR remains open. Do not merge, close, reopen, change draft status, or resolve review threads unless explicitly requested.
+Continue until the PR is merged or closed, the user explicitly stops or replaces the monitoring request, or an open item needs the user (see [Monitoring](#monitoring)). Answer status questions and incorporate steering without abandoning monitoring. Green CI, approval, merge readiness, quiet polls, and a successful push are progress states while the PR remains open. Do not merge, close, reopen, change draft status, or resolve review threads unless explicitly requested.
 
 ## Start or resume
 
@@ -50,12 +50,17 @@ Consume the watcher's JSONL snapshots and `actions` in this session. The watcher
 - Check mergeability and review state alongside CI. Handle actionable review feedback before rerunning flakes when a fix would replace the current SHA.
 - For GitHub commands or endpoint details, consult the relevant section of [API notes](references/github-api-notes.md).
 
-After a fix, push, reply, acknowledgement, or rerun, continue monitoring on the current state. If an action requires stopping `--watch`, restart it immediately afterward in the same turn unless a stop condition applies. Do not end the turn with a detached watcher and describe the task as complete.
+Pause only actions that depend on a missing permission, unresolved product decision, or unsafe checkout. Finish all independent authorized work in the current round first.
 
-Pause only actions that depend on a missing permission, unresolved product decision, or unsafe checkout. Continue independent monitoring and authorized work while seeking the needed input. If nothing useful can proceed, report the blocker and stop the watcher.
+After each round of fixes, pushes, replies, acknowledgements, or reruns, check whether the round left an open item for the user. An open item is anything the user must answer or decide: a question, an unresolved scope or product decision, a missing permission, an unsafe checkout, feedback without an inline target, or an offer such as "say so and I will add it".
+
+- No open item: continue monitoring on the current state. If an action required stopping `--watch`, restart it in the same turn unless a stop condition applies. Do not end the turn with a detached watcher and describe the task as complete.
+- One or more open items: pause monitoring and hand off. Stop the watcher and release any harness-level PR watch (for example, T3 Code `unwatch_pull_request`), because an active watch hides the thread from the user's attention. List each open item as a numbered question with a recommendation, state that monitoring is paused, and end the turn.
+
+Resume monitoring only after the user has handled every open item. Apply the answers first, then restart the watcher and any harness-level PR watch in the same turn. If the user answers only some items, apply those answers and ask again for the others without resuming.
 
 ## Updates and handoff
 
 After the initial snapshot, report meaningful state changes, actions, blockers, and terminal outcomes. Do not narrate unchanged polls or empty watcher output. Report the first all-green transition and readiness milestone once; a brief celebratory update is welcome.
 
-At completion or a blocking handoff, include the final PR SHA, CI and mergeability status, fixes pushed, retry cycles used, and remaining unresolved feedback or failures. A push or readiness update alone is not a final handoff.
+At completion or a paused handoff, include the final PR SHA, CI and mergeability status, fixes pushed, retry cycles used, and remaining unresolved feedback or failures. A push or readiness update alone is not a final handoff.

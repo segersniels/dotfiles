@@ -10,7 +10,7 @@ Read directly linked tickets and specifications that define the intended behavio
 
 Fix feedback automatically only when it fits the intended outcome or is necessary to make that outcome correct and safe. A PR-introduced issue is not automatically in scope. New supported scenarios, changed acceptance criteria, and unrelated product, design, or architecture decisions need user direction.
 
-Explicit user decisions take precedence over ticket and PR text. If new evidence challenges a deliberate trade-off or rejected alternative, surface the decision instead of silently reversing or dismissing it. Continue independent authorized work while awaiting material clarification.
+Explicit user decisions take precedence over ticket and PR text. If new evidence challenges a deliberate trade-off or rejected alternative, surface the decision instead of silently reversing or dismissing it. Finish independent authorized work, then pause monitoring and hand off as described in [Monitoring](../SKILL.md#monitoring).
 
 ## Protect the selected checkout
 
@@ -32,4 +32,4 @@ git push origin HEAD:<head-branch>
 
 For a fork PR, identify or add the writable head-repository remote and push `HEAD:<head-branch>` there. Verify the resulting remote SHA before reporting success.
 
-For review-driven fixes, complete the originating feedback disposition using [review feedback](review-feedback.md), then resume the watcher immediately in the same turn. Do not stop after the push.
+For review-driven fixes, complete the originating feedback disposition using [review feedback](review-feedback.md), then resume the watcher immediately in the same turn. Do not stop after the push, unless an open item for the user remains (see [Monitoring](../SKILL.md#monitoring)).

@@ -16,7 +16,7 @@ Apply the mandatory [comment-assessment checklist](../SKILL.md#assess-every-revi
 | Rare but credible security, privacy, data-loss, or corruption issue | Do not dismiss it merely because it is uncommon. Apply the same scope and evidence checks. |
 | Pre-existing behavior unchanged in reachability or impact | Do not expand the PR. Explain the base/head evidence in the inline thread; surface material risks to the user for separate handling. |
 | Incorrect, already addressed, unreachable, or negligible concern | Make no code change and give an evidence-backed rationale in the inline thread. |
-| Proposed scope change that the user has not decided, or new evidence that may change a deliberate trade-off | Ask the user before changing code or posting a disposition. Continue independent authorized work. |
+| Proposed scope change that the user has not decided, or new evidence that may change a deliberate trade-off | Ask the user before changing code or posting a disposition. Finish independent authorized work, then pause monitoring and hand off as described in [Monitoring](../SKILL.md#monitoring). |
 
 A touched nearby file does not make a pre-existing issue part of the PR. When explicit user direction already settles the feedback and no new material evidence challenges it, explain that decision in the originating inline thread without asking again. Keep independent fixes separate; reply in every originating thread when several comments share a fix.
 
