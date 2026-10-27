@@ -203,7 +203,10 @@ Run this step only when the person asks you to approve the PR. Never offer it or
 
 After the last item, or when there are no live items, ask once: "Do you want me to monitor this PR and tell you when something needs your attention?" Never start monitoring without a yes.
 
-Monitoring is notify-only, the same as the review: no edits, pushes, reruns, replies or PR state changes. To watch, use T3 Code's `watch_pull_request` when it is available and end the turn; it wakes this thread on changes. Otherwise run `python3 <skills dir>/babysit/scripts/gh_pr_watch.py --pr <pr-url> --watch` in the background, with `<skills dir>` resolved to the absolute parent of this skill's directory, and never pass `--retry-failed-now` or `--ack-review-item`.
+Monitoring is notify-only, the same as the review: no edits, pushes, reruns, replies or PR state changes.
+
+- In T3 Code, call `watch_pull_request` and end the turn. It wakes this thread on changes.
+- Elsewhere, run `python3 <skills dir>/babysit/scripts/watch_pull_request.py --pr <pr-url> --fresh`, with `<skills dir>` resolved to the absolute parent of this skill's directory. `--fresh` skips everything the review already covered. In Claude Code, run it with the Monitor tool and `timeout_ms: 1800000`. The watcher prints only changes, one short block per poll, so do not add a filter or a wrapper script. When the monitor expires, run the same command without `--fresh`. The watcher saves its state between runs, so no change is lost.
 
 Notify the user, in two or three lines with a suggested next step, when:
 
@@ -214,6 +217,10 @@ Notify the user, in two or three lines with a suggested next step, when:
 - The PR becomes ready to merge. Report this once
 - The PR is merged or closed. Report it and stop
 
-Stay quiet about pending checks, unchanged polls, the user's own comments and bot noise such as coverage or preview-deploy updates.
+Stay quiet about pending or passing checks, unchanged polls and bot noise such as coverage or preview-deploy updates. The watcher already skips the user's own comments and pushes.
 
-Every message to the user pauses monitoring: a notification above, a question, or anything else you think the user must know. Before you send it, call `unwatch_pull_request` or stop the watcher, because an active watch keeps the thread marked as working and hides the message from the user. End the message with "Monitoring is paused. Say so and I will resume." and end the turn. Resume only when the user asks.
+When the watcher stops by itself after 10 comment-only updates in a row or repeated GitHub read failures, tell the user why and end the turn.
+
+In T3 Code, every message to the user pauses monitoring: a notification above, a question, or anything else you think the user must know. Before you send it, call `unwatch_pull_request`, because an active watch keeps the thread marked as working and hides the message from the user. End the message with "Monitoring is paused. Say so and I will resume." and end the turn. Resume only when the user asks.
+
+Elsewhere, a running watcher hides nothing, so keep it running after a notification and end the message with "Still watching." Stop the watcher when the user asks you to stop. To resume, run the command without `--fresh`, so changes during the pause are reported.

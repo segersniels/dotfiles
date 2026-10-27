@@ -4,9 +4,9 @@ Read when the watcher surfaces review items. Before deciding on a code change or
 
 ## Select actionable feedback
 
-Consider published feedback from humans and bots, including existing unaddressed feedback surfaced by a fresh state file. Ignore reviews in `PENDING` state and their inline comments; do not acknowledge unpublished feedback.
+Consider published feedback from humans and bots, including open threads that the start-up sweep finds. The watcher already ignores reviews in `PENDING` state and their inline comments.
 
-Ignore status-only messages, approvals, duplicates, self-authored follow-ups, and resolved threads without new unresolved feedback. Deliberately classify these before acknowledging them.
+Ignore status-only messages, approvals, duplicates, self-authored follow-ups, and resolved threads without new unresolved feedback. Deliberately classify these before you move on.
 
 Apply the mandatory [comment-assessment checklist](../SKILL.md#assess-every-review-comment) to each substantive item before choosing a disposition below.
 
@@ -22,7 +22,7 @@ A touched nearby file does not make a pre-existing issue part of the PR. When ex
 
 ## Reply only in the originating inline thread
 
-Use the inline review-comment reply endpoint with the watcher's `thread_root_id`. Verify that the created comment's `in_reply_to_id` equals that root before reporting success or acknowledging completion. See [API notes](github-api-notes.md#review-follow-up-endpoints) for the endpoint.
+Use the inline review-comment reply endpoint with the thread ID from the watcher update or the start-up sweep. Verify that the created comment's `in_reply_to_id` equals that thread ID before reporting success. See [API notes](github-api-notes.md#review-follow-up-endpoints) for the endpoint.
 
 PR issue comments, review summaries, check annotations, and findings embedded in bot summaries have no inline thread target. Report that limitation to the user; do not create top-level comments as a substitute. A failed reply endpoint also does not authorize another posting destination.
 
@@ -38,16 +38,8 @@ Lead with `Addressed in <commit-sha>.` or `No change made.`, followed by the pra
 
 Do not append signatures, sign-offs, or automation attribution footers unless the user explicitly requests them.
 
-## Acknowledge only completed dispositions
+## Finish every disposition
 
-For a fix, verify the push and required inline reply first. For a no-change disposition, verify the inline reply. For ignorable feedback, finish its classification. Substantive feedback without an inline target needs a user handoff, not a fabricated reply or premature acknowledgement.
+The watcher reports each comment once. Nothing repeats it, so finish its disposition in the same round. For a fix, verify the push and required inline reply. For a no-change disposition, verify the inline reply. For ignorable feedback, finish its classification. Substantive feedback without an inline target needs a user handoff, not a fabricated reply.
 
-Stop the current watcher, acknowledge completed items, and restart `--watch`:
-
-```bash
-python3 "<babysit-skill-directory>/scripts/gh_pr_watch.py" \
-  --pr <pr-url> \
-  --ack-review-item <issue_comment|review_comment|review>:<id>
-```
-
-Resolve the skill directory as described in `SKILL.md`. The acknowledgement flag is repeatable. Use `--requeue-review-item <kind>:<id>` only to recover feedback that was incorrectly acknowledged or migrated as handled. Pending feedback otherwise repeats in snapshots; fetching it is not completion.
+Your inline reply is the record that a thread is handled: the start-up sweep skips threads whose latest comment is yours.

@@ -1,69 +1,86 @@
 # GitHub CLI / API Notes For `babysit`
 
-## Primary commands used
+## Rate limits
 
 The watcher polls only REST endpoints. `gh pr view` and `gh pr checks` use GraphQL, which has a
 small shared hourly budget; do not poll them in a loop. The watcher sends `If-None-Match` with the
 last ETag of each endpoint. GitHub does not count a `304 Not Modified` reply against the rate limit.
-Only `--pr auto` or a bare number without `--repo` calls `gh pr view --json url` once per process.
+Only `--pr auto` or a bare number without `--repo` calls `gh pr view --json url` once per run.
 
 `gh api rate_limit` can report a wrong GraphQL budget. To see the real budget, read the
 `X-RateLimit-*` headers of `gh api -i graphql -f query='{viewer{login}}'`.
 
-### PR metadata
+## Endpoints the watcher reads
 
-- `gh api repos/{owner}/{repo}/pulls/<pr_number>`
+- `repos/{owner}/{repo}/pulls/<pr_number>`: head SHA, base branch, merged and closed state, `mergeable`, and `mergeable_state`.
+- `repos/{owner}/{repo}/commits/<sha>`: the author of the head commit, to tell other people's pushes from yours.
+- `repos/{owner}/{repo}/commits/<sha>/check-runs` and `repos/{owner}/{repo}/commits/<sha>/status`: checks on the head commit.
+- `repos/{owner}/{repo}/issues/<pr_number>/comments`, `repos/{owner}/{repo}/pulls/<pr_number>/comments`, and `repos/{owner}/{repo}/pulls/<pr_number>/reviews`: published comments and reviews.
 
-Used to resolve the URL, branch, head SHA, closed/merged state, `mergeable`, and `mergeable_state`.
-The review decision comes from the latest approval or change request of each reviewer.
+## Start-up sweep
 
-### PR checks summary
+The watcher reports only changes after it starts, so run this sweep before the first watch and each
+time you resume. It is one GraphQL call, not a loop.
 
-- `gh api repos/{owner}/{repo}/commits/<sha>/check-runs?per_page=100`
-- `gh api repos/{owner}/{repo}/commits/<sha>/status?per_page=100`
+List unresolved inline threads whose latest comment is not yours:
 
-Used to compute pending/failed/passed counts and whether the current CI round is terminal.
+```bash
+gh api graphql -f owner=<owner> -f repo=<repo> -F number=<pr_number> -f query='
+query($owner: String!, $repo: String!, $number: Int!) {
+  viewer { login }
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $number) {
+      reviewThreads(first: 100) {
+        nodes {
+          isResolved
+          root: comments(first: 1) { nodes { databaseId path line } }
+          latest: comments(last: 1) { nodes { author { login } body url } }
+        }
+      }
+    }
+  }
+}' --jq '.data.viewer.login as $me | .data.repository.pullRequest.reviewThreads.nodes[]
+  | select((.isResolved | not) and .latest.nodes[0].author.login != $me)
+  | {thread: .root.nodes[0].databaseId, path: .root.nodes[0].path, line: .root.nodes[0].line,
+     author: .latest.nodes[0].author.login, body: .latest.nodes[0].body[:300], url: .latest.nodes[0].url}'
+```
 
-### Workflow runs for head SHA
+`thread` is the ID to reply to. Then list failed checks on the current head:
 
-- `gh api 'repos/{owner}/{repo}/actions/runs?head_sha=<sha>&per_page=100'`
+```bash
+gh pr checks <pr-url> --json name,bucket,link --jq '.[] | select(.bucket == "fail")'
+```
 
-Used to discover failed workflow runs and rerunnable run IDs.
+Review summaries and PR issue comments have no thread state. Read the latest ones with
+`gh pr view <pr-url> --comments` when the user asks, or when a thread points to them.
 
-### Failed log inspection
+## Failed log inspection
 
 - `gh run view <run-id> --json jobs,name,workflowName,conclusion,status,url,headSha`
 - `gh api repos/{owner}/{repo}/actions/runs/{run_id}/jobs -X GET -f per_page=100`
-- `gh api repos/{owner}/{repo}/actions/jobs/{job_id}/logs > /tmp/codex-gh-job-{job_id}-logs.zip`
+- `gh api repos/{owner}/{repo}/actions/jobs/{job_id}/logs`
 - `gh run view <run-id> --log-failed`
 
-Used by the babysitter to classify branch-related vs flaky/unrelated failures. Prefer the direct job log endpoint as soon as a job has failed because `gh run view --log-failed` may not produce failed-job logs until the overall workflow run completes.
+Used to classify branch-related vs flaky/unrelated failures. Prefer the direct job log endpoint as
+soon as a job has failed, because `gh run view --log-failed` may not produce failed-job logs until
+the overall workflow run completes.
 
-### Retry failed jobs only
+## Retry failed jobs only
 
+- `gh run view <run-id> --json attempt --jq .attempt`
 - `gh run rerun <run-id> --failed`
 
-Reruns only failed jobs (and dependencies) for a workflow run.
-
-## Review-related endpoints
-
-- Issue comments on PR:
-  - `gh api repos/{owner}/{repo}/issues/<pr_number>/comments?per_page=100`
-- Inline PR review comments:
-  - `gh api repos/{owner}/{repo}/pulls/<pr_number>/comments?per_page=100`
-- Review submissions:
-  - `gh api repos/{owner}/{repo}/pulls/<pr_number>/reviews?per_page=100`
-
-Use each inline comment's `pull_request_review_id` to find its parent review. Ignore parent reviews
-whose `state` is `PENDING`, along with their inline comments, until the review is submitted.
+Reruns only failed jobs (and dependencies) for a workflow run. See [CI diagnosis](heuristics.md)
+for the retry limit.
 
 ## Review follow-up endpoints
 
 - Reply to an inline review comment:
-  - `gh api -X POST repos/{owner}/{repo}/pulls/<pr_number>/comments/<comment_id>/replies -f body='<reply>'`
+  - `gh api -X POST repos/{owner}/{repo}/pulls/<pr_number>/comments/<thread_id>/replies -f body='<reply>'`
 
-Use the watcher's `thread_root_id` as `<comment_id>`. After posting, verify that the returned
-`in_reply_to_id` equals `thread_root_id`; only then report that the reply was posted in the thread.
+Use the thread ID from the watcher update or the start-up sweep. After posting, verify that the
+returned `in_reply_to_id` equals that thread ID; only then report that the reply was posted in the
+thread.
 
 After a pushed fix, include the commit SHA, what changed, and why. When no change is made, state the
 technical reason. Do not reply to status-only bot messages, summaries without requested changes,
@@ -75,42 +92,3 @@ summary do not have inline review-thread reply targets. Never use
 `repos/{owner}/{repo}/issues/<pr_number>/comments` as a fallback and never split embedded findings
 into synthetic top-level PR comments. If the inline reply endpoint is unavailable or fails, report
 the blocker instead of posting elsewhere.
-
-## JSON fields consumed by the watcher
-
-### Pulls API
-
-- `number`
-- `html_url`
-- `state`
-- `merged`
-- `closed_at`
-- `head.ref`
-- `head.sha`
-- `mergeable`
-- `mergeable_state`
-
-### Check runs API (`check_runs[]`) and combined status API (`statuses[]`)
-
-- `name` / `context`
-- `status` and `conclusion` / `state`
-- `details_url` / `target_url`
-
-The watcher maps these to `gh pr checks` buckets (`pass`, `fail`, `pending`, `skipping`, `cancel`).
-
-### Actions runs API (`workflow_runs[]`)
-
-- `id`
-- `name`
-- `status`
-- `conclusion`
-- `html_url`
-- `head_sha`
-
-### Actions run jobs API (`jobs[]`)
-
-- `id`
-- `name`
-- `status`
-- `conclusion`
-- `html_url`
