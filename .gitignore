@@ -5,3 +5,4 @@ bar.sh
 lorem.sh
 ipsum.sh
 .codex/environments/
+.secrets

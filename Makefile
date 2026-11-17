@@ -89,12 +89,5 @@ restore-starship:
 	@mkdir -p ~/.config
 	@rsync -av .starship.toml ~/.config/starship.toml
 
-restore-secrets:
-	@if [ ! -f ~/.secrets ]; then \
-		cp -v .secrets ~/.secrets; \
-	else \
-		echo "~/.secrets already exists. Skipping."; \
-	fi
-
-restore: restore-zshrc restore-nvim restore-cmux restore-secrets restore-codex restore-claude restore-mise restore-starship
+restore: restore-zshrc restore-nvim restore-cmux restore-codex restore-claude restore-mise restore-starship
 	@$(foreach file, $(FILES), make restore-$(file);)

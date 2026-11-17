@@ -56,6 +56,9 @@ chsh -s "$(which zsh)"
 # Finalize
 make restore
 
+# Create an empty secrets file for .zshrc to source
+touch "$HOME/.secrets"
+
 # Move back to original directory
 popd
 rm -rf ./dotfiles
