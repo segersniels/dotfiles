@@ -9,28 +9,12 @@ disable-model-invocation: true
 
 You are a critical but fair technical lead reviewing a PR. Question everything. Be thorough. Approve when changes definitely improve overall code health — don't block because it isn't exactly how you'd write it.
 
-The review is for the person who invoked it. Nothing leaves this session: never post, reply, react, approve, resolve or request changes on the PR, and never let a sub-agent do it. Present the findings; the person decides what to do with them. The one exception is an approval the person asks for, per Step 7.
+The review is for the person who invoked it. The only thing you send to GitHub without being asked is a pending review (Step 6), which only the person can see. Never submit it, post, reply, react, approve, resolve or request changes until the person tells you to, and never let a sub-agent do any of it. The person decides what goes out.
 
 Terms used below:
 - **Finder**: a sub-agent that hunts for defects in one role (Step 2).
 - **Refuter**: a sub-agent that tries to disprove one finding (Step 3).
 - **The criteria**: [references/review-criteria.md](references/review-criteria.md) plus the repo's own review guide (Step 1.2).
-
-## Step 0: Understand the Problem
-
-Before anyone reads the fix, the person and you agree on what the PR must fix. A reviewer who first understands the problem can judge the solution. A reviewer who starts with the diff adopts the author's framing. Do not read the diff, the changed files at the PR head or any finder output in this step.
-
-1. Run `gh pr view <target> --json number,title,body,headRefName,baseRefName,commits` for the description and commit messages only. `<target>` is as in Step 1.3
-2. Find every linked source in the title, body, branch name and commit messages: issue references (`#123`, `Fixes …`), ticket keys, and links to issue trackers, docs, error reports or chat threads. Open each one with the tools this session has, such as a CLI, an MCP server or a web fetch. When you cannot open a source, name it and ask the person to paste it. Never guess its content. When nothing is linked, say so
-3. Investigate the problem on the base branch only (`git fetch origin <base>`, then read `origin/<base>`). Find where the problem lives, what triggers it and why the current behavior is wrong. For a feature, find what is missing. Treat the sources as claims, per the criteria "Establishing the goal"
-4. Explain the problem in junior-friendly language: what is broken or missing, who it affects, how it is triggered and what the expected behavior is. For a feature or refactor, explain the intended outcome. Do not invent a bug. Label inferred intent as inferred
-5. Sketch one or two ways the problem could be solved, still without the diff. Name the trade-off of each
-6. Work through the problem with the person. Answer their questions, correct the statement when they push back and investigate further when they ask
-7. End with: "Ready to start the review?" Continue to Step 1 only after an explicit yes
-
-The agreed problem statement from this step is the goal for the premise finder (Step 2), the efficacy gate (Step 3.7) and the summary (Step 5).
-
-**Skip offer.** When nothing is linked and the PR is small (as defined in Step 2), offer to skip this step with one line that states the inferred goal. Skip it only when the person agrees.
 
 ## Step 1: Context
 
@@ -48,12 +32,12 @@ The agreed problem statement from this step is the goal for the premise finder (
 
    ```bash
    gh api graphql -F owner='{owner}' -F name='{repo}' -F number=<number> -f query='query($owner:String!,$name:String!,$number:Int!){ repository(owner:$owner,name:$name){ pullRequest(number:$number){
-     reviewThreads(first:100){ nodes{ isResolved isOutdated path line originalLine
+     reviewThreads(first:100){ nodes{ id isResolved isOutdated path line originalLine
        comments(first:10){ nodes{ author{ login } body url } } } }
      reviews(first:50){ nodes{ author{ login } state body } }
      comments(first:100){ nodes{ author{ login } body url } } } } }' \
      --jq '.data.repository.pullRequest | def s: gsub("\\s+"; " ") | .[:300];
-       (.reviewThreads.nodes[] | "thread resolved=\(.isResolved) outdated=\(.isOutdated) \(.path):\(.line // .originalLine)",
+       (.reviewThreads.nodes[] | "thread \(.id) resolved=\(.isResolved) outdated=\(.isOutdated) \(.path):\(.line // .originalLine)",
          (.comments.nodes[] | "  \(.author.login): \(.body | s) \(.url)")),
        (.reviews.nodes[] | select(.body != "") | "review \(.author.login) \(.state): \(.body | s)"),
        (.comments.nodes[] | "comment \(.author.login): \(.body | s) \(.url)")'
@@ -72,7 +56,7 @@ Launch finders in parallel to review the PR. **Frame every finder adversarially*
 
 **Dispatch.** Launch every finder at once. Each is a general sub-agent with full tool access (shell, file reads, search), on the same model as this session, never a smaller or faster one. Hand each a path, not a payload: the PR number, `headRefOid`, the merge-base SHA, the files it owns, the Step 1.4 read rules, its role name, and "read `<skill dir>/references/roles.md` for your role and the finding format, and `<skill dir>/references/review-criteria.md` for the criteria", with `<skill dir>` resolved to the absolute path of this skill's directory. Don't restate the criteria or the role in the prompt; point at the files so finders inherit changes to them automatically.
 
-**The premise finder's prompt is different.** Give it the problem and the changed-file list, not the diff and not the approach the PR chose. Use the problem statement agreed in Step 0, and strip helper names, mechanisms and the proposed fix. It sketches the smallest fix before it reads the diff; Step 5 uses that sketch.
+**The premise finder's prompt is different.** Give it the problem and the changed-file list, not the diff and not the approach the PR chose. Write the problem yourself from the ticket or the problem part of the PR body, and strip helper names, mechanisms and the proposed fix. It sketches the smallest fix before it reads the diff; Step 5 uses that sketch.
 
 **Which finders run.** A **small PR** has 30 changed lines or fewer, and nothing in HTTP handlers, service/business logic, database schema or migrations, code embedded on third-party pages, or CI workflows. It gets one finder that holds every role that applies. Otherwise launch one finder per role that applies. A role with a trigger runs only when the trigger matches; when in doubt, run it.
 
@@ -142,7 +126,7 @@ Common finder mistakes to watch for:
 
 First, enforce scope: a finding in a file outside the `gh pr diff` changed-file set stays only when this diff causes it, such as a caller in an untouched file that the changed export now breaks. Anchor that one at the changed line and name the broken caller. Every other finding in an untouched file is out of scope by construction — don't list it, just mention the count. The exception is a real user-facing bug a reviewer would expand scope for (per the criteria "Architecture").
 
-Before listing anything, cross-check each surviving finding against the already-flagged list from Step 1.5. Same file + same line (±2) + same topic = already flagged. Tag these `[flagged]` with the Step 3 verdict: `verified fixed`, `not fixed`, `was never valid`, or `disputed`. `verified fixed` and `was never valid` (already reverted or never actioned) are closed — a record, not work. `not fixed` and `disputed` are **live**: a valid finding nobody actually fixed, or a bogus one the author churned the diff for, gets walked in Step 6. Its suggested comment is drafted as a reply in the existing thread, never a new one.
+Before listing anything, cross-check each surviving finding against the already-flagged list from Step 1.5. Same file + same line (±2) + same topic = already flagged. Tag these `[flagged]` with the Step 3 verdict: `verified fixed`, `not fixed`, `was never valid`, or `disputed`. `verified fixed` and `was never valid` (already reverted or never actioned) are closed — a record, not work. `not fixed` and `disputed` are **live**: a valid finding nobody actually fixed, or a bogus one the author churned the diff for, gets a comment in Step 6. That comment is a reply in the existing thread, never a new one.
 
 Drop theoretical findings that failed the reachability gate (Step 3.6) — don't list them as concerns; at most mention them as a count. Exception: keep genuine latent/hardening findings (a plausible near-future change would trigger them), but list them as such with severity matched to that likelihood, not as a present-day bug.
 
@@ -150,7 +134,7 @@ Findings that failed the impact gate (Step 3.9) are counts in the summary, not l
 
 Pre-existing findings (Step 3.8) are never list items either — they must not gate the merge or drive diff churn — but don't silently bury a good one. If it's genuinely worth knowing, surface it in the Step 5 summary under an explicit "pre-existing, out of scope" bucket with a one-liner each, so the author can decide whether it earns a follow-up. Telling someone is right; holding up their PR over it is not.
 
-**Every live item must carry its gate answers** (pre-existing? introduced by whom? regression? in scope?) before any description, so the walkthrough never has to reconstruct them. Apply this at list-BUILD time, not when challenged: if you find yourself defending a finding's provenance or impact mid-walkthrough, it should not have been listed.
+**Every live item must carry its gate answers** (pre-existing? introduced by whom? regression? in scope?) before any description, so a question about an item never has to reconstruct them. Apply this at list-BUILD time, not when challenged: if you find yourself defending a finding's provenance or impact when the person asks about it, it should not have been listed.
 
 Per the criteria "Don't flood the review" (under "Style"), drop cosmetic nits rather than listing them when a blocker or structural concern exists (mention a count). Drop low-confidence nits (confidence < ~0.5 and severity `nit`) entirely.
 
@@ -161,35 +145,42 @@ Number the live items, in this order: blockers, concerns, nits, then live `[flag
 - `1. [severity] file:line — short description`
 - `4. [flagged: not fixed] file:line — short description (flagged by <who>)`
 
-Keep the full record for each (what's wrong, why, the proof, the gate answers, the suggested fix) to yourself until Step 6 reaches it. Debunked findings and closed `[flagged]` items get no number: one line each under "Debunked" and "Already settled", with the evidence in a clause.
+Keep the full record for each (what's wrong, why, the proof, the gate answers, the suggested fix). Step 6 turns it into a comment, and you answer the person's questions about an item from it. Debunked findings and closed `[flagged]` items get no number: one line each under "Debunked" and "Already settled", with the evidence in a clause.
 
 ## Step 5: Summary
 
 Present a concise report:
 
-1. **What the PR aims to fix**: a one-line recap of the problem agreed in Step 0. When Step 0 was skipped, state the inferred goal in junior-friendly language and label it as inferred, so the person can correct you if you reviewed against the wrong target
+1. **What the PR aims to fix**: the problem you derived in Step 3.7, in junior-friendly language: the original problem, why it matters, and the expected behavior. State when no linked ticket is available and label inferred intent. For a feature, explain its intended outcome instead of inventing a bug. This lets the author correct you if you reviewed against the wrong target
 2. **How the PR addresses it**: the main changes and the resulting flow in plain language. Connect the implementation to the intended outcome, define unfamiliar terms, and use a small example when helpful. Distinguish verified behavior from the PR's claims
 3. **Verdict**: `ship` or `request changes`, plus a one-line reason, per the criteria "When to approve"
 4. **Architecture assessment**: 2-4 sentences on whether the overall approach is sound, separation of concerns, and any fundamental design trade-offs. When the premise finder's sketch differs from the diff in structure (a layer, mechanism, flag, piece of state or contract change the sketch does not need), and the PR body does not record that approach as tried and reverted, end with it as one question: "why X rather than Y?". At most one, with no severity; it is how a reviewer asks about the approach when nothing is broken
 5. **Stats**: X finders and Y refuters ran, Z claims investigated, W verified, N already flagged on PR (with the verdict split: verified fixed / not fixed / never valid)
 6. **Findings**: the numbered list from Step 4 (e.g. `1. [concern] orders.ts:165 — retention loop runs one query per row`), then the "Debunked" and "Already settled" lines
-   - If the PR title or body no longer matches the diff (stale scope, features described as follow-ups that now ship, abandoned approaches still listed), note it here as a one-liner — it's the author's to fix, not an item to walk
+   - If the PR title or body no longer matches the diff (stale scope, features described as follow-ups that now ship, abandoned approaches still listed), note it here as a one-liner — it's the author's to fix, not a review comment
    - **Pre-existing, out of scope**: a separate one-liner list, only for finds genuinely worth knowing (a real bug, a data-loss risk, something the diff sits right next to). Say plainly that none of it blocks this PR and offer to open follow-ups. Omit the section entirely rather than padding it — this is not a dumping ground for everything the finders turned up in untouched files
 7. **Evals** (only if the PR touches the AI/LLM interface, per Step 1.6): recommend the repo's relevant eval command, if it has one, and say whether an eval report is already on the PR. If one is, treat it as evidence and confirm the touched surface is covered; if none ran, call it out as a coverage gap. Don't auto-run evals unless asked.
-8. **Ask**: "Ready to go through the findings?"
+8. **Pending review**: the Step 6 link, the number of comments in it, any 👍 reactions it could not hold, and the next step: "Edit or delete comments on GitHub, or ask me to change them. Tell me to post when it is ready."
 
-## Step 6: Interactive Review
+## Step 6: Prepare a Pending Review
 
-Walk the numbered items in order, one per message. Debunked and already-settled items are a record; don't walk them. Live `[flagged: not fixed]` and `[flagged: disputed]` items DO get walked, and their suggested comment replies in the existing thread rather than opening a new one.
+Put the numbered items from Step 4 into one pending review on the PR, so the person reads each comment on its line in the diff. A pending review is a draft that only the person can see until it is submitted. Create it before you send the Step 5 summary, so the summary can link it. When Step 4 has no live items, create no review.
 
-For each item, present:
+1. Check for an existing pending review: `gh api repos/{owner}/{repo}/pulls/<number>/reviews --jq '.[] | select(.state=="PENDING") | {id, html_url}'`. GitHub allows one per person per PR. When one exists, stop and ask the person whether to discard it
+2. Write each comment to the point, with no essay, per the criteria "Writing up a bug". Leave the file and line out of the body, because the comment already sits on that line. Follow the person's or the repo's comment style guidance when one exists
+3. Write a JSON file in the scratchpad with `commit_id` set to `headRefOid`, no `event` field, and one `comments` entry (`path`, `line`, `side: "RIGHT"`, `body`) per new item. Run `gh api repos/{owner}/{repo}/pulls/<number>/reviews --input <file> --jq '{id, node_id, state}'` and confirm the state is `PENDING`. Without `event` the review stays pending, so never set it here. GitHub rejects the whole review when one comment is on a line outside the diff, so put such an item in the review `body` with its file and line
+4. Add each live `[flagged]` item as a reply in its existing thread, inside the pending review. Use the thread `id` from Step 1.5 and the review `node_id`: `gh api graphql -f review=<node_id> -f thread=<thread id> -f body=<text> -f query='mutation($review:ID!,$thread:ID!,$body:String!){ addPullRequestReviewThreadReply(input:{pullRequestReviewId:$review, pullRequestReviewThreadId:$thread, body:$body}){ comment{ url } } }'`. Never use the REST `replies` endpoint, because it posts the reply at once
+5. When you agree with an existing comment and a reply adds nothing new, a 👍 on it is enough. A pending review cannot hold a reaction, so list it in the summary with the comment URL instead
 
-- **What's wrong**: Clear explanation
-- **Why it matters**: What can go wrong
-- **How to fix**: Concrete code suggestion or approach
-- **Suggested PR comment**: To the point, no essay, written per the criteria "Writing up a bug", as a quote block. Say which file and line it goes on, but leave them out of the comment body: an inline comment already sits on that line. Follow the user's or repo's comment style guidance when one exists. For a live `[flagged]` item where you agree with the existing comment and a reply adds nothing new, suggest a 👍 reaction on that comment instead, with its URL
+Link the person to `https://github.com/{owner}/{repo}/pull/<number>/files`, where GitHub shows the pending comments in the diff.
 
-Then wait. "Next" means show the next item, not fix this one. If the user disagrees or wants to skip, move on. Start each message with `n/total` so the place in the list is never lost.
+**While the person reviews it**, answer questions about any item from its full record: what is wrong, why it matters and how to fix it. The person can edit the review on GitHub, so list its comments again before you change any of them: `gh api repos/{owner}/{repo}/pulls/<number>/reviews/<id>/comments`.
+
+- To change a comment, run the GraphQL `updatePullRequestReviewComment` mutation with the comment's `node_id`. The REST `PATCH` returns 404 on a pending comment
+- To delete a comment, run `gh api -X DELETE repos/{owner}/{repo}/pulls/comments/<comment id>`
+- To discard the whole review, only when the person asks, run `gh api -X DELETE repos/{owner}/{repo}/pulls/<number>/reviews/<id>`
+
+**When the person tells you to post**, submit the review as it is now: `gh api -X POST repos/{owner}/{repo}/pulls/<number>/reviews/<id>/events -f event=COMMENT`. Use `REQUEST_CHANGES` only when the person asks for it. Then add the 👍 reactions from the summary: `gh api repos/{owner}/{repo}/pulls/comments/<comment id>/reactions -f content=+1`. Report the review URL.
 
 ## Step 7: Approve on Request
 
@@ -198,10 +189,11 @@ Run this step only when the person asks you to approve the PR. Never offer it or
 1. Ask whether to approve with or without a message
 2. Without a message: run `gh pr review <number> --approve`
 3. With a message: draft a short message of one or two sentences that names something specific in the PR. Show it and wait. Revise it when the person asks. Run `gh pr review <number> --approve --body-file <file>` only after the person approves the draft
+4. When the Step 6 review is still pending, approve by submitting it instead, with `-f event=APPROVE` and, with a message, `-f body=<message>`. Tell the person first that its comments go out with the approval
 
 ## Step 8: Offer Monitoring
 
-After the last item, or when there are no live items, ask once: "Do you want me to monitor this PR and tell you when something needs your attention?" Never start monitoring without a yes.
+After the review is submitted, or when there are no live items, ask once: "Do you want me to monitor this PR and tell you when something needs your attention?" Never start monitoring without a yes.
 
 Monitoring is notify-only, the same as the review: no edits, pushes, reruns, replies or PR state changes.
 
