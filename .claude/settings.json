@@ -60,11 +60,8 @@
   },
   "enabledPlugins": {
     "slack@claude-plugins-official": false,
-    "notion@claude-plugins-official": true,
     "expo@claude-plugins-official": true,
-    "sentry@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
-    "vercel@claude-plugins-official": true
+    "figma@claude-plugins-official": true
   },
   "modelSettings": {
     "claude-fable-5-1": {
@@ -77,7 +74,7 @@
   "editorMode": "normal",
   "verbose": false,
   "preferredNotifChannel": "auto",
+  "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": false,
-  "remoteControlAtStartup": true
+  "agentPushNotifEnabled": false
 }
