@@ -5,7 +5,7 @@ description: Monitor a GitHub PR and handle CI failures and review feedback when
 
 ## Workflow and authorization
 
-An explicit `$babysit` request starts the full workflow: monitor a PR, retry likely flakes within policy, make and push validated in-scope fixes, and reply in originating inline review threads. Honor narrower instructions: a request only to watch CI or report status does not authorize fixes, pushes, reruns, or replies.
+An explicit babysit request starts the full workflow: monitor a PR, retry likely flakes within policy, make and push validated in-scope fixes, and reply in originating inline review threads. The request is the user's explicit instruction to post these replies, including evidence-backed declines, so it satisfies repository rules that keep pushback out of PR threads unless the user asks for it. Honor narrower instructions: a request only to watch CI or report status does not authorize fixes, pushes, reruns, or replies.
 
 Keep the current session as the babysitter. Use the checkout selected by the user; do not create another task, agent, session, branch, or worktree. A PR branch or detached HEAD is acceptable.
 
