@@ -24,7 +24,9 @@ Use the smallest clear fix at the existing ownership boundary. Keep names and co
 
 Validate the affected behavior and complete repository-required checks. Use the commit skill for explicit staging, dependency grouping, and Conventional Commit titles. Make independently actionable issues separate commits; comments about the same root cause can share a commit. Keep regression tests with the fix and avoid catch-all titles such as `chore: address PR review feedback`.
 
-Push the current commit explicitly to the PR head branch:
+Push once per round. Commit each fix of the round, run the checks on the result, and then push all the commits together. Do not push after each comment.
+
+Push the current commits explicitly to the PR head branch:
 
 ```bash
 git push origin HEAD:<head-branch>
