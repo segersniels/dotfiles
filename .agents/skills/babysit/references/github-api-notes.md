@@ -82,6 +82,34 @@ Use the thread ID from the watcher update or the start-up sweep. After posting, 
 returned `in_reply_to_id` equals that thread ID; only then report that the reply was posted in the
 thread.
 
+A reply in a resolved thread stays collapsed, so the reviewer does not see it. After each reply,
+find the thread's node ID and resolved state by its thread ID:
+
+```bash
+gh api graphql -f owner=<owner> -f repo=<repo> -F number=<pr_number> -f query='
+query($owner: String!, $repo: String!, $number: Int!) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $number) {
+      reviewThreads(first: 100) {
+        nodes { id isResolved isOutdated comments(first: 1) { nodes { databaseId } } }
+      }
+    }
+  }
+}' --jq '.data.repository.pullRequest.reviewThreads.nodes[]
+  | select(.comments.nodes[0].databaseId == <thread_id>) | {id, isResolved, isOutdated}'
+```
+
+If `isResolved` is true, unresolve it:
+
+```bash
+gh api graphql -f id=<thread-node-id> -f query='
+mutation($id: ID!) { unresolveReviewThread(input: { threadId: $id }) { thread { isResolved } } }'
+```
+
+Run the query again to confirm `isResolved: false`; do not trust the mutation response alone. An
+outdated thread still looks collapsed in the Files tab after it is unresolved. Report the reply's
+`html_url` and the confirmed `isResolved` state, not only that the reply was posted.
+
 After a pushed fix, include the commit SHA, what changed, and why. When no change is made, state the
 technical reason. Do not reply to status-only bot messages, summaries without requested changes,
 approvals, or self-authored follow-ups. Leave review threads open for reviewer follow-up unless the

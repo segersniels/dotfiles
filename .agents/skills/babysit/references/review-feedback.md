@@ -22,7 +22,7 @@ A touched nearby file does not make a pre-existing issue part of the PR. When ex
 
 ## Reply only in the originating inline thread
 
-Use the inline review-comment reply endpoint with the thread ID from the watcher update or the start-up sweep. Verify that the created comment's `in_reply_to_id` equals that thread ID before reporting success. See [API notes](github-api-notes.md#review-follow-up-endpoints) for the endpoint.
+Use the inline review-comment reply endpoint with the thread ID from the watcher update or the start-up sweep. Verify that the created comment's `in_reply_to_id` equals that thread ID before reporting success. If the thread was resolved, unresolve it so the reply is visible, and report the reply URL with the confirmed resolved state. See [API notes](github-api-notes.md#review-follow-up-endpoints) for the endpoint.
 
 PR issue comments, review summaries, check annotations, and findings embedded in bot summaries have no inline thread target. Report that limitation to the user; do not create top-level comments as a substitute. A failed reply endpoint also does not authorize another posting destination.
 
