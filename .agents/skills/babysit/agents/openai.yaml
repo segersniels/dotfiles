@@ -1,7 +1,0 @@
-interface:
-  display_name: "Babysit"
-  short_description: "Babysit a PR in the current session"
-  default_prompt: "Use $babysit in this session to monitor this PR, push validated in-scope fixes, retry likely flakes within policy, and reply in originating inline threads until merge, closure, or a blocker requires my help."
-
-policy:
-  allow_implicit_invocation: false
